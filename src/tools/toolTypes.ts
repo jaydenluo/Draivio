@@ -8,6 +8,7 @@ export type ToolGroupId =
   | 'text-shape'
   | 'color-fill'
   | 'navigation'
+  | 'enhance'
 
 export type ToolId =
   | 'select'
@@ -49,6 +50,8 @@ export type ToolId =
   | 'pan'
   | 'zoom'
   | 'rotate'
+  | 'cutout'
+  | 'upscale'
 
 export type ToolOptions = Record<string, unknown>
 

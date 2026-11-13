@@ -23,7 +23,7 @@ function optionValue(options: ToolOptions, key: string, fallback: string): strin
   return typeof options[key] === 'string' ? options[key] as string : fallback
 }
 
-export function ToolOptionsBar() {
+export function ToolOptionsBar({ onOpenModelManager }: { onOpenModelManager?: (kind: 'cutout' | 'upscale') => void }) {
   const { state, dispatch } = useEditor()
   const tool = getTool(state.activeToolId)
   const options = state.toolOptions
@@ -90,6 +90,9 @@ export function ToolOptionsBar() {
     controls = <span className="tool-options-status">点击添加锚点 · 拖动调整曲线 · Enter 闭合</span>
   } else if (tool?.id === 'transform') {
     controls = <span className="tool-options-status">拖动控制点变换 · Enter 确认 · Esc 取消</span>
+  } else if (tool?.id === 'cutout' || tool?.id === 'upscale') {
+    const kind = tool.id === 'cutout' ? 'cutout' : 'upscale'
+    controls = <><span className="tool-options-status">{tool.id === 'cutout' ? '选择模型后生成透明背景图' : '选择模型后放大当前图层'}</span><button type="button" onClick={() => onOpenModelManager?.(kind)}>管理模型</button></>
   }
 
   return <div className="tool-options-bar" role="toolbar" aria-label="工具选项"><strong className="tool-options-name">{tool?.label ?? '选择'}</strong><div className="tool-options-controls">{controls}</div></div>

@@ -7,6 +7,7 @@ import { TopBar } from '../components/TopBar'
 import { ToolOptionsBar } from '../components/ToolOptionsBar'
 import { useEditor } from '../state/editor'
 import { useToolShortcuts } from '../tools/useToolShortcuts'
+import { ModelManagerDialog } from '../models/ModelManagerDialog'
 
 const MIN_INSPECTOR_WIDTH = 240
 const MAX_INSPECTOR_WIDTH = 520
@@ -16,6 +17,7 @@ export function AppShell() {
   useToolShortcuts()
   const [inspectorWidth, setInspectorWidth] = useState(320)
   const [resizing, setResizing] = useState(false)
+  const [modelKind, setModelKind] = useState<'cutout' | 'upscale' | null>(null)
 
   useEffect(() => {
     if (!resizing) return
@@ -43,5 +45,5 @@ export function AppShell() {
   }, [])
 
   const style = { '--inspector-width': `${inspectorWidth}px` } as CSSProperties
-  return <div className={`app-shell ${resizing ? 'is-resizing' : ''} ${state.historyCollapsed ? 'history-collapsed' : ''}`} style={style}><TopBar /><div className="workspace"><ToolRail /><div className="canvas-workspace"><ToolOptionsBar /><CanvasViewport /></div><Inspector inspectorWidth={inspectorWidth} onResizeStart={() => setResizing(true)} onResizeBy={(delta) => setInspectorWidth((value) => Math.min(MAX_INSPECTOR_WIDTH, Math.max(MIN_INSPECTOR_WIDTH, value + delta)))} /></div><HistoryStrip /></div>
+  return <div className={`app-shell ${resizing ? 'is-resizing' : ''} ${state.historyCollapsed ? 'history-collapsed' : ''}`} style={style}><TopBar /><div className="workspace"><ToolRail /><div className="canvas-workspace"><ToolOptionsBar onOpenModelManager={setModelKind} /><CanvasViewport /></div><Inspector inspectorWidth={inspectorWidth} onResizeStart={() => setResizing(true)} onResizeBy={(delta) => setInspectorWidth((value) => Math.min(MAX_INSPECTOR_WIDTH, Math.max(MIN_INSPECTOR_WIDTH, value + delta)))} /></div><HistoryStrip /><ModelManagerDialog open={modelKind !== null} initialKind={modelKind ?? 'cutout'} onClose={() => setModelKind(null)} /></div>
 }
