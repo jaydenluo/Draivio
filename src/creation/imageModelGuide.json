@@ -1,0 +1,103 @@
+{
+  "updatedAt": "2026-11-13",
+  "intro": "按创作任务选择模型，而不是只看 Pro、Fast 或一个总排名。以下是可通过 API 评估的代表性模型与产品线，适用建议不是统一基准测试结果。",
+  "availability": "指南不代表这些模型已接入。当前 Image Pro / Image Fast / Image Detail 是演示名称；实际可用模型、费用和参数以所选平台配置及官方文档为准。",
+  "strength": {
+    "title": "强度不是所有模型的通用参数",
+    "summary": "在一些扩散式图生图流程中，重绘强度（strength / denoising strength）控制重建原图的程度。通常较低时更保留原图，较高时变化更大；具体方向、范围和默认值必须看对应接口。",
+    "example": "想保留主体、只调整材质时，可以从较小变化开始；想重新设计构图时，才考虑更大变化。高强度不代表高画质，48% 也不表示修改 48% 的像素。",
+    "difference": "CFG / guidance scale 主要影响提示词引导，不是重绘强度；参考图权重、输入保真度、输出质量也不是同一个参数。不同模型中相同数值不能直接比较。",
+    "support": "现代图片接口可能只提供提示词与参考图，或使用各自的保真度、质量设置，不能假定存在统一的 strength。只有具体模型和接口明确支持时，才应该显示并传入这个参数。",
+    "demo": "当前界面的「强度 48%」是演示参数，尚未映射到真实模型接口，不代表已生效。"
+  },
+  "models": [
+    {
+      "id": "seedream", "name": "Seedream 5.5 / 5.0", "platform": "字节跳动 · 火山方舟", "verified": true,
+      "focus": "多图编辑、透明素材与图层工作流",
+      "features": "官方 API 区分文生图、单图与多图编辑；5.5 支持原生 RGBA、图层拆分及富文本 OCR，5.0 pro / flash 也有图层拆分和交互编辑能力。",
+      "bestFor": "需要结合多张参考图、提取独立素材或继续进行图层编辑的任务。",
+      "limits": "同一系列版本差异很大：5.5 与 5.0 pro / flash 的常规生成以单图为主，组图功能需查看 5.0 lite / 4.5 / 4.0 等具体版本。透明图、拆层不等于任意图片都能无损拆解。",
+      "strength": "不能把通用强度滑杆直接映射到此系列；需核对具体版本的参数表。",
+      "sources": [{"title":"火山方舟图片生成 API","url":"https://docs.volcengine.com/docs/ark/image-generation-api?lang=zh"}]
+    },
+    {
+      "id": "qwen", "name": "Qwen-Image 2.0 / 2.0 Pro", "platform": "阿里云 · 百炼 Model Studio", "verified": true,
+      "focus": "文字渲染、写实纹理与指令理解",
+      "features": "官方将 Pro 系列定位于更强的文字渲染、写实纹理和语义遵循，2.0 系列强调质量与响应速度的平衡；提供生成和编辑能力，编辑需查看对应文档。",
+      "bestFor": "含文字的图片、海报与希望兼顾生成质量和响应速度的任务。中文、数字和长文仍应逐字检查。",
+      "limits": "所核查的生成接口 n 为 1–6；尺寸受总像素限制，地区可用版本不同。不能把“支持中文提示词”当成中文字形永远准确。",
+      "strength": "本次核查的生成参数包含尺寸、数量和提示词扩写等，不能据此宣称支持通用编辑强度。",
+      "sources": [{"title":"Qwen-Image 生成 API","url":"https://www.alibabacloud.com/help/en/model-studio/qwen-image-api"}]
+    },
+    {
+      "id": "flux", "name": "FLUX.2 系列", "platform": "Black Forest Labs · BFL API", "verified": true,
+      "focus": "参考图编辑与写实合成",
+      "features": "官方编辑文档支持自然语言修改与多参考图；区分 max 的精细编辑、pro 的规模化生产、flex 的细节控制和 klein 的高吞吐编辑定位。",
+      "bestFor": "商品换背景、材质替换、结合多张参考图进行写实编辑。",
+      "limits": "官方页面区分 API 最多 8 张参考图与 Playground 最多 10 张，不能混用。接口采用异步提交与轮询；preview 与固定快照的可复现性要求也不同。",
+      "strength": "自然语言编辑不意味着提供传统重绘强度；按具体端点确认可调字段。",
+      "sources": [{"title":"FLUX.2 图片编辑","url":"https://docs.bfl.ai/flux_2/flux2_image_editing"},{"title":"BFL API 生成流程与端点","url":"https://docs.bfl.ai/quick_start/generating_images"}]
+    },
+    {
+      "id": "recraft", "name": "Recraft V4.1 / V4 / V3", "platform": "Recraft API", "verified": true,
+      "focus": "矢量图、品牌插画与设计素材",
+      "features": "官方 REST API 同时提供栅格与矢量图。V4.1 面向写实和插画，V4 Styles 提供参考图风格匹配；文档仍将 V3 单独列为拥有文字排版及编辑工具的选择。",
+      "bestFor": "需要 SVG 的图标与插画，以及希望保持视觉风格一致的设计素材。",
+      "limits": "并非所有版本都支持同样的编辑工具或矢量输出。SVG 是矢量文件，PNG 透明图和 SVG 不是同一回事；排版编辑还要核对版本。",
+      "strength": "图生图、remix 和风格工具的参数要分别查看；不要给所有 Recraft 模型共用一个强度数值。",
+      "sources": [{"title":"Recraft API 与模型定位","url":"https://www.recraft.ai/docs/api-reference/introduction"}]
+    },
+    {
+      "id": "stability", "name": "Stable Diffusion 3.5 / Stability 图片工具", "platform": "Stability AI API / 自部署", "verified": true,
+      "focus": "多种画风、可定制流程与专用编辑",
+      "features": "官方介绍 SD 3.5 的摄影、绘画、线稿等多风格生成，并提供 Large、Turbo、Medium 等定位；平台同时提供独立的图片编辑服务。",
+      "bestFor": "需要选择部署方式，或将生成、修补、背景处理等工具组成工作流的任务。",
+      "limits": "开放权重的部署能力不等于官方托管 API 暴露全部参数。此次已核查产品介绍，API 参数参考页访问受限，具体端点能力仍需复核。",
+      "strength": "一些扩散式图生图实现使用重绘强度，但不能因此推断 SD 3.5 的所有托管接口都接受 strength。",
+      "sources": [{"title":"Stability 图片模型与部署方式","url":"https://stability.ai/stable-image"}]
+    },
+    {
+      "id":"openai", "name":"OpenAI GPT Image 系列", "platform":"OpenAI API", "verified":false,
+      "focus":"复杂指令、图中文字与图片编辑的评测候选",
+      "features":"建议用自己的海报、改图和主体保留样例评估。此次官方文档返回访问错误，未确认当前最新型号及字段，不在这里给出版本排名或参数保证。",
+      "bestFor":"作为复杂指令与图像编辑的候选进行同题比较。",
+      "limits":"当前可用版本、质量档位、尺寸、输入保真度、蒙版及计费需以官方页面和账户权限重新确认。",
+      "strength":"不应凭通用百分比推定支持；保真度与重绘强度需要区分。",
+      "sources":[{"title":"OpenAI 官方图片生成指南（本次未读通）","url":"https://developers.openai.com/api/docs/guides/image-generation"}]
+    },
+    {
+      "id":"google", "name":"Gemini Image / Imagen", "platform":"Google Gemini API / Vertex AI", "verified":false,
+      "focus":"对话式改图与专门生图的评测候选",
+      "features":"应分别评估 Gemini 图片能力与 Imagen 专门生图能力，不把两条产品线当成同一接口。此次 Google 文档连接失败，当前型号与字段待复核。",
+      "bestFor":"比较自然语言持续修改与纯图片生成两类任务。",
+      "limits":"参考图、编辑、尺寸、地区和安全策略依具体产品与模型版本而变，本指南不保证每个型号都能局部编辑。",
+      "strength":"未核实通用强度支持；不能把分辨率或参考图设置叫作强度。",
+      "sources":[{"title":"Gemini 官方图片生成指南（本次未读通）","url":"https://ai.google.dev/gemini-api/docs/image-generation"},{"title":"Imagen 官方指南（本次未读通）","url":"https://ai.google.dev/gemini-api/docs/imagen"}]
+    },
+    {
+      "id":"ideogram", "name":"Ideogram 系列", "platform":"Ideogram API", "verified":false,
+      "focus":"文字海报与设计排版的评测候选",
+      "features":"可以纳入含文字海报的实测清单；此次官方 API 页面连接失败，因此不宣称某个当前版本的文字准确率、领先程度或可用接口。",
+      "bestFor":"与其他模型对比品牌文字、字体表现和海报构图。",
+      "limits":"具体版本、语言表现、编辑端点、速度档位及价格需复核。不能把视觉上像文字当成文字内容正确。",
+      "strength":"是否提供图生图权重或其他控制参数，需要按端点核实。",
+      "sources":[{"title":"Ideogram 官方 API（本次未读通）","url":"https://developer.ideogram.ai/api-reference/api-reference/generate-v3"}]
+    }
+  ],
+  "parameters": [
+    {"name":"提示词与参考图","meaning":"提示词表达想做什么，参考图提供主体、风格或布局线索。不同接口对参考图的用途与数量定义不同。"},
+    {"name":"选区与蒙版","meaning":"指定希望处理的区域，不是强度。模型可能连带改变区域外的内容；严格保留区域外像素需要应用在返回结果后按蒙版合成。"},
+    {"name":"比例、分辨率与 Auto","meaning":"比例决定画面形状，分辨率决定像素尺寸。Auto 是自动选择意图，平台适配后才会变成合法请求；不是每个接口都接受字面值 auto 或任意尺寸。"},
+    {"name":"数量与批量请求","meaning":"界面选择 8 张是期望的结果总数，不保证模型单次请求支持 8 张。平台可能需要拆分请求，费用、限流和部分失败也按实际调用处理。"},
+    {"name":"质量、速度与费用","meaning":"更高质量或更大分辨率可能增加耗时与费用，但不保证更符合意图。价格、地区、限额经常变化，应查看所选平台的实时说明，不把固定示例积分视为报价。"},
+    {"name":"Seed 与可复现性","meaning":"随机种子只在支持的接口内有意义；相同种子跨模型、版本或平台不保证同图。模型快照、提示词、输入图与其他参数也应保存。"}
+  ],
+  "tips": [
+    "修改现有图片时明确哪些内容必须保留，例如“只替换天空，人物、字体和构图保持不变”；需要严格保留的区域还应通过蒙版合成约束。",
+    "生成新内容时明确主体、背景和用途；需要独立素材时说明透明背景，但只有支持透明输出的接口才能可靠返回透明通道。",
+    "使用相同提示词和参考图比较模型，逐项检查主体保留、文字正确性、构图、耗时与真实费用，不依赖一个万能排行榜。",
+    "中文、数字、小字和品牌标识都要人工核对；照片级写实不代表文字排版也准确。",
+    "选择平台再选择模型。第三方平台可能改写参数、限制尺寸或使用不同版本，同名模型也要核对实际模型 ID、地区与能力。",
+    "上传参考图前确认你愿意把图片发送到所选平台，并查看该平台的数据保留与使用规则。"
+  ]
+}

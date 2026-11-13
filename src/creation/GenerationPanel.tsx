@@ -1,0 +1,16 @@
+import { useEditor } from '../state/editor'
+import { useState } from 'react'
+import { ModelSourcePicker } from './ModelSourcePicker'
+import { getModelsForSource, getSourceById } from './modelSources'
+
+export function GenerationPanel() {
+  const { state, dispatch } = useEditor()
+  const [operation, setOperation] = useState('文生图')
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const generate = () => { dispatch({ type: 'set-generating', value: true }); window.setTimeout(() => { dispatch({ type: 'append-history', item: { id: `generated-${Date.now()}`, label: '文生图 · 新结果', tone: 'mint' } }); dispatch({ type: 'set-generating', value: false }) }, 900) }
+  const source = getSourceById(state.composerSourceId)
+  const modelCode = getModelsForSource(state.composerSourceId).find((model) => model.displayName === state.composerParameters.model)?.code ?? getModelsForSource(state.composerSourceId)[0]?.code ?? ''
+  return <div className="inspector-panel"><div className="panel-heading"><h2>生成图片</h2><small>{source?.providerName ?? '服务来源'} · {state.composerParameters.model}</small></div><div className="operation-row">{['文生图', '草图', '图生图'].map((item) => <button key={item} className={`operation ${operation === item ? 'active' : ''}`} onClick={() => setOperation(item)}>{item}</button>)}</div><label htmlFor="prompt">描述你想要的画面</label><textarea id="prompt" value={state.prompt} onChange={(event) => dispatch({ type: 'set-prompt', prompt: event.target.value })} /><ModelSourcePicker sourceId={state.composerSourceId} modelCode={modelCode} onSourceChange={(sourceId, nextModelCode) => { dispatch({ type: 'set-composer-source', sourceId }); dispatch({ type: 'set-composer-parameter', parameter: 'model', value: getModelsForSource(sourceId).find((model) => model.code === nextModelCode)?.displayName ?? '' }) }} onModelChange={(nextModelCode) => dispatch({ type: 'set-composer-parameter', parameter: 'model', value: getModelsForSource(state.composerSourceId).find((model) => model.code === nextModelCode)?.displayName ?? state.composerParameters.model })} /><div className="field-grid"><Field label="尺寸"><select defaultValue="1024 × 1024"><option>1024 × 1024</option><option>1536 × 1024</option></select></Field><Field label="数量"><select defaultValue="4 张"><option>4 张</option><option>2 张</option></select></Field></div><div className="field-grid"><Field label="风格"><select defaultValue="自动"><option>自动</option><option>摄影</option><option>插画</option></select></Field><div /></div>{advancedOpen ? <div className="advanced-settings"><label htmlFor="seed">随机种子</label><input id="seed" defaultValue="自动" /><label htmlFor="steps">细节强度</label><input id="steps" type="range" min="1" max="10" defaultValue="6" /></div> : null}<div className="cost-row"><span>{source?.billingMode === 'credits' ? '预计消耗' : '费用说明'}</span><b>{source?.billingMode === 'credits' ? '12 积分' : source?.billingLabel}</b></div><button className="primary-button" onClick={generate} disabled={state.isGenerating}>{state.isGenerating ? '生成中…' : '生成图片'}</button><button className="secondary-button" onClick={() => setAdvancedOpen((open) => !open)}>更多设置　{advancedOpen ? '⌃' : '⌄'}</button></div>
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div><label>{label}</label>{children}</div> }

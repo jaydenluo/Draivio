@@ -1,0 +1,5 @@
+import { LayersPanel } from '../layers/LayersPanel'
+import { useEditor } from '../state/editor'
+import { AIComposer } from '../creation/AIComposer'
+
+export function Inspector({ inspectorWidth, onResizeStart, onResizeBy }: { inspectorWidth: number; onResizeStart: () => void; onResizeBy: (delta: number) => void }) { const { state } = useEditor(); return <aside className="inspector" aria-label="操作面板"><div className="resize-handle" role="separator" aria-label="调整画布和操作面板宽度" aria-orientation="vertical" aria-valuemin={240} aria-valuemax={520} aria-valuenow={inspectorWidth} tabIndex={0} onPointerDown={(event) => { event.preventDefault(); onResizeStart() }} onKeyDown={(event) => { if (event.key === 'ArrowLeft') onResizeBy(16); if (event.key === 'ArrowRight') onResizeBy(-16) }} /><div className="inspector-context"><span>当前上下文</span><strong>{state.selectionVisible ? '局部选区' : '当前画布'}</strong><small>{state.composerPlacement === 'right' ? 'AI 对话框已停靠在此' : 'AI 对话框悬浮在画布底部'}</small></div>{state.composerPlacement === 'right' ? <AIComposer /> : null}<LayersPanel /></aside> }

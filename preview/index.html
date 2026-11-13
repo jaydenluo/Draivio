@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draivio — 画布预览</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink-950: #0d1013;
+      --ink-900: #15181c;
+      --ink-850: #1c2127;
+      --ink-800: #252c33;
+      --ink-700: #303841;
+      --paper: #f4f1eb;
+      --text: #f2efe8;
+      --muted: #9ca6af;
+      --faint: #69737d;
+      --coral: #ff765f;
+      --coral-light: #ff907d;
+      --sky: #77c7ff;
+      --mint: #80d6a5;
+      --amber: #f0c36a;
+      --red: #f27c7c;
+      --font: "Noto Sans SC", "PingFang SC", Inter, system-ui, sans-serif;
+      --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 1020px;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--ink-950);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 13px;
+    }
+    button, input, textarea { font: inherit; }
+    button { color: inherit; border: 0; cursor: pointer; }
+
+    .app { height: 100vh; display: grid; grid-template-rows: 52px minmax(0, 1fr) 128px; }
+    .topbar {
+      display: flex; align-items: center; gap: 18px; padding: 0 18px;
+      background: var(--ink-900); border-bottom: 1px solid var(--ink-700);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; min-width: 205px; }
+    .brand-mark { width: 22px; height: 22px; position: relative; }
+    .brand-mark::before, .brand-mark::after { content: ""; position: absolute; border: 2px solid var(--coral); border-radius: 50%; transform: rotate(-22deg); }
+    .brand-mark::before { inset: 2px 5px 2px 4px; }
+    .brand-mark::after { inset: 5px 2px 4px 7px; opacity: .55; }
+    .brand-name { font-weight: 700; letter-spacing: -.03em; font-size: 15px; }
+    .project { display: flex; align-items: center; gap: 9px; color: var(--muted); }
+    .project strong { color: var(--text); font-weight: 500; }
+    .unsaved { width: 6px; height: 6px; border-radius: 50%; background: var(--coral); }
+    .top-actions { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+    .icon-btn, .top-btn { height: 32px; padding: 0 9px; background: transparent; color: var(--muted); border-radius: 7px; }
+    .icon-btn { width: 32px; padding: 0; font-size: 17px; }
+    .icon-btn:hover, .top-btn:hover { background: var(--ink-800); color: var(--text); }
+    .balance { display: flex; gap: 7px; align-items: center; padding: 0 11px; height: 30px; border: 1px solid var(--ink-700); border-radius: 7px; color: var(--muted); }
+    .balance b { color: var(--amber); font-family: var(--mono); font-size: 11px; font-weight: 500; }
+    .avatar { width: 27px; height: 27px; border-radius: 50%; background: #5e7686; display: grid; place-items: center; color: #e8f1f5; font-size: 11px; }
+
+    .workspace { display: grid; grid-template-columns: 64px minmax(0, 1fr) 320px; min-height: 0; }
+    .toolbar { background: var(--ink-900); border-right: 1px solid var(--ink-700); padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .tool { width: 46px; height: 44px; border-radius: 8px; background: transparent; color: var(--muted); display: grid; place-items: center; gap: 1px; font-size: 18px; position: relative; }
+    .tool span { display: block; font-size: 10px; line-height: 12px; }
+    .tool:hover { background: var(--ink-800); color: var(--text); }
+    .tool.active { background: rgba(255, 118, 95, .12); color: var(--coral); }
+    .tool.active::before { content: ""; position: absolute; left: -8px; width: 2px; height: 21px; background: var(--coral); border-radius: 3px; }
+    .tool-divider { width: 34px; height: 1px; background: var(--ink-700); margin: 3px 0; }
+
+    .canvas-area { position: relative; min-width: 0; background: var(--ink-950); display: grid; place-items: center; overflow: hidden; }
+    .canvas-grid { position: absolute; inset: 0; opacity: .22; background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px); background-size: 32px 32px; mask-image: radial-gradient(ellipse at center, black, transparent 78%); }
+    .artboard { position: relative; width: min(63%, 560px); aspect-ratio: 4 / 5; background: var(--paper); box-shadow: 0 22px 55px rgba(0,0,0,.42); overflow: hidden; }
+    .artboard svg { display: block; width: 100%; height: 100%; }
+    .selection { position: absolute; left: 27%; top: 26%; width: 46%; height: 40%; border: 1px dashed var(--sky); box-shadow: 0 0 0 999px rgba(119,199,255,.045); pointer-events: none; }
+    .selection::before { content: "局部选区"; position: absolute; top: -23px; left: -1px; padding: 3px 6px; background: var(--sky); color: #0d1013; font-size: 10px; border-radius: 4px 4px 0 0; }
+    .zoom { position: absolute; right: 16px; bottom: 14px; display: flex; gap: 4px; align-items: center; color: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .zoom button { width: 26px; height: 26px; border-radius: 6px; background: var(--ink-800); color: var(--muted); }
+    .zoom button:hover { color: var(--text); }
+    .canvas-hint { position: absolute; left: 18px; bottom: 14px; color: var(--faint); font-family: var(--mono); font-size: 10px; }
+
+    .inspector { background: var(--ink-900); border-left: 1px solid var(--ink-700); display: flex; flex-direction: column; min-height: 0; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--ink-700); }
+    .tab { height: 46px; background: transparent; color: var(--muted); position: relative; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--text); }
+    .tab.active::after { content: ""; height: 2px; background: var(--coral); position: absolute; bottom: -1px; left: 17px; right: 17px; border-radius: 4px; }
+    .panel { padding: 18px 16px; overflow: auto; }
+    .panel-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .panel-title h2 { margin: 0; font-size: 14px; font-weight: 600; }
+    .panel-title small { color: var(--faint); font-family: var(--mono); font-size: 10px; }
+    .operation-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
+    .operation { padding: 9px 4px; border: 1px solid var(--ink-700); border-radius: 7px; background: transparent; color: var(--muted); font-size: 11px; }
+    .operation:hover, .operation.active { border-color: var(--coral); color: var(--text); background: rgba(255,118,95,.08); }
+    label { display: block; color: var(--muted); font-size: 11px; margin: 13px 0 6px; }
+    textarea, select, input { width: 100%; color: var(--text); background: var(--ink-850); border: 1px solid var(--ink-700); border-radius: 8px; outline: none; }
+    textarea { min-height: 102px; resize: vertical; padding: 11px; line-height: 1.6; }
+    textarea:focus, select:focus, input:focus { border-color: var(--sky); box-shadow: 0 0 0 2px rgba(119,199,255,.12); }
+    select, input { height: 34px; padding: 0 10px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .range-row { display: flex; align-items: center; gap: 9px; }
+    input[type="range"] { height: 4px; accent-color: var(--coral); padding: 0; }
+    .mono { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .cost { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; margin-top: 13px; border-top: 1px solid var(--ink-700); color: var(--muted); }
+    .cost b { color: var(--amber); font-family: var(--mono); font-size: 11px; font-weight: 500; }
+    .primary { width: 100%; height: 38px; background: var(--coral); color: #171313; border-radius: 8px; font-weight: 600; }
+    .primary:hover { background: var(--coral-light); transform: translateY(-1px); }
+    .secondary { width: 100%; height: 34px; background: var(--ink-800); color: var(--muted); border-radius: 8px; margin-top: 8px; }
+    .secondary:hover { color: var(--text); }
+    .layers { display: grid; gap: 7px; }
+    .layer { height: 46px; padding: 7px 9px; border: 1px solid var(--ink-700); border-radius: 8px; display: flex; align-items: center; gap: 8px; color: var(--muted); }
+    .layer.active { border-color: var(--sky); color: var(--text); background: rgba(119,199,255,.06); }
+    .layer-thumb { width: 32px; height: 32px; border-radius: 5px; background: linear-gradient(140deg,#f5c07a,#d86a6a 55%,#2e6673); }
+    .layer-thumb.mask { background: repeating-linear-gradient(135deg, #3b464d 0 4px, #89949b 4px 8px); }
+    .layer-name { flex: 1; font-size: 11px; }
+    .layer-eye { color: var(--faint); }
+
+    .history { display: flex; flex-direction: column; background: var(--ink-900); border-top: 1px solid var(--ink-700); min-width: 0; }
+    .history-head { height: 35px; display: flex; align-items: center; gap: 17px; padding: 0 18px; color: var(--muted); }
+    .history-head button { background: transparent; color: var(--muted); font-size: 11px; height: 35px; position: relative; }
+    .history-head button.active { color: var(--text); }
+    .history-head button.active::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--coral); }
+    .history-list { display: flex; gap: 10px; padding: 7px 18px 11px; overflow: hidden; }
+    .history-item { flex: 0 0 82px; height: 72px; border: 1px solid var(--ink-700); border-radius: 7px; overflow: hidden; background: var(--ink-850); position: relative; cursor: pointer; }
+    .history-item:hover, .history-item.active { border-color: var(--coral); }
+    .history-image { height: 49px; background: linear-gradient(140deg,#f4ca8b 0%,#d76a68 44%,#365d6a 80%); }
+    .history-image.alt1 { background: linear-gradient(140deg,#7dc9db,#eec48a 48%,#a35d72); }
+    .history-image.alt2 { background: linear-gradient(140deg,#ef8e73,#8b5f91 48%,#2d546c); }
+    .history-image.up { background: linear-gradient(140deg,#f7d59f,#df7c73 48%,#496f7a); filter: saturate(1.2); }
+    .history-label { padding: 4px 6px; color: var(--muted); font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-add { display: grid; place-items: center; color: var(--faint); font-size: 20px; }
+
+    .toast { position: fixed; right: 28px; top: 68px; padding: 10px 13px; background: var(--ink-800); border: 1px solid var(--ink-700); border-radius: 8px; color: var(--text); box-shadow: 0 12px 32px rgba(0,0,0,.24); opacity: 0; transform: translateY(-6px); pointer-events: none; transition: .18s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 1180px) { .workspace { grid-template-columns: 56px minmax(0, 1fr) 280px; } .tool { width: 40px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark"></div><div class="brand-name">Draivio</div></div>
+      <div class="project"><span>春日海报</span><span class="unsaved" title="有未保存修改"></span><strong>未保存</strong></div>
+      <div class="top-actions">
+        <button class="icon-btn" title="撤销">↶</button><button class="icon-btn" title="重做">↷</button>
+        <div class="balance">云端 <b>1,280 积分</b></div>
+        <button class="top-btn" id="exportBtn">导出</button><div class="avatar">SZ</div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <aside class="toolbar">
+        <button class="tool active" data-tool="select" title="选择 (V)">⌁<span>选择</span></button>
+        <button class="tool" data-tool="move" title="移动 (H)">✥<span>移动</span></button>
+        <button class="tool" data-tool="brush" title="画笔 (B)">✎<span>画笔</span></button>
+        <button class="tool" data-tool="eraser" title="橡皮擦 (E)">◌<span>橡皮</span></button>
+        <div class="tool-divider"></div>
+        <button class="tool" data-tool="selection" title="选区">▧<span>选区</span></button>
+        <button class="tool" data-tool="mask" title="蒙版">◩<span>蒙版</span></button>
+        <button class="tool" data-tool="crop" title="裁剪">⌗<span>裁剪</span></button>
+        <button class="tool" data-tool="text" title="文字">T<span>文字</span></button>
+        <div class="tool-divider"></div>
+        <button class="tool" data-tool="picker" title="取色器">◉<span>取色</span></button>
+        <button class="tool" data-tool="pan" title="平移">✋<span>平移</span></button>
+      </aside>
+
+      <section class="canvas-area">
+        <div class="canvas-grid"></div>
+        <div class="artboard" id="artboard">
+          <svg viewBox="0 0 500 625" xmlns="http://www.w3.org/2000/svg" aria-label="春日海报示例画布">
+            <defs>
+              <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#f4c47d"/><stop offset=".5" stop-color="#dd806d"/><stop offset="1" stop-color="#52717a"/></linearGradient>
+              <linearGradient id="hill" x1="0" x2="1"><stop stop-color="#335b65"/><stop offset="1" stop-color="#1f394d"/></linearGradient>
+              <filter id="blur"><feGaussianBlur stdDeviation="18"/></filter>
+            </defs>
+            <rect width="500" height="625" fill="url(#sky)"/>
+            <circle cx="372" cy="142" r="82" fill="#ffe5af" opacity=".72" filter="url(#blur)"/>
+            <circle cx="372" cy="142" r="42" fill="#ffe8b0" opacity=".9"/>
+            <path d="M0 414 Q110 330 218 409 T500 370 V625 H0Z" fill="url(#hill)"/>
+            <path d="M0 474 Q125 418 246 477 T500 448 V625 H0Z" fill="#1e3544" opacity=".84"/>
+            <path d="M74 625 L96 300 L116 300 L145 625Z" fill="#172832"/>
+            <path d="M105 350 L46 420 M109 380 L178 435 M100 332 L68 370 M118 354 L158 380" stroke="#172832" stroke-width="13" stroke-linecap="round"/>
+            <path d="M305 625 L320 372 L337 372 L360 625Z" fill="#172832"/>
+            <path d="M327 415 L286 464 M332 440 L382 470 M326 398 L303 430 M340 420 L372 443" stroke="#172832" stroke-width="11" stroke-linecap="round"/>
+            <text x="35" y="68" fill="#fff5df" font-size="15" letter-spacing="5" font-family="sans-serif">SPRING / 04</text>
+            <text x="34" y="550" fill="#fff5df" font-size="39" font-weight="700" font-family="sans-serif">慢一点，</text>
+            <text x="34" y="592" fill="#fff5df" font-size="39" font-weight="700" font-family="sans-serif">去看晚霞。</text>
+            <path d="M36 610 C80 604 109 615 155 607" stroke="#ff765f" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+          <div class="selection" id="selection"></div>
+        </div>
+        <div class="canvas-hint">B 画笔　G 生成　E 编辑</div>
+        <div class="zoom"><button>−</button><span>100%</span><button>＋</button><button>适应</button></div>
+      </section>
+
+      <aside class="inspector">
+        <nav class="tabs">
+          <button class="tab active" data-tab="generate">生成</button>
+          <button class="tab" data-tab="edit">编辑</button>
+          <button class="tab" data-tab="layers">图层</button>
+        </nav>
+        <div class="panel" id="generatePanel">
+          <div class="panel-title"><h2>生成图片</h2><small>云端 · Image Pro</small></div>
+          <div class="operation-row"><button class="operation active">文生图</button><button class="operation">草图</button><button class="operation">图生图</button></div>
+          <label for="prompt">描述你想要的画面</label>
+          <textarea id="prompt">一张春日黄昏海报，暖色天空，远山和树影，安静、留白、杂志感</textarea>
+          <div class="field-row"><div><label>模型</label><select><option>Image Pro</option><option>Image Fast</option></select></div><div><label>尺寸</label><select><option>1024 × 1024</option><option>1536 × 1024</option></select></div></div>
+          <div class="field-row"><div><label>数量</label><select><option>4 张</option><option>2 张</option></select></div><div><label>风格</label><select><option>自动</option><option>摄影</option><option>插画</option></select></div></div>
+          <div class="cost"><span>预计消耗</span><b>12 积分</b></div>
+          <button class="primary" id="generateBtn">生成图片</button>
+          <button class="secondary" id="moreBtn">更多设置　⌄</button>
+        </div>
+        <div class="panel" id="editPanel" hidden>
+          <div class="panel-title"><h2>局部重绘</h2><small>已选择区域</small></div>
+          <label for="editPrompt">描述修改内容</label>
+          <textarea id="editPrompt">把天空改成更深的蓝紫色，保留人物和建筑轮廓</textarea>
+          <label>变化强度</label><div class="range-row"><input type="range" min="0" max="100" value="48"><span class="mono">48%</span></div>
+          <div class="field-row"><div><label>生成数量</label><select><option>4 张</option><option>2 张</option></select></div><div><label>保留构图</label><select><option>开启</option><option>关闭</option></select></div></div>
+          <div class="cost"><span>预计消耗</span><b>12 积分</b></div>
+          <button class="primary" id="editBtn">生成局部</button>
+        </div>
+        <div class="panel" id="layersPanel" hidden>
+          <div class="panel-title"><h2>图层</h2><button class="icon-btn" title="新建图层">＋</button></div>
+          <div class="layers"><div class="layer active"><div class="layer-thumb"></div><div class="layer-name">春日海报 · 变体 1</div><div class="layer-eye">◉</div></div><div class="layer"><div class="layer-thumb mask"></div><div class="layer-name">局部蒙版</div><div class="layer-eye">◉</div></div><div class="layer"><div class="layer-thumb" style="background:linear-gradient(140deg,#f4c47d,#dd806d)"></div><div class="layer-name">原图</div><div class="layer-eye">◉</div></div></div>
+          <div class="field-row" style="margin-top:16px"><div><label>不透明度</label><input value="100%"></div><div><label>混合模式</label><select><option>正常</option><option>正片叠底</option></select></div></div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="history">
+      <div class="history-head"><button class="active">操作历史</button><button>生成结果</button><button>多结果对比</button><button id="clearHistory">清空</button></div>
+      <div class="history-list">
+        <div class="history-item active"><div class="history-image"></div><div class="history-label">原图 · 现在</div></div>
+        <div class="history-item"><div class="history-image alt1"></div><div class="history-label">文生图 · 1</div></div>
+        <div class="history-item"><div class="history-image alt2"></div><div class="history-label">文生图 · 2</div></div>
+        <div class="history-item"><div class="history-image up"></div><div class="history-label">放大 · 1</div></div>
+        <div class="history-item history-add" title="导入图片">＋</div>
+      </div>
+    </footer>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+    const toast = (message) => { const el = $('#toast'); el.textContent = message; el.classList.add('show'); clearTimeout(window.__toast); window.__toast = setTimeout(() => el.classList.remove('show'), 2200); };
+
+    $$('.tool').forEach((button) => button.addEventListener('click', () => {
+      $$('.tool').forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      const tool = button.dataset.tool;
+      $('#selection').style.display = ['selection', 'mask'].includes(tool) ? 'block' : 'none';
+      toast(`${button.textContent.trim()} 工具已选择`);
+    }));
+
+    const panels = { generate: $('#generatePanel'), edit: $('#editPanel'), layers: $('#layersPanel') };
+    $$('.tab').forEach((tab) => tab.addEventListener('click', () => {
+      $$('.tab').forEach((item) => item.classList.remove('active'));
+      tab.classList.add('active');
+      Object.values(panels).forEach((panel) => panel.hidden = true);
+      panels[tab.dataset.tab].hidden = false;
+    }));
+
+    $$('.operation').forEach((button) => button.addEventListener('click', () => {
+      $$('.operation').forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      toast(`已切换到${button.textContent.trim()}`);
+    }));
+
+    $('#generateBtn').addEventListener('click', () => {
+      const button = $('#generateBtn'); button.textContent = '生成中…'; button.disabled = true;
+      toast('正在生成 4 张预览…');
+      setTimeout(() => { button.textContent = '生成图片'; button.disabled = false; toast('生成完成，结果已加入历史'); }, 1500);
+    });
+    $('#editBtn').addEventListener('click', () => { toast('正在生成局部预览…'); setTimeout(() => toast('局部结果已准备好'), 1300); });
+    $('#exportBtn').addEventListener('click', () => toast('已打开导出设置'));
+    $('#moreBtn').addEventListener('click', () => toast('更多设置将在这里展开'));
+    $('#clearHistory').addEventListener('click', () => toast('预览模式：历史记录不会真的删除'));
+    $$('.history-item').forEach((item) => item.addEventListener('click', () => { $$('.history-item').forEach((x) => x.classList.remove('active')); item.classList.add('active'); toast('已预览这次操作的结果'); }));
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+import { useEditor } from '../state/editor'
+
+export function LayersPanel() {
+  const { state, dispatch } = useEditor()
+  const selectedLayer = state.layers.find((layer) => layer.id === state.selectedLayerId) ?? state.layers[0]
+  return <div className="inspector-panel"><div className="panel-heading"><h2>图层</h2><button className="icon-button" aria-label="新建图层" onClick={() => dispatch({ type: 'add-layer' })}>＋</button></div><div className="layers-list">{state.layers.map((layer) => <div className={`layer-row ${layer.id === state.selectedLayerId ? 'active' : ''}`} key={layer.id}><button className="layer-select" aria-label={`${layer.name}图层`} aria-pressed={layer.id === state.selectedLayerId} onClick={() => dispatch({ type: 'select-layer', id: layer.id })}><span className={`layer-thumb ${layer.className}`} /><span>{layer.name}</span></button><button className={`layer-eye ${layer.visible ? 'visible' : ''}`} aria-label={`${layer.name}${layer.visible ? '隐藏' : '显示'}`} onClick={() => dispatch({ type: 'toggle-layer', id: layer.id })}>{layer.visible ? '◉' : '○'}</button></div>)}</div>{selectedLayer ? <div className="field-grid layer-properties"><Field label="不透明度"><input aria-label="图层不透明度" type="number" min="0" max="100" value={selectedLayer.opacity} onChange={(event) => dispatch({ type: 'set-layer-opacity', id: selectedLayer.id, opacity: Math.min(100, Math.max(0, Number(event.target.value) || 0)) })} /></Field><Field label="混合模式"><select aria-label="图层混合模式" value={selectedLayer.blendMode} onChange={(event) => dispatch({ type: 'set-layer-blend', id: selectedLayer.id, blendMode: event.target.value })}><option>正常</option><option>正片叠底</option><option>滤色</option></select></Field></div> : null}</div>
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) { return <div><label>{label}</label>{children}</div> }
