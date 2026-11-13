@@ -8,9 +8,9 @@ import { createElement } from 'react'
 
 describe('tool registry', () => {
   it('defines the nine Photoshop-style tool groups', () => {
-    expect(TOOL_GROUPS).toHaveLength(9)
+    expect(TOOL_GROUPS).toHaveLength(10)
     expect(TOOL_GROUPS.map((group) => group.id)).toEqual([
-      'select-move', 'selection', 'brush', 'erase-heal', 'mask', 'crop-transform', 'text-shape', 'color-fill', 'navigation',
+      'select-move', 'selection', 'brush', 'erase-heal', 'mask', 'crop-transform', 'text-shape', 'color-fill', 'navigation', 'enhance',
     ])
   })
 
@@ -58,7 +58,7 @@ describe('tool registry', () => {
 
   it('renders all registry groups and tools from the active group', () => {
     render(createElement(EditorProvider, null, createElement(ToolRail)))
-    expect(screen.getAllByRole('button', { name: /^工具组：/ })).toHaveLength(9)
+    expect(screen.getAllByRole('button', { name: /^工具组：/ })).toHaveLength(10)
     expect(screen.getByRole('button', { name: '打开工具组菜单：选择/移动' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '工具组：选择/移动' })).toBeInTheDocument()
   })
