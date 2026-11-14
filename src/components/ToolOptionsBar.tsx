@@ -23,7 +23,7 @@ function optionValue(options: ToolOptions, key: string, fallback: string): strin
   return typeof options[key] === 'string' ? options[key] as string : fallback
 }
 
-export function ToolOptionsBar({ onOpenModelManager }: { onOpenModelManager?: (kind: 'cutout' | 'upscale') => void }) {
+export function ToolOptionsBar({ onOpenModelManager, onRunEnhancement }: { onOpenModelManager?: (kind: 'cutout' | 'upscale') => void; onRunEnhancement?: (kind: 'cutout' | 'upscale') => void }) {
   const { state, dispatch } = useEditor()
   const tool = getTool(state.activeToolId)
   const options = state.toolOptions
@@ -92,7 +92,7 @@ export function ToolOptionsBar({ onOpenModelManager }: { onOpenModelManager?: (k
     controls = <span className="tool-options-status">拖动控制点变换 · Enter 确认 · Esc 取消</span>
   } else if (tool?.id === 'cutout' || tool?.id === 'upscale') {
     const kind = tool.id === 'cutout' ? 'cutout' : 'upscale'
-    controls = <><span className="tool-options-status">{tool.id === 'cutout' ? '选择模型后生成透明背景图' : '选择模型后放大当前图层'}</span><button type="button" onClick={() => onOpenModelManager?.(kind)}>管理模型</button></>
+    controls = <><span className="tool-options-status">{tool.id === 'cutout' ? '生成透明背景图（四边连通背景）' : '放大当前图层（2x / 4x）'}</span><button type="button" onClick={() => onRunEnhancement?.(kind)}>执行{tool.label}</button><button type="button" onClick={() => onOpenModelManager?.(kind)}>管理模型</button></>
   }
 
   return <div className="tool-options-bar" role="toolbar" aria-label="工具选项"><strong className="tool-options-name">{tool?.label ?? '选择'}</strong><div className="tool-options-controls">{controls}</div></div>

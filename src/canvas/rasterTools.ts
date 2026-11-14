@@ -290,3 +290,17 @@ export async function cloneImage(svg: SVGElement, points: SelectionPoint[], sour
   const canvas = await rasterizeSvg(svg)
   return writePng(canvas, clonePixels(readPixels(canvas), points, source, size))
 }
+
+export async function rasterizeSvgPixels(svg: SVGElement): Promise<PixelImage> {
+  const canvas = await rasterizeSvg(svg)
+  const pixels = context2d(canvas).getImageData(0, 0, canvas.width, canvas.height)
+  return { width: pixels.width, height: pixels.height, data: new Uint8ClampedArray(pixels.data) }
+}
+export function imageToPng(image: PixelImage): string {
+  const canvas = document.createElement('canvas')
+  canvas.width = image.width; canvas.height = image.height
+  const context = context2d(canvas)
+  const output = context.createImageData(image.width, image.height)
+  output.data.set(image.data); context.putImageData(output, 0, 0)
+  return canvas.toDataURL('image/png')
+}

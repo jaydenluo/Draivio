@@ -12,7 +12,8 @@ export const TOOL_GROUPS: readonly ToolGroupDefinition[] = [
   { id: 'text-shape', label: '文字/形状', defaultToolId: 'text', tools: [tool('text', 'text-shape', '文字', 'T', 'T'), tool('shape', 'text-shape', '形状', 'U', '□'), tool('shape-ellipse', 'text-shape', '圆形', 'U', '◯'), tool('shape-line', 'text-shape', '线条', 'U', '╱'), tool('shape-arrow', 'text-shape', '箭头', 'U', '↗'), tool('pen', 'text-shape', '钢笔')] },
   { id: 'color-fill', label: '颜色/填充', defaultToolId: 'picker', tools: [tool('picker', 'color-fill', '取色', 'I', '◉'), tool('fill', 'color-fill', '填充', 'G'), tool('gradient-fill', 'color-fill', '渐变')] },
   { id: 'navigation', label: '导航', defaultToolId: 'pan', tools: [tool('pan', 'navigation', '平移', 'H', '✋'), tool('zoom', 'navigation', '缩放', 'Z'), tool('rotate', 'navigation', '旋转画布', 'R')] },
-  { id: 'enhance', label: '增强', defaultToolId: 'cutout', tools: [tool('cutout', 'enhance', '扣图', undefined, '◐'), tool('upscale', 'enhance', '超分', undefined, '↗')] },
+  { id: 'cutout', label: '扣图', defaultToolId: 'cutout', tools: [tool('cutout', 'cutout', '扣图', undefined, '◐')] },
+  { id: 'upscale', label: '超分', defaultToolId: 'upscale', tools: [tool('upscale', 'upscale', '超分', undefined, '↗')] },
 ]
 
 export const toolRegistry: Record<ToolGroupId, ToolGroupDefinition> = Object.fromEntries(TOOL_GROUPS.map((group) => [group.id, group])) as Record<ToolGroupId, ToolGroupDefinition>

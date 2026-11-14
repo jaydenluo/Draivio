@@ -79,7 +79,7 @@ export type EditorAction =
   | { type: 'redo' }
 
 export const initialEditorState: EditorState = {
-  activeTool: 'select', activeToolGroup: 'select-move', activeToolId: 'select', recentToolByGroup: { 'select-move': 'select', selection: 'selection', brush: 'brush', 'erase-heal': 'eraser', mask: 'mask', 'crop-transform': 'crop', 'text-shape': 'text', 'color-fill': 'picker', navigation: 'pan', enhance: 'cutout' }, toolOptions: {}, inspectorTab: 'generate', selectionVisible: true, selection: createSelection('rectangle', { x: 27, y: 26, width: 46, height: 40 }), selectionRect: { x: 27, y: 26, width: 46, height: 40 }, zoom: 100, selectedHistoryId: 'original',
+  activeTool: 'select', activeToolGroup: 'select-move', activeToolId: 'select', recentToolByGroup: { 'select-move': 'select', selection: 'selection', brush: 'brush', 'erase-heal': 'eraser', mask: 'mask', 'crop-transform': 'crop', 'text-shape': 'text', 'color-fill': 'picker', navigation: 'pan', cutout: 'cutout', upscale: 'upscale' }, toolOptions: {}, inspectorTab: 'generate', selectionVisible: true, selection: createSelection('rectangle', { x: 27, y: 26, width: 46, height: 40 }), selectionRect: { x: 27, y: 26, width: 46, height: 40 }, zoom: 100, selectedHistoryId: 'original',
   history: [
     { id: 'original', label: '原图 · 现在', tone: 'original' }, { id: 'variation-1', label: '文生图 · 1', tone: 'warm' },
     { id: 'variation-2', label: '文生图 · 2', tone: 'violet' }, { id: 'upscale-1', label: '放大 · 1', tone: 'upscale' },

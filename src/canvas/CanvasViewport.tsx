@@ -1,3 +1,5 @@
+import { removeBackground, upscalePixels } from '../imaging/enhancement'
+import { ensureModelInstalled } from '../models/modelApi'
 import { useEffect, useRef, useState } from 'react'
 import { useEditor } from '../state/editor'
 import { AIComposer } from '../creation/AIComposer'
@@ -13,7 +15,7 @@ import { TransformOverlay, type TransformDraft } from './TransformOverlay'
 import { TextObject } from './TextObject'
 import type { CanvasShape, LayerMask } from './documentTypes'
 import { canvasCloudServices } from './cloudToolServices'
-import { contiguousMagicSelection, eraseBackground, sampleCanvasColor, serializeSvg, rasterizeSvg, perspectiveWarp, cloneImage, smudgeImage } from './rasterTools'
+import { contiguousMagicSelection, eraseBackground, sampleCanvasColor, serializeSvg, rasterizeSvg, rasterizeSvgPixels, imageToPng, perspectiveWarp, cloneImage, smudgeImage } from './rasterTools'
 import { PerspectiveOverlay, type PerspectiveQuad } from './PerspectiveOverlay'
 
 type Point = SelectionPoint
@@ -26,7 +28,7 @@ const fullQuad: PerspectiveQuad = [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y
 const inputTarget = (target: EventTarget | null) => target instanceof Element && !!target.closest('input,textarea,select,[contenteditable="true"],[role="textbox"]')
 type Gesture = { pointerId: number; start: Point; client: Point; previous: Selection | null; selection?: Selection; stroke?: BrushStroke; shape?: CanvasShape; offset: Point; transform?: TransformDraft; pathIndex?: number; points: Point[]; rotation: number }
 
-export function CanvasViewport() {
+export function CanvasViewport({ enhancementRequest }: { enhancementRequest?: { kind: 'cutout' | 'upscale'; nonce: number } }) {
   const { state, dispatch } = useEditor()
   const artboardRef = useRef<HTMLDivElement>(null)
   const gesture = useRef<Gesture | null>(null)
@@ -62,6 +64,17 @@ export function CanvasViewport() {
     setBusy(true)
     try { await job() } catch (error) { notice(error instanceof Error ? error.message : '操作失败，请重试') } finally { setBusy(false) }
   }
+  useEffect(() => {
+    if (!enhancementRequest) return
+    const kind = enhancementRequest.kind
+    void perform(async () => {
+      await ensureModelInstalled(kind === 'cutout' ? 'u2net' : 'realesrgan-x4plus')
+      const image = await rasterizeSvgPixels(layerScene())
+      const result = kind === 'cutout' ? removeBackground(image, 28) : upscalePixels(image, 2)
+      dispatch({ type: 'rasterize-layer', id: state.selectedLayerId, source: imageToPng(result) })
+      notice(kind === 'cutout' ? '扣图完成，可撤销' : '2x 放大完成，可撤销')
+    })
+  }, [enhancementRequest?.nonce])
   const clientPoint = (clientX: number, clientY: number): Point => {
     const board = artboardRef.current
     const bounds = board?.getBoundingClientRect()

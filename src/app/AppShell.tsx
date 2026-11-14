@@ -17,6 +17,7 @@ export function AppShell() {
   useToolShortcuts()
   const [inspectorWidth, setInspectorWidth] = useState(320)
   const [resizing, setResizing] = useState(false)
+  const [enhancementRequest, setEnhancementRequest] = useState<{ kind: 'cutout' | 'upscale'; nonce: number }>()
   const [modelKind, setModelKind] = useState<'cutout' | 'upscale' | null>(null)
 
   useEffect(() => {
@@ -45,5 +46,5 @@ export function AppShell() {
   }, [])
 
   const style = { '--inspector-width': `${inspectorWidth}px` } as CSSProperties
-  return <div className={`app-shell ${resizing ? 'is-resizing' : ''} ${state.historyCollapsed ? 'history-collapsed' : ''}`} style={style}><TopBar /><div className="workspace"><ToolRail /><div className="canvas-workspace"><ToolOptionsBar onOpenModelManager={setModelKind} /><CanvasViewport /></div><Inspector inspectorWidth={inspectorWidth} onResizeStart={() => setResizing(true)} onResizeBy={(delta) => setInspectorWidth((value) => Math.min(MAX_INSPECTOR_WIDTH, Math.max(MIN_INSPECTOR_WIDTH, value + delta)))} /></div><HistoryStrip /><ModelManagerDialog open={modelKind !== null} initialKind={modelKind ?? 'cutout'} onClose={() => setModelKind(null)} /></div>
+  return <div className={`app-shell ${resizing ? 'is-resizing' : ''} ${state.historyCollapsed ? 'history-collapsed' : ''}`} style={style}><TopBar /><div className="workspace"><ToolRail /><div className="canvas-workspace"><ToolOptionsBar onOpenModelManager={setModelKind} onRunEnhancement={(kind) => setEnhancementRequest({ kind, nonce: Date.now() })} /><CanvasViewport enhancementRequest={enhancementRequest} /></div><Inspector inspectorWidth={inspectorWidth} onResizeStart={() => setResizing(true)} onResizeBy={(delta) => setInspectorWidth((value) => Math.min(MAX_INSPECTOR_WIDTH, Math.max(MIN_INSPECTOR_WIDTH, value + delta)))} /></div><HistoryStrip /><ModelManagerDialog open={modelKind !== null} initialKind={modelKind ?? 'cutout'} onClose={() => setModelKind(null)} /></div>
 }

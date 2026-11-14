@@ -8,7 +8,8 @@ export type ToolGroupId =
   | 'text-shape'
   | 'color-fill'
   | 'navigation'
-  | 'enhance'
+  | 'cutout'
+  | 'upscale'
 
 export type ToolId =
   | 'select'
