@@ -1,0 +1,47 @@
+{
+  "outcome": "ready_for_independent_review",
+  "scope": "formal platform cycle5 additional retouch finite geometry, enums and ancestor lock repair",
+  "changedFiles": [
+    "src/ai/tools/retouchTools.ts",
+    "src/ai/tools/retouchTools.test.ts"
+  ],
+  "fix": [
+    "Validate tool heal/clone/fill and scope current/below/visible enums",
+    "Validate options object, finite size>0<=2048, optional hardness/opacity finite0..100, aligned boolean",
+    "Optional points must contain1..4096 finite0..100 points; heal requires points",
+    "Source/destination rectangles finite percentage x/y0..100 and width/height>0<=100, x+width/y+height<=100; clone/fill require both rectangles",
+    "Use effectiveLayerState for target inherited lock and sampled effective visibility/lock metadata",
+    "Shared geometry validation runs in both validateRetouch (publication gate) and runRetouchPixels (compute gate); prior full-selection-match and trusted state clipping remain"
+  ],
+  "basis": [
+    "RetouchOptions in cloneHeal.ts documents size,hardness,opacity,aligned; manual drawing adapter uses4096 point budget and2048 size budget; shared layerHierarchy defines inherited locks",
+    "RetouchRequest is consumed only via typed manual toolCoverage adapter; unknown tools no longer fall through clone/patch behavior",
+    "cloneHeal generic algorithms unmodified"
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run src/ai/tools/retouchTools.test.ts --maxWorkers=1 before fix",
+      "exitCode": 1,
+      "result": "18 regressions failed,11passed; /tmp/retouch-parameters-red.log; malformed geometry/enums/options and locked ancestor accepted by old implementation"
+    },
+    {
+      "command": "npx vitest run src/ai/tools/retouchTools.test.ts src/ai/tools/toolCoverage.test.ts src/retouch/cloneHeal.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "result": "3files44tests passed1.25s;/tmp/retouch-parameters-final.log; malformed requests fail both computation and publication without invoking PNG encoder; valid boundary percentages/options/scopes accepted"
+    },
+    {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "result": "passed;/tmp/retouch-parameters-tsc.log"
+    },
+    {
+      "command": "git diff --check -- src/ai/tools/retouchTools.ts src/ai/tools/retouchTools.test.ts",
+      "exitCode": 0,
+      "result": "passed"
+    }
+  ],
+  "remainingIssues": [],
+  "codeFreeze": true,
+  "cloudMutations": false,
+  "commit": null
+}

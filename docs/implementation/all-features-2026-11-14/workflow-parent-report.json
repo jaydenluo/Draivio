@@ -1,0 +1,99 @@
+{
+  "summary": "完成AI生成编辑父目标候选集成：纯生成收件不再自动建正式图层或写内容撤销历史；明确采用才单次事务，支持候选保存重开、同批逐一采用、去重、undo、stale/lock守卫及partial/cancel/retry。修复旧同批收件守卫漏查effects/smartFilters的问题。父验收映射包含masked/outpaint、连续对话、真实前后像素预览、参数微调、OCR原生/UI与放大恢复专项证据。第三方固定HTTP契约不冒充真实付费调用，官方云不可用提示保留。待独立验收，不自行批准。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/state/editor.tsx",
+    "src/state/generationCandidates.test.ts",
+    "src/ai/context/editorContext.ts",
+    "src/ai/context/editorPreview.test.ts",
+    "src/layers/ResultsPanel.tsx",
+    "src/creation/ImageGeneration.test.tsx",
+    "src/creation/AIResult.test.ts",
+    "src/creation/Inspector.test.tsx",
+    "src/creation/ServiceSourceSettings.test.tsx",
+    "docs/user-guide/generation-candidates.md"
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run src/state/generationCandidates.test.ts src/ai/context/editorPreview.test.ts src/creation/ImageGeneration.test.tsx src/creation/AIResult.test.ts src/creation/Inspector.test.tsx src/creation/ServiceSourceSettings.test.tsx src/state/layerWorkspace.test.ts --maxWorkers=1 --testTimeout=30000",
+      "result": "7files56passed; 11.44s. Candidate receipt/no layers/history, production HTTPpartial+retry, explicit adoption+undo, cancellation late responses, candidate offline project, same-batch pristine adoption and effects/filter invalidation. /tmp/workflow-final-all-candidates.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/ai/maskedEdit/provider.test.tsx src/ai/maskedEdit/workflow.test.ts src/ai/maskedEdit/maskedEdit.test.ts src/ai/outpaint/workflow.test.ts src/ai/outpaint/OutpaintDialog.test.tsx src/ai/conversation/session.test.ts src/ai/conversation/repair.test.ts src/ai/conversation/persistence.test.ts src/ai/conversation/temperature.test.ts src/creation/AIComposer.conversation.test.tsx src/creation/AIComposer.color.test.tsx src/ai/ui/EditRunSummary.test.tsx src/ai/ui/editRunIntegration.test.ts src/ai/execution/executor.test.ts src/ai/vision/ocr.test.ts src/ai/workflows/replaceText.test.ts src/ai/workflows/replaceText.atomic.test.ts src/ai/tools/restorationTools.test.ts src/imaging/enhancement.test.ts src/ai/persistence/editRecord.test.ts src/ai/persistence/recoveryUI.test.tsx --maxWorkers=1 --testTimeout=30000",
+      "result": "21files87passed;81.93s. /tmp/workflow-parent-integration-focused.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/creation/AIComposer.preview.test.tsx src/ai/execution/transaction.test.ts src/ai/execution/preview.test.ts src/ai/vision/nativeOcr.test.ts src/ai/vision/OcrWorkspace.test.tsx --maxWorkers=1 --testTimeout=30000",
+      "result": "5files29passed;14.66s. Actual preview comparison pixels/cancel/undo + transaction failure recovery + OCR UI/fonts. /tmp/workflow-parent-preview-ocr.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml --lib ocr::tests",
+      "result": "1passed actual embedded macOS Vision authored Chinese/duplicate prices inference,2.14s. /tmp/workflow-parent-native-ocr.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed with existing bundle/dynamic import warnings; /tmp/workflow-final-build.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "Vibe Plan checks passed; /tmp/workflow-final-check.log",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [
+    {
+      "label": "工作流集成实际执行证据：本仓库workflow-parent-report.json记录精确命令、退出码和本地日志；未进行真实付费模型调用。",
+      "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+    }
+  ],
+  "risks": [
+    "未进行真实付费模型请求；第三方HTTP生产UI契约和本地能力分别验证，不声称官方云已配置。",
+    "本轮仅移除无具体必需缺失输出的官方云整体父目标硬依赖；其官方平台阻塞和不可用提示仍保留。",
+    "全套由主控执行，本轮未重复全量；独立验收仍待主控协调。"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "5e9113d3-ab90-4254-847f-940f624be283",
+      "result": "passed evidence: final7files56tests生成先候选/explicit adopt/undo，maskedEdit provider/workflow与outpaint workflow/UI证明编辑、局部合成、物体移除、扩图候选先保留后采用。",
+      "evidence": [
+        {
+          "label": "passed evidence: final7files56tests生成先候选/explicit adopt/undo，maskedEdit provider/workflow与outpaint workflow/UI证明编辑、局部合成、物体移除、扩图候选先保留后采用。",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "2cb8e5fd-c27a-47d1-a0ac-fa42c0c2448f",
+      "result": "passed evidence: context/stable目标/锁定/选区及masked pixels保护测试；preview/transaction/cancel/failure/stale不写入正式layers，采用后undo恢复，生成partial取消保留已完成候选且丢弃迟到结果。",
+      "evidence": [
+        {
+          "label": "passed evidence: context/stable目标/锁定/选区及masked pixels保护测试；preview/transaction/cancel/failure/stale不写入正式layers，采用后undo恢复，生成partial取消保留已完成候选且丢弃迟到结果。",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "468d9c19-12f1-485c-80c7-61a55da6b3d2",
+      "result": "passed evidence: AIComposer.conversation repeated warm10/20与选择性撤销、文档隔离、原生OCR中文价格实际推理+OCR工作区取消/低置信度/字体确认/修补失败、restorationTools成功候选+原图/项目保存+507失败反馈、enhancement局部处理、真实preview before/after像素与事务失败/取消/恢复均专项通过。",
+      "evidence": [
+        {
+          "label": "passed evidence: AIComposer.conversation repeated warm10/20与选择性撤销、文档隔离、原生OCR中文价格实际推理+OCR工作区取消/低置信度/字体确认/修补失败、restorationTools成功候选+原图/项目保存+507失败反馈、enhancement局部处理、真实preview before/after像素与事务失败/取消/恢复均专项通过。",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    }
+  ]
+}

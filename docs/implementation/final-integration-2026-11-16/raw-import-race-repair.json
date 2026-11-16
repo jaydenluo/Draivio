@@ -1,0 +1,53 @@
+{
+  "scope": "Root-authorized repair of independently reproduced RAW file-import race; original RAW integration scope",
+  "reviewType": "implementation evidence; author must not independently approve this repair",
+  "outcome": "ready_for_independent_review",
+  "changedFiles": [
+    "src/raw/RawControls.tsx",
+    "src/raw/RawControls.test.tsx"
+  ],
+  "rootCause": "File input awaited arrayBuffer and SHA256 without any request identity. Earlier success/failure could overwrite a newer import, or repopulate controls after close/document switch/reopen.",
+  "repair": [
+    "Each selected file captures a monotonically increasing import epoch and document ID. Both byte-read and hash completions verify epoch/document before publishing; catch also rejects stale errors.",
+    "Close button, Escape, reopening RAW from current selection, document switch and component unmount invalidate pending import epochs. Existing decoder AbortController behavior retained; reopen also aborts prior decoder.",
+    "No RAW format-gate or document reducer semantics changed in this follow-up."
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run src/raw/RawControls.test.tsx --maxWorkers=1 --configLoader runner --no-cache --no-fsModuleCache (before implementation)",
+      "result": "5 new behavioral regressions failed;6 existing passed. Both buffer/hash old-success-after-new-failure, close/reopen, document/reopen, and old-error-after-new-success reproduced. /tmp/raw-import-race-red.log",
+      "outcome": "failed",
+      "exitCode": 1
+    },
+    {
+      "command": "npx vitest run src/raw/RawControls.test.tsx --maxWorkers=1 --configLoader runner --no-cache --no-fsModuleCache (after implementation)",
+      "result": "11 tests passed. /tmp/raw-import-race-green.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/raw/RawControls.test.tsx src/raw/rawPipeline.test.ts src/raw/rawState.test.ts src/raw/rawExport.test.ts --maxWorkers=1 --configLoader runner --no-cache --no-fsModuleCache",
+      "result": "4 files29 tests passed, including additional unmount-before-hash regression; RAW Controls12tests. /tmp/raw-import-race-final.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx tsc -b --pretty false",
+      "result": "Passed. /tmp/raw-import-race-tsc.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check -- src/raw/RawControls.tsx src/raw/RawControls.test.tsx",
+      "result": "Passed",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "remainingIssues": [
+    "Independent review by root required after this implementation; earlier failed independent report is preserved, not overwritten.",
+    "Final frozen integration belongs to integration_freeze; no heavy real RAW/render/performance/full build executed here.",
+    "No cloud state/acceptance, commits, push or deployment performed."
+  ],
+  "codeFreeze": true
+}

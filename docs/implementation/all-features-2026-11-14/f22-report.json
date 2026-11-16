@@ -1,0 +1,69 @@
+{
+  "summary": "F22路径锚点与布尔运算闭环完成，经独立复审四条验收通过。包括控制柄拖动、独立圆角/样式、四种SVG布尔语义、源关联与复制重映射、项目重开编辑及撤销。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/vector/pathGeometry.ts",
+    "src/vector/booleanShapes.ts",
+    "src/vector/VectorEditor.tsx",
+    "src/vector/pathGeometry.test.ts",
+    "src/vector/VectorEditor.test.tsx",
+    "src/vector/vectorDocument.test.tsx",
+    "src/vector/vectorPixels.test.tsx",
+    "src/canvas/documentTypes.ts",
+    "src/canvas/CanvasScene.tsx",
+    "src/components/ToolOptionsBar.tsx",
+    "src/state/editor.tsx",
+    "src/state/layerHierarchy.ts",
+    "src/document/projectValidation.ts",
+    "package.json",
+    "package-lock.json"
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run src/vector/pathGeometry.test.ts src/vector/VectorEditor.test.tsx src/vector/vectorDocument.test.tsx src/vector/vectorPixels.test.tsx src/document/projectFormat.test.ts src/canvas/CanvasScene.test.tsx",
+      "result": "independent review 6 files / 31 tests passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "independent review passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "CLI exit 0; later task show verified current remote version",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "resvg does not support non-scaling-stroke; that branch verifies SVG standard attribute only; scaled stroke 4→8px independently raster-tested."
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "7046e0f0-6636-4404-abb5-b86207311265",
+      "result": "Independent review passed: anchor/handle drag, corner/smooth and closed-path geometry fixtures",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "180b6f15-6da1-4d3d-8cfc-91cd39a10102",
+      "result": "Independent review passed: four boolean operations, holes/self-intersections/disjoint actual resvg pixels",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "ac627111-d7ff-4ba4-beed-064c23fa31eb",
+      "result": "Independent review passed: explicit stroke scaling and style restore; 4→8px scaled fixture; non-scaling SVG attribute limitation disclosed",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "fa8770b0-21bb-4e92-b10f-a00c9e7b709a",
+      "result": "Independent review passed: sourceIds sync, duplicate remap, project reopen/edit and undo tested",
+      "evidence": []
+    }
+  ]
+}

@@ -88,3 +88,7 @@ npm run build
 ## AI 工作流与发布状态
 
 参见 [AI 编辑五条工作流](docs/user-guide/ai-editing.md)：基础编辑、局部编辑、配方、批量、离线恢复，以及上传费用与取消重试边界。RAW 需可选本地运行时，详见 [RAW 支持矩阵与许可](docs/raw/README.md)。本地候选验证与完整目标验收分开记录，见 [首版审核材料](docs/release/first-version-candidate.md)、[完整目标待验清单](docs/release/full-target-pending.md) 和 [真人五流程验收包](docs/release/user-five-flow-validation.md)。语义工具、AI 工作流及指定负载的性能 cycle2 已有任务验收；不声明已完成全部平台人工验收或已发布。
+
+## 开源发布与自动更新
+
+桌面包通过 GitHub Actions 在 `v*` 标签下自动构建，签名更新由 Tauri updater 提供。首次发布前请阅读 [桌面版发布与自动更新](docs/release/desktop-release.md)，配置 `TAURI_SIGNING_PRIVATE_KEY` 与 `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` 两个 GitHub Actions Secrets。私钥不要提交到仓库。

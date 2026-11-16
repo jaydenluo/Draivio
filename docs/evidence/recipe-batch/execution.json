@@ -1,0 +1,274 @@
+{
+  "root": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC",
+  "firstRecords": {
+    "version": 1,
+    "id": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02",
+    "createdAt": "2026-11-15T17:53:12.800Z",
+    "config": {
+      "recipe": {
+        "schemaVersion": 1,
+        "id": "local-opacity",
+        "version": 1,
+        "name": "Local opacity 70%",
+        "inputs": [
+          {
+            "id": "target",
+            "required": true
+          }
+        ],
+        "parameters": {},
+        "steps": [
+          {
+            "id": "opacity",
+            "tool": "opacity",
+            "args": {
+              "layerId": {
+                "$input": "target"
+              },
+              "value": 70
+            }
+          }
+        ]
+      },
+      "parameters": {},
+      "inputSlot": "target",
+      "concurrency": 2,
+      "prefix": "recipe",
+      "maxRequests": 0,
+      "budgetMicros": 0
+    },
+    "items": [
+      {
+        "id": "file-0",
+        "name": "same.png",
+        "index": 0,
+        "status": "success",
+        "attempts": 1,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-0",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-same-batch-001-2.png"
+      },
+      {
+        "id": "file-1",
+        "name": "same.png",
+        "index": 1,
+        "status": "success",
+        "attempts": 1,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-1",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-same-batch-002.png"
+      },
+      {
+        "id": "file-2",
+        "name": "broken.png",
+        "index": 2,
+        "status": "failed",
+        "attempts": 1,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "error": "文件损坏或格式不支持（PNG、JPEG、WebP）"
+      }
+    ],
+    "trialSucceeded": true,
+    "reservedRequests": 0,
+    "reservedMicros": 0
+  },
+  "final": {
+    "version": 1,
+    "id": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02",
+    "createdAt": "2026-11-15T17:53:12.800Z",
+    "config": {
+      "recipe": {
+        "schemaVersion": 1,
+        "id": "local-opacity",
+        "version": 1,
+        "name": "Local opacity 70%",
+        "inputs": [
+          {
+            "id": "target",
+            "required": true
+          }
+        ],
+        "parameters": {},
+        "steps": [
+          {
+            "id": "opacity",
+            "tool": "opacity",
+            "args": {
+              "layerId": {
+                "$input": "target"
+              },
+              "value": 70
+            }
+          }
+        ]
+      },
+      "parameters": {},
+      "inputSlot": "target",
+      "concurrency": 2,
+      "prefix": "recipe",
+      "maxRequests": 0,
+      "budgetMicros": 0
+    },
+    "items": [
+      {
+        "id": "file-0",
+        "name": "same.png",
+        "index": 0,
+        "status": "success",
+        "attempts": 1,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-0",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-same-batch-001-2.png"
+      },
+      {
+        "id": "file-1",
+        "name": "same.png",
+        "index": 1,
+        "status": "success",
+        "attempts": 1,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-1",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-same-batch-002.png"
+      },
+      {
+        "id": "file-2",
+        "name": "broken.png",
+        "index": 2,
+        "status": "success",
+        "attempts": 2,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-2",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-broken-batch-003.png"
+      }
+    ],
+    "trialSucceeded": true,
+    "reservedRequests": 0,
+    "reservedMicros": 0
+  },
+  "restored": {
+    "version": 1,
+    "id": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02",
+    "createdAt": "2026-11-15T17:53:12.800Z",
+    "config": {
+      "recipe": {
+        "schemaVersion": 1,
+        "id": "local-opacity",
+        "version": 1,
+        "name": "Local opacity 70%",
+        "inputs": [
+          {
+            "id": "target",
+            "required": true
+          }
+        ],
+        "parameters": {},
+        "steps": [
+          {
+            "id": "opacity",
+            "tool": "opacity",
+            "args": {
+              "layerId": {
+                "$input": "target"
+              },
+              "value": 70
+            }
+          }
+        ]
+      },
+      "parameters": {},
+      "inputSlot": "target",
+      "concurrency": 2,
+      "prefix": "recipe",
+      "maxRequests": 0,
+      "budgetMicros": 0
+    },
+    "items": [
+      {
+        "id": "file-0",
+        "name": "same.png",
+        "index": 0,
+        "status": "success",
+        "attempts": 1,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-0",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-same-batch-001-2.png"
+      },
+      {
+        "id": "file-1",
+        "name": "same.png",
+        "index": 1,
+        "status": "success",
+        "attempts": 1,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-1",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-same-batch-002.png"
+      },
+      {
+        "id": "file-2",
+        "name": "broken.png",
+        "index": 2,
+        "status": "success",
+        "attempts": 2,
+        "reservedRequests": 0,
+        "reservedMicros": 0,
+        "resultId": "c2c7b817-9911-4d3f-b5ad-4de8ad08ea02:file-2",
+        "output": "/var/folders/74/t_4qqt2j4zlb53rvxzdrv9z80000gn/T/draivio-recipe-batch-uRw2vC/out/recipe-broken-batch-003.png"
+      }
+    ],
+    "trialSucceeded": false,
+    "reservedRequests": 0,
+    "reservedMicros": 0
+  },
+  "originalHashesBefore": [
+    "d038b4b36787cdd4770d4662f48f9bedd0d1f56280244072d9621937e3b35012",
+    "d038b4b36787cdd4770d4662f48f9bedd0d1f56280244072d9621937e3b35012",
+    "5155182a33d313b31f33aa3e24b611b78bd745d35d5dc03993e17464796dac31"
+  ],
+  "unmodifiedGoodInputHashes": [
+    "d038b4b36787cdd4770d4662f48f9bedd0d1f56280244072d9621937e3b35012",
+    "d038b4b36787cdd4770d4662f48f9bedd0d1f56280244072d9621937e3b35012"
+  ],
+  "calls": [
+    "file-0",
+    "file-1",
+    "file-2",
+    "file-2"
+  ],
+  "maxActive": 1,
+  "transactions": [
+    1,
+    1,
+    1
+  ],
+  "outputPixels": [
+    [
+      196,
+      74,
+      49,
+      178
+    ],
+    [
+      196,
+      74,
+      49,
+      178
+    ],
+    [
+      196,
+      74,
+      49,
+      178
+    ]
+  ],
+  "actualProviderRequests": 0,
+  "actualProviderCost": 0,
+  "existingOutputPreserved": true
+}

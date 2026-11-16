@@ -1,0 +1,86 @@
+{
+  "summary": "生产AI编辑持久化/离线恢复已完成；最终17文件114项focused测试与fresh tsc通过。修复root全量定位的智能对象内部画板命名空间污染与快捷键表单定位；v1/v2→v3迁移和真实ICC字节/校验和、离线候选采用与撤销、认证过滤、资源生命周期、坏恢复隔离均已覆盖。主控最终全量与独立审查仍须在上传前合并。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/ai/persistence/editRecord.ts",
+    "src/ai/persistence/editRecord.test.ts",
+    "src/ai/persistence/recoveryUI.test.tsx",
+    "src/document/projectFormat.ts",
+    "src/document/workspaceRecovery.ts",
+    "src/document/recoveryStore.ts",
+    "src/document/recoveryStore.test.ts",
+    "src/state/editor.tsx",
+    "src/ai/conversation/session.ts",
+    "src/ai/recipes/runner.ts",
+    "src/ai/ui/EditRunSummary.tsx",
+    "src/layers/ResultsPanel.tsx",
+    "docs/user-guide/ai-editing-recovery.md",
+    "docs/implementation/ai-persistence/plan.md",
+    "src/document/smartObjects.ts",
+    "src/document/smartObjects.test.ts",
+    "src/document/projectValidation.ts",
+    "src/tools/useToolShortcuts.test.tsx",
+    "docs/implementation/ai-persistence/historical-checks.json"
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run --maxWorkers=2 --testTimeout=30000 src/ai/persistence src/document/recoveryStore.test.ts src/document/projectFormat.test.ts src/document/DocumentTabs.test.tsx src/ai/conversation src/ai/recipes src/ai/ui/EditRunSummary.test.tsx src/color/softProof.test.ts src/document/smartObjects.test.ts src/state/smartObjects.test.ts src/tools/useToolShortcuts.test.tsx",
+      "result": "17 files/114 tests passed; /tmp/draivio-a30-freeze-tests.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx tsc -b",
+      "result": "Fresh compile after integration repair; /tmp/draivio-a30-final-tsc.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "Checks passed; no queued events",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "Workspace recovery retains existing 900ms debounce and 24MiB local cache limit; latest unsnapshotted state cannot be recovered.",
+    "No paid external model calls; test assets are embedded offline contract fixtures.",
+    "历史检查留档：默认并发全量因资源竞争中断exit130；早期build曾因本任务literal类型/并行OCR测试缺layerIds失败，均不是通过记录。实际当前检查已单列tests。",
+    "这是待主控合并全量与独立审查的成功报告草稿，尚未上传；不表示任务已验收。"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "4275c278-7aaa-4134-8fb9-3210220dbda0",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "Conversation actual parameters/version and selection inverse reopen, recipes existing persistence, workspace per-document IDs, real provider offline candidate adoption and isolated undo covered by 90 focused tests.",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "c6db2e54-d576-4ed9-9b8a-fa0fac89ee15",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "Recursive authentication fields stripped; credential patterns/query URLs rejected; HTTP/blob embedded, deduplicated; invalid downloaded temporary resources rejected; only reachable asset data retained.",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "f6144d71-4e55-4327-8396-fd6de26d85c6",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "Legacy schema 1/2 tests; real EditorProvider restore with fetch spy zero calls, interrupted notice and cached candidate adoption; corrupt/future workspace data rejected; missing resource save preserves input.",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    }
+  ]
+}

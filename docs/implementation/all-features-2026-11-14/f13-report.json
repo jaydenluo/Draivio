@@ -1,0 +1,93 @@
+{
+  "summary": "F13 完整实现并通过 fresh 独立复核：全局/六色 HSL、色彩平衡与保持明度；版本化安全预设及真实保存/重命名/删除/导入/导出/替换/合并；文档项目往返和撤销；96px 异步缩略图；Canvas 预览与 SVG/位图导出复用逐层 CPU 调色。已修复坏输入、祖先锁、NaN、局部坐标烘焙和曲线比较回归。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/adjustments/hsl.ts",
+    "src/adjustments/hsl.test.ts",
+    "src/adjustments/presets.ts",
+    "src/adjustments/presets.test.ts",
+    "src/state/editor.tsx",
+    "src/state/layerHierarchy.ts",
+    "src/state/f13Safety.test.ts",
+    "src/imaging/layerAdjustments.ts",
+    "src/layers/PropertiesPanel.tsx",
+    "src/layers/PropertiesPanel.presets.test.tsx",
+    "src/document/projectFormat.ts",
+    "src/document/projectFormat.test.ts",
+    "src/canvas/AdjustmentFilter.tsx",
+    "src/canvas/AdjustmentFilter.hslPreview.test.tsx",
+    "src/canvas/CanvasScene.tsx",
+    "src/canvas/documentIO.ts",
+    "src/render/exportImage.ts",
+    "src/render/serializeExport.ts",
+    "src/render/ExportDialog.tsx",
+    "src/render/colorAdjustmentExport.test.ts"
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run src/render/colorAdjustmentExport.test.ts src/render/exportImage.test.ts src/render/serializeExport.test.ts src/render/serializeExport.dom.test.tsx src/canvas/CanvasScene.test.tsx src/canvas/CanvasScene.adjustments.test.tsx src/canvas/CanvasScene.clipping.test.tsx src/adjustments/hsl.test.ts src/adjustments/presets.test.ts src/document/projectFormat.test.ts src/state/f13Safety.test.ts src/layers/PropertiesPanel.presets.test.tsx --maxWorkers=1",
+      "result": "12 files / 100 tests passed; final comparison metadata change subsequently verified by focused test",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/canvas/AdjustmentFilter.hslPreview.test.tsx src/render/colorAdjustmentExport.test.ts --maxWorkers=1",
+      "result": "2 files / 5 tests passed (curve comparison/export metadata and 4 Resvg cases)",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/adjustments/hsl.test.ts src/adjustments/presets.test.ts src/document/projectFormat.test.ts src/render/colorAdjustmentExport.test.ts src/layers/PropertiesPanel.presets.test.tsx src/state/f13Safety.test.ts src/canvas/AdjustmentFilter.hslPreview.test.tsx",
+      "result": "fresh independent review: 7 files / 33 tests passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx tsc -b",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed; existing chunk and dynamic-import warnings only",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "包含复杂 HSL/色彩平衡的 SVG 图层会栅格化；子像素 affine 变换可能有正常重采样差异。",
+    "预设缩略图限制最长 96px，作为近似预览；最终预览/导出处理实际像素。"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "d836fe4c-ffe4-45fc-9d17-7444d3bb507d",
+      "result": "PASS：真实 Resvg 固定六色色卡/灰阶 expected；平滑边界、灰阶中性、保持明度差值<1e-6、alpha 不变测试通过。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "9ba39f4d-851f-4a11-9d4e-019b065001ab",
+      "result": "PASS：独立文件与 project roundtrip、版本0迁移、完整6通道/bounds/未知私有字段/超大拒绝；尺寸无关调色；真实 UI 导入导出与文档预设持久化。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "54102844-0e6e-4709-bf55-5b41ef1f1e09",
+      "result": "PASS：真实 replace/merge、内置与用户预设、保存/重命名/删除；单项/全部重置及undo；继承锁与NaN保护；shared bake在Canvas与SVG/bitmap导出复用；nested affine/mask/opacity/blend/ancestor negative-translation反例和curve compare/export恢复测试通过。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "de71d7d4-5753-4265-ad3d-c900955ba14d",
+      "result": "PASS：thumbnail先降采样最长96px，分帧生成真实PNG；工作前检查取消/失效、过期结果丢弃并清空；组件真实呈现thumbnail。",
+      "evidence": []
+    }
+  ]
+}

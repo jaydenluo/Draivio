@@ -1,0 +1,427 @@
+{
+  "createdAt": "2026-11-16T01:33:16.735Z",
+  "command": "node scripts/benchmark-raster.mjs",
+  "method": "5 fresh Node processes (no discarded cold samples); 3 warmup + 20 consecutive warm samples; source creation excluded, output allocation and yields included. All samples retained. Cooperative fallback executes on the measured main thread.",
+  "referenceDevice": {
+    "cpu": "Apple M5",
+    "cores": 10,
+    "platform": "darwin",
+    "osRelease": "25.5.0",
+    "arch": "arm64",
+    "runtime": "v22.23.1"
+  },
+  "input": {
+    "width": 2048,
+    "height": 2048,
+    "layers": 1,
+    "blendMode": "normal",
+    "alpha": 255
+  },
+  "cold": {
+    "runs": [
+      {
+        "referenceDevice": {
+          "cpu": "Apple M5",
+          "cores": 10,
+          "platform": "darwin",
+          "osRelease": "25.5.0",
+          "arch": "arm64",
+          "runtime": "v22.23.1"
+        },
+        "input": {
+          "width": 2048,
+          "height": 2048,
+          "layers": 1,
+          "blendMode": "normal",
+          "alpha": 255
+        },
+        "warmupRuns": 0,
+        "samples": [
+          {
+            "elapsedMs": 39.535083,
+            "maxTaskMs": 3.421042,
+            "peakBytes": 33554432
+          }
+        ],
+        "p50": 39.535083,
+        "p95": 39.535083,
+        "maxTaskMs": 3.421042,
+        "trackedPixelPeakBytes": 33554432,
+        "processMemory": {
+          "start": {
+            "rss": 41467904,
+            "heapTotal": 5128192,
+            "heapUsed": 3752824,
+            "external": 1409831,
+            "arrayBuffers": 25448
+          },
+          "peakSampled": {
+            "rss": 80494592,
+            "heapTotal": 5390336,
+            "heapUsed": 3992480,
+            "external": 35024576,
+            "arrayBuffers": 33579880
+          }
+        },
+        "cancelLatencyMs": 3.5997500000000286,
+        "limit8192": {
+          "allowed": false,
+          "reason": "图像超过当前设备处理上限（16777216 像素），请先缩小或分块"
+        }
+      },
+      {
+        "referenceDevice": {
+          "cpu": "Apple M5",
+          "cores": 10,
+          "platform": "darwin",
+          "osRelease": "25.5.0",
+          "arch": "arm64",
+          "runtime": "v22.23.1"
+        },
+        "input": {
+          "width": 2048,
+          "height": 2048,
+          "layers": 1,
+          "blendMode": "normal",
+          "alpha": 255
+        },
+        "warmupRuns": 0,
+        "samples": [
+          {
+            "elapsedMs": 39.192291999999995,
+            "maxTaskMs": 3.4500419999999963,
+            "peakBytes": 33554432
+          }
+        ],
+        "p50": 39.192291999999995,
+        "p95": 39.192291999999995,
+        "maxTaskMs": 3.4500419999999963,
+        "trackedPixelPeakBytes": 33554432,
+        "processMemory": {
+          "start": {
+            "rss": 41664512,
+            "heapTotal": 5128192,
+            "heapUsed": 3752824,
+            "external": 1409831,
+            "arrayBuffers": 25448
+          },
+          "peakSampled": {
+            "rss": 80740352,
+            "heapTotal": 5390336,
+            "heapUsed": 3992480,
+            "external": 35024576,
+            "arrayBuffers": 33579880
+          }
+        },
+        "cancelLatencyMs": 2.4954170000000033,
+        "limit8192": {
+          "allowed": false,
+          "reason": "图像超过当前设备处理上限（16777216 像素），请先缩小或分块"
+        }
+      },
+      {
+        "referenceDevice": {
+          "cpu": "Apple M5",
+          "cores": 10,
+          "platform": "darwin",
+          "osRelease": "25.5.0",
+          "arch": "arm64",
+          "runtime": "v22.23.1"
+        },
+        "input": {
+          "width": 2048,
+          "height": 2048,
+          "layers": 1,
+          "blendMode": "normal",
+          "alpha": 255
+        },
+        "warmupRuns": 0,
+        "samples": [
+          {
+            "elapsedMs": 40.626875,
+            "maxTaskMs": 3.5406250000000057,
+            "peakBytes": 33554432
+          }
+        ],
+        "p50": 40.626875,
+        "p95": 40.626875,
+        "maxTaskMs": 3.5406250000000057,
+        "trackedPixelPeakBytes": 33554432,
+        "processMemory": {
+          "start": {
+            "rss": 41631744,
+            "heapTotal": 5128192,
+            "heapUsed": 3752824,
+            "external": 1409831,
+            "arrayBuffers": 25448
+          },
+          "peakSampled": {
+            "rss": 80691200,
+            "heapTotal": 5390336,
+            "heapUsed": 3992480,
+            "external": 35024576,
+            "arrayBuffers": 33579880
+          }
+        },
+        "cancelLatencyMs": 2.369833,
+        "limit8192": {
+          "allowed": false,
+          "reason": "图像超过当前设备处理上限（16777216 像素），请先缩小或分块"
+        }
+      },
+      {
+        "referenceDevice": {
+          "cpu": "Apple M5",
+          "cores": 10,
+          "platform": "darwin",
+          "osRelease": "25.5.0",
+          "arch": "arm64",
+          "runtime": "v22.23.1"
+        },
+        "input": {
+          "width": 2048,
+          "height": 2048,
+          "layers": 1,
+          "blendMode": "normal",
+          "alpha": 255
+        },
+        "warmupRuns": 0,
+        "samples": [
+          {
+            "elapsedMs": 42.856458,
+            "maxTaskMs": 4.66062500000001,
+            "peakBytes": 33554432
+          }
+        ],
+        "p50": 42.856458,
+        "p95": 42.856458,
+        "maxTaskMs": 4.66062500000001,
+        "trackedPixelPeakBytes": 33554432,
+        "processMemory": {
+          "start": {
+            "rss": 41517056,
+            "heapTotal": 5128192,
+            "heapUsed": 3752824,
+            "external": 1409831,
+            "arrayBuffers": 25448
+          },
+          "peakSampled": {
+            "rss": 80658432,
+            "heapTotal": 5390336,
+            "heapUsed": 3992456,
+            "external": 35024576,
+            "arrayBuffers": 33579880
+          }
+        },
+        "cancelLatencyMs": 3.844832999999994,
+        "limit8192": {
+          "allowed": false,
+          "reason": "图像超过当前设备处理上限（16777216 像素），请先缩小或分块"
+        }
+      },
+      {
+        "referenceDevice": {
+          "cpu": "Apple M5",
+          "cores": 10,
+          "platform": "darwin",
+          "osRelease": "25.5.0",
+          "arch": "arm64",
+          "runtime": "v22.23.1"
+        },
+        "input": {
+          "width": 2048,
+          "height": 2048,
+          "layers": 1,
+          "blendMode": "normal",
+          "alpha": 255
+        },
+        "warmupRuns": 0,
+        "samples": [
+          {
+            "elapsedMs": 38.771208,
+            "maxTaskMs": 3.021374999999992,
+            "peakBytes": 33554432
+          }
+        ],
+        "p50": 38.771208,
+        "p95": 38.771208,
+        "maxTaskMs": 3.021374999999992,
+        "trackedPixelPeakBytes": 33554432,
+        "processMemory": {
+          "start": {
+            "rss": 41533440,
+            "heapTotal": 5128192,
+            "heapUsed": 3752824,
+            "external": 1409831,
+            "arrayBuffers": 25448
+          },
+          "peakSampled": {
+            "rss": 80560128,
+            "heapTotal": 5390336,
+            "heapUsed": 3992480,
+            "external": 35024576,
+            "arrayBuffers": 33579880
+          }
+        },
+        "cancelLatencyMs": 3.077875000000006,
+        "limit8192": {
+          "allowed": false,
+          "reason": "图像超过当前设备处理上限（16777216 像素），请先缩小或分块"
+        }
+      }
+    ],
+    "p50": 39.535083,
+    "p95": 42.856458
+  },
+  "warm": {
+    "referenceDevice": {
+      "cpu": "Apple M5",
+      "cores": 10,
+      "platform": "darwin",
+      "osRelease": "25.5.0",
+      "arch": "arm64",
+      "runtime": "v22.23.1"
+    },
+    "input": {
+      "width": 2048,
+      "height": 2048,
+      "layers": 1,
+      "blendMode": "normal",
+      "alpha": 255
+    },
+    "warmupRuns": 3,
+    "samples": [
+      {
+        "elapsedMs": 56.382500000000164,
+        "maxTaskMs": 6.84091699999999,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 50.710916,
+        "maxTaskMs": 5.317749999999933,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 59.0642499999999,
+        "maxTaskMs": 6.863624999999956,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 79.50129200000038,
+        "maxTaskMs": 12.320042000000285,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 50.197791999999936,
+        "maxTaskMs": 7.332417000000078,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 35.43424999999979,
+        "maxTaskMs": 2.914832999999817,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 43.592083,
+        "maxTaskMs": 3.9087079999999332,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 33.39958399999978,
+        "maxTaskMs": 2.7908339999999043,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 32.4382499999997,
+        "maxTaskMs": 2.760250000000269,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 31.527583999999933,
+        "maxTaskMs": 2.232666999999765,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 33.17170800000031,
+        "maxTaskMs": 2.6641249999997854,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 326.98941700000023,
+        "maxTaskMs": 68.90470800000003,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 57.961874999999964,
+        "maxTaskMs": 10.82858299999998,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 49.19795900000008,
+        "maxTaskMs": 4.974334000000454,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 59.12858300000062,
+        "maxTaskMs": 9.161540999999488,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 40.54870799999935,
+        "maxTaskMs": 3.5008749999997235,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 40.44654200000059,
+        "maxTaskMs": 3.797375000000102,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 37.5567089999995,
+        "maxTaskMs": 3.6327500000006694,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 29.868124999999964,
+        "maxTaskMs": 2.3141249999998763,
+        "peakBytes": 33554432
+      },
+      {
+        "elapsedMs": 32.50550000000021,
+        "maxTaskMs": 2.4329160000006596,
+        "peakBytes": 33554432
+      }
+    ],
+    "p50": 43.592083,
+    "p95": 79.50129200000038,
+    "maxTaskMs": 68.90470800000003,
+    "trackedPixelPeakBytes": 33554432,
+    "processMemory": {
+      "start": {
+        "rss": 41746432,
+        "heapTotal": 5128192,
+        "heapUsed": 3752824,
+        "external": 1409831,
+        "arrayBuffers": 25448
+      },
+      "peakSampled": {
+        "rss": 114917376,
+        "heapTotal": 6438912,
+        "heapUsed": 3731280,
+        "external": 68564035,
+        "arrayBuffers": 67119339
+      }
+    },
+    "cancelLatencyMs": 0.5662499999998545,
+    "limit8192": {
+      "allowed": false,
+      "reason": "图像超过当前设备处理上限（16777216 像素），请先缩小或分块"
+    }
+  },
+  "limits": {
+    "previewMs": 300,
+    "mainThreadTaskMs": 50
+  },
+  "passed": false,
+  "memoryCaveat": "trackedPixelPeakBytes counts input/output typed arrays; sampled process RSS includes Node runtime and is not a GPU/browser memory measure."
+}

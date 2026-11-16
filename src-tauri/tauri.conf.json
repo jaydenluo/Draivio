@@ -28,9 +28,18 @@
       "csp": null
     }
   },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGM0U3MzJDMTM1OUMyRDIKUldUU3dsa1RMSE0rbjZ0WS9iNm5zNGxGQlJldURpbUdoMjcvdmk5MHNTLzRNek13dXRwcHFxcnQK",
+      "endpoints": [
+        "https://github.com/jaydenluo/Draivio/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": "v1Compatible",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

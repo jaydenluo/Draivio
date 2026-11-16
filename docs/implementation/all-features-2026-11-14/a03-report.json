@@ -1,0 +1,63 @@
+{
+  "summary": "实现稳定文档请求上下文并接入真实生成入口：冻结文档ID、内容指纹、目标ID、选区和像素范围；有效祖先锁定校验；按真实SVG祖先变换链（含内容尺寸）捕获坐标映射。真实延迟响应时切换选择仍保留原目标。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/ai/context/editorContext.ts",
+    "src/ai/context/editorContext.test.ts",
+    "src/creation/ImageGeneration.tsx",
+    "src/creation/ImageGeneration.test.tsx",
+    "src/state/editor.tsx",
+    "docs/implementation/all-features-2026-11-14/a03-worker-result.md"
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run src/ai/context/editorContext.test.ts src/creation/ImageGeneration.test.tsx src/document/documentWorkspace.test.ts src/document/projectFormat.test.ts",
+      "result": "4 files / 19 tests passed after ancestor-transform repair",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm test -- --run",
+      "result": "89 files / 373 tests passed before final ancestor-transform repair; final repair additionally verified by focused 19 tests",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed; existing large bundle warning",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "preview提供采样尺寸metadata；当前真实文生图不发送参考像素，实际位图输入由F23独立接入",
+    "revision为provenance指纹，后续编辑事务仍需写入冲突守卫",
+    "其他checkout组变换整合后须重核坐标语义"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "2b9befad-3123-492f-87f7-2477ca2bc431",
+      "result": "单元与真实入口验证组继承锁定、无目标、无选区，校验失败不提交网络请求",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "99f6d9d9-c7e3-44c0-a5a1-5a6f51a724f7",
+      "result": "延迟真实fetch契约返回期间切换选中与选区，返回结果context仍是原目标ID；已有documentWorkspace测试验证文档归属",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "3e981e71-0fe1-43b7-b147-64aed7d4bfac",
+      "result": "view zoom/rotation/DPI不参与像素范围；两级组与不同content尺寸的真实CanvasScene SVG矩阵独立解析对照点及AABB通过",
+      "evidence": []
+    }
+  ]
+}

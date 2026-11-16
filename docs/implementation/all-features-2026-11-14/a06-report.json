@@ -1,0 +1,72 @@
+{
+  "summary": "实现显式图片/文本/视觉模型能力与独立助手选择，真实服务抽屉和来源编辑均接入；旧配置保持仅生图，来源与图片模型顺序不变；native SQLite强类型持久化和旧记录兼容通过。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/ai/providers/modelCapabilities.ts",
+    "src/ai/providers/modelCapabilities.test.ts",
+    "src/creation/serviceConnections.ts",
+    "src/creation/modelSources.ts",
+    "src/creation/ServiceSourceEditor.tsx",
+    "src/creation/ServiceSourceSettings.tsx",
+    "src/creation/ServiceSourceSettings.test.tsx",
+    "src/styles/service-settings.css",
+    "src-tauri/src/service_connections.rs",
+    "docs/implementation/all-features-2026-11-14/a06-worker-result.md"
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run",
+      "result": "90 files / 381 tests passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm test -- --run src/ai/providers/modelCapabilities.test.ts src/creation/ServiceSourceSettings.test.tsx src/creation/serviceConnections.test.ts src/creation/ModelSourcePicker.test.tsx",
+      "result": "4 files / 33 tests passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "cargo test --manifest-path src-tauri/Cargo.toml service_connections::tests",
+      "result": "6 tests passed; coordinator independently reran",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed; existing large bundle warning",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "能力为用户显式声明，不等于远端权限已验证；真实推理请求由A07承担",
+    "未调用付费API；原生GUI人工验收未声称完成"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "971f515e-00ff-4da9-b038-22b6a9caef90",
+      "result": "旧配置image-only迁移与真实UI未选择状态测试通过；不从名称或模型列表推断推理能力",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "3225aa5e-f7bc-4b50-af18-b4d9c47e431c",
+      "result": "同名不同源按sourceID区分，独立助手选择不改Composer，来源与生图模型顺序和SQLite往返测试通过",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "3876ebfc-d3aa-44a4-9ced-ca11a2514813",
+      "result": "无助手配置引导、禁用来源和缺密钥候选排除测试通过；UI明确模型列表不证明推理和工具权限",
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "source": "Actual PNGs downloaded through root agent CUA from diagnostic HTML; this worker only decoded designated files.",
+  "comparisons": {
+    "low25 vs identity": {
+      "max": 0,
+      "mean": 0.0,
+      "count": 16384,
+      "nonzero": 0
+    },
+    "separable25 vs identity": {
+      "max": 122,
+      "mean": 19.11865234375,
+      "count": 16384,
+      "nonzero": 11187
+    },
+    "low13 vs identity": {
+      "max": 113,
+      "mean": 13.23626708984375,
+      "count": 16384,
+      "nonzero": 9349
+    }
+  },
+  "samples": [
+    {
+      "x": 32,
+      "y": 24,
+      "pixels": {
+        "low25": [
+          170,
+          50,
+          180,
+          255
+        ],
+        "separable25": [
+          161,
+          113,
+          118,
+          255
+        ],
+        "low13": [
+          183,
+          102,
+          115,
+          255
+        ],
+        "identity": [
+          170,
+          50,
+          180,
+          255
+        ]
+      }
+    },
+    {
+      "x": 12,
+      "y": 60,
+      "pixels": {
+        "low25": [
+          180,
+          180,
+          180,
+          255
+        ],
+        "separable25": [
+          118,
+          118,
+          118,
+          255
+        ],
+        "low13": [
+          124,
+          124,
+          124,
+          255
+        ],
+        "identity": [
+          180,
+          180,
+          180,
+          255
+        ]
+      }
+    },
+    {
+      "x": 32,
+      "y": 52,
+      "pixels": {
+        "low25": [
+          160,
+          160,
+          160,
+          255
+        ],
+        "separable25": [
+          152,
+          140,
+          134,
+          255
+        ],
+        "low13": [
+          157,
+          154,
+          153,
+          255
+        ],
+        "identity": [
+          160,
+          160,
+          160,
+          255
+        ]
+      }
+    }
+  ],
+  "files": {
+    "low25": {
+      "path": "/Users/szys/Downloads/adjustment-diagnostic-low25.png",
+      "sha256": "ee93a326953088a9d0d6b8865cbb276c7cea1055ea97b11a61cf839eea6f1859"
+    },
+    "separable25": {
+      "path": "/Users/szys/Downloads/adjustment-diagnostic-separable25.png",
+      "sha256": "256939b3356a033fdcdcc92776e217482dc9b47940349239676cbc2e93b586dc"
+    },
+    "low13": {
+      "path": "/Users/szys/Downloads/adjustment-diagnostic-low13.png",
+      "sha256": "074061545f6ed25da3edf261f2c0bb889952ad514ff70c50d7570c67a291bf75"
+    },
+    "identity": {
+      "path": "/Users/szys/Downloads/adjustment-diagnostic-identity.png",
+      "sha256": "ee93a326953088a9d0d6b8865cbb276c7cea1055ea97b11a61cf839eea6f1859"
+    }
+  },
+  "conclusion": "This browser renders 25x25 dense convolution as identity; equivalent separable 25x1 and 1x25 changes pixels. Exact engine internal fallback limit not inferred."
+}

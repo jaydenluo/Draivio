@@ -1,0 +1,87 @@
+{
+  "summary": "产品抠图、背景与接触投影配方已接入真实Composer入口。仅移除未使用的文字实例分割整体依赖，保留四项实际依赖。用户接受主体蒙版后，复制原商品source/几何和软mask，原商品层隐藏保留；纯色/已有背景及独立投影本地完成，显式生成入口不自动发请求。真实瓶身文字/镂空/玻璃alpha固定像素、导出/重开/undo/取消/过期/锁定均验证。5files15tests、build、check全部通过；交独立审查，未自行验收或提交。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/ai/recipes/product.ts",
+    "src/ai/recipes/ProductRecipeWorkspace.tsx",
+    "src/ai/recipes/product.test.ts",
+    "src/ai/recipes/product.pixels.test.tsx",
+    "src/ai/recipes/ProductRecipeWorkspace.test.tsx",
+    "src/ai/recipes/productFixture.ts",
+    "src/creation/AIComposer.tsx",
+    "src/state/editor.tsx",
+    "src/document/projectFormat.ts",
+    "src/document/projectValidation.ts",
+    "docs/user-guide/product-recipe.md",
+    "docs/implementation/product-recipe/plan.md",
+    "docs/implementation/product-recipe/before.png",
+    "docs/implementation/product-recipe/after.png",
+    "docs/implementation/product-recipe/export.png"
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run --maxWorkers=2 --testTimeout=30000 src/ai/recipes/product.test.ts src/ai/recipes/product.pixels.test.tsx src/ai/recipes/ProductRecipeWorkspace.test.tsx src/creation/ComposerLayout.test.tsx src/creation/AIComposer.conversation.test.tsx",
+      "result": "5 files/15 tests passed; /tmp/draivio-product-focused-final.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "tsc + vite passed; existing nonblocking chunk size/dynamic import warnings; /tmp/draivio-product-build.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "Checks passed; /tmp/draivio-product-check-final.log",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [
+    {
+      "label": "固定样例前后图与实际导出：docs/implementation/product-recipe/{before,after,export}.png；瓶身文字逐像素、镂空和alpha128通过",
+      "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+    }
+  ],
+  "risks": [
+    "接触投影为用户可调椭圆近似，不是物理光照推理；透明/反光分割质量需手工精修。",
+    "支持顶层普通商品图片；嵌套/智能对象/特殊图层及独立绘制对象明确要求先做普通图片副本。",
+    "固定像素样例不是语义模型准确率证据；未调用付费模型。背景生成走已有显式用户确认通道。",
+    "历史首次build因并行doubleExposure测试模块尚未就绪失败exit1，未视为通过；本次fresh build已exit0。"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "728b333d-c763-4990-ad9a-13bd211c301a",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "固定瓶身标签逐像素相等，源source/transform/soft mask保留；真实CanvasScene/export/reopen/undo像素一致。",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "6e336a6a-901c-4f34-a582-16f0c9f55bff",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "独立接触投影SVG图片层，水平/垂直接触、宽度、压扁、模糊、透明度可调；Layer.productRecipe参数版本化入项目，正常图层移动/透明度继续可编辑。",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "95a5be80-d613-43c1-b294-689627dabe46",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "接受已有主体mask后复制软alpha，玻璃alpha128/镂空0像素通过；手工精修按钮切换现有mask工具，不改源图；无mask明确阻塞，不自动重绘或付费调用。",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    }
+  ]
+}

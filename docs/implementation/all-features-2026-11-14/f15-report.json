@@ -1,0 +1,22 @@
+{
+  "summary":"F15 完整实现并通过 fresh 独立复核：投影、描边、内阴影、颜色叠加、渐变叠加接入图片/文字/形状/组真实 SVG 合成，固定顺序、可逆 state/project/undo、属性面板参数、样式复制粘贴和严格边界校验。",
+  "outcome":"success",
+  "changedFiles":["src/render/layerEffects.ts","src/render/layerEffects.test.ts","src/render/LayerEffectsFilter.tsx","src/render/layerEffects.pixels.test.tsx","src/render/layerEffects.integration.test.tsx","src/layers/LayerEffectsPanel.tsx","src/layers/LayerEffectsPanel.test.tsx","src/layers/PropertiesPanel.tsx","src/state/editor.tsx","src/state/layerHierarchy.ts","src/document/projectValidation.ts","src/document/projectFormat.ts","src/document/projectFormat.test.ts","src/canvas/CanvasScene.tsx"],
+  "tests":[
+    {"command":"npx vitest run F15 focused --maxWorkers=1 --testTimeout=60000","result":"11 files / 95 tests passed; exit 0","outcome":"passed","exitCode":0},
+    {"command":"npx vitest run F15 fresh review --maxWorkers=1 --testTimeout=60000","result":"7 files / 45 tests passed; exit 0","outcome":"passed","exitCode":0},
+    {"command":"npx tsc -b","result":"passed","outcome":"passed","exitCode":0},
+    {"command":"npm run build","result":"passed; existing chunk/dynamic-import warnings only","outcome":"passed","exitCode":0},
+    {"command":"vibeplan check","result":"passed","outcome":"passed","exitCode":0}
+  ],
+  "commit":null,
+  "evidence":[],
+  "risks":["渐变使用本地 SVG defs/#resource；filter region按effectPadding限制，极端子像素变换有正常重采样差异。"],
+  "remainingIssues":[],
+  "criterionResults":[
+    {"acceptanceItemId":"a91e252f-33f4-43aa-a462-0163c0361fdf","result":"PASS：真实 Resvg 验证五类效果在透明图片边缘、文字、形状、组中的像素；固定顺序且扩展 region 不裁切。","evidence":[]},
+    {"acceptanceItemId":"b8b7be92-27ba-4510-a1e5-4e92bd4914bc","result":"PASS：面板预览、启停/重置、undo、样式复制粘贴、项目重开与导出一致；效果不改变几何。","evidence":[]},
+    {"acceptanceItemId":"bfc30378-b0f0-497f-805e-e1dbe22788ea","result":"PASS：effects 深拷贝，关闭恢复原始内容，祖先锁拒绝写入。","evidence":[]},
+    {"acceptanceItemId":"ea108be8-a03f-4e17-84de-100945f3d2e5","result":"PASS：透明颜色、负值/NaN、超大 blur/width/distance 严格拒绝；effectPadding 估算扩展边界。","evidence":[]}
+  ]
+}

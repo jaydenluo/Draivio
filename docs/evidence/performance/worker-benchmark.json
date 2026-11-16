@@ -1,0 +1,56 @@
+{
+  "samples": [
+    {
+      "elapsedMs": 83.15995900000007,
+      "maxMainTaskMs": 1.8060840000000553,
+      "maxWorkerTaskMs": 2.6442910000000666,
+      "trackedPixelPeakBytes": 50331648
+    },
+    {
+      "elapsedMs": 82.69462500000009,
+      "maxMainTaskMs": 4.708499999999958,
+      "maxWorkerTaskMs": 2.9804160000001048,
+      "trackedPixelPeakBytes": 50331648
+    },
+    {
+      "elapsedMs": 137.77241700000013,
+      "maxMainTaskMs": 3.367334000000028,
+      "maxWorkerTaskMs": 8.02233299999989,
+      "trackedPixelPeakBytes": 50331648
+    },
+    {
+      "elapsedMs": 115.61408299999994,
+      "maxMainTaskMs": 2.7114579999999933,
+      "maxWorkerTaskMs": 3.4682920000000195,
+      "trackedPixelPeakBytes": 50331648
+    },
+    {
+      "elapsedMs": 119.87404100000003,
+      "maxMainTaskMs": 2.875541000000112,
+      "maxWorkerTaskMs": 5.985541999999896,
+      "trackedPixelPeakBytes": 50331648
+    },
+    {
+      "elapsedMs": 108.61208299999998,
+      "maxMainTaskMs": 2.011166000000003,
+      "maxWorkerTaskMs": 5.053583000000117,
+      "trackedPixelPeakBytes": 50331648
+    },
+    {
+      "elapsedMs": 97.49154199999975,
+      "maxMainTaskMs": 4.163082999999915,
+      "maxWorkerTaskMs": 3.4290829999999914,
+      "trackedPixelPeakBytes": 50331648
+    }
+  ],
+  "p50": 108.61208299999998,
+  "p95": 137.77241700000013,
+  "maxMainTaskMs": 4.708499999999958,
+  "transport": "Real bundled module worker on Node worker_threads; source clone + startup + output transfer included; no fake pixels/backend.",
+  "input": {
+    "width": 2048,
+    "height": 2048,
+    "layers": 1
+  },
+  "caveat": "Real separate OS threads with a transport bridge, not a claim of browser GPU/desktop end-to-end timing."
+}

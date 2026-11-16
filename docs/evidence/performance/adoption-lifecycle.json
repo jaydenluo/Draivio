@@ -1,0 +1,172 @@
+{
+  "cycles": 20,
+  "peakPixelBytes": 524288,
+  "peakSampledProcessRss": 187514880,
+  "retainedOwnedPixelBytes": 0,
+  "sourceDataUrlsRetainedForUndo": 20,
+  "undoStack": 0,
+  "redoStack": 1,
+  "rows": [
+    {
+      "cycle": 1,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1072524,
+      "rss": 173096960,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 2,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1334668,
+      "rss": 173391872,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 3,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1596812,
+      "rss": 173686784,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 4,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1858956,
+      "rss": 174014464,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 5,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 2121100,
+      "rss": 175046656,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 6,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1203065,
+      "rss": 181633024,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 7,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1465254,
+      "rss": 181927936,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 8,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1727398,
+      "rss": 182239232,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 9,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 1989542,
+      "rss": 182534144,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 10,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 2251686,
+      "rss": 182845440,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 11,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 2513830,
+      "rss": 183123968,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 12,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 2775974,
+      "rss": 183402496,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 13,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 3038118,
+      "rss": 183730176,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 14,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 3300262,
+      "rss": 184254464,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 15,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 3562406,
+      "rss": 184778752,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 16,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 3824550,
+      "rss": 185319424,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 17,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 4086694,
+      "rss": 186302464,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 18,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 4348838,
+      "rss": 186564608,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 19,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 4610982,
+      "rss": 186974208,
+      "undo": 0,
+      "redo": 1
+    },
+    {
+      "cycle": 20,
+      "retainedPixelBytes": 0,
+      "arrayBuffers": 4873126,
+      "rss": 187514880,
+      "undo": 0,
+      "redo": 1
+    }
+  ],
+  "caveat": "Undo/results intentionally retain encoded PNG sources. Zero owned pixel buffers proves deterministic cleanup and reference eviction, not immediate JS/GPU garbage collection. Process RSS/arrayBuffers are actual samples, not scheduler-only ownership."
+}

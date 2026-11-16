@@ -1,0 +1,78 @@
+{
+  "taskId": "fa00ba86-4507-4ae0-91c9-1bc405e94ede",
+  "summary": "F06 implemented: 16 W3C blend modes with alpha-correct raster composition; atomic base-alpha clipping chains in shared SVG preview/export; strict project/undo/lock handling, UI, and merge integration.",
+  "changedFiles": [
+    "src/render/blendModes.ts",
+    "src/render/blendModes.test.ts",
+    "src/engine/raster/composite.ts",
+    "src/state/clipping.ts",
+    "src/state/clipping.test.ts",
+    "src/state/editor.tsx",
+    "src/state/layerHierarchy.ts",
+    "src/document/projectFormat.ts",
+    "src/document/projectValidation.ts",
+    "src/document/groupTransforms.tsx",
+    "src/document/segmentedMerge.tsx",
+    "src/document/clippingMerge.test.tsx",
+    "src/canvas/CanvasScene.tsx",
+    "src/canvas/CanvasScene.clipping.test.tsx",
+    "src/layers/LayersPanel.tsx",
+    "src/layers/LayersPanel.clipping.test.tsx",
+    "src/ai/context/editorContext.ts",
+    "docs/user-guide/layer-clipping.md"
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run src/render/blendModes.test.ts src/state/clipping.test.ts src/engine/raster/composite.test.ts src/canvas/CanvasScene.clipping.test.tsx src/document/clippingMerge.test.tsx src/layers/LayersPanel.clipping.test.tsx src/document/projectFormat.test.ts src/state/layerHierarchy.test.ts src/document/segmentedMerge.test.tsx src/document/groupTransforms.test.tsx src/canvas/CanvasScene.test.tsx src/layers/LayersPanel.hierarchy.test.tsx src/ai/context/editorContext.test.ts src/canvas/retouchScope.test.ts src/render/serializeExport.dom.test.tsx src/render/exportImage.test.ts",
+      "result": "16 files / 144 tests passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/state/clipping.test.ts src/state/layerHierarchy.test.ts src/canvas/CanvasScene.clipping.test.tsx",
+      "result": "3 files / 48 tests passed after final SVG ID collision and group-copy sibling-order fixes",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed; existing chunk size and dynamic/static import warnings",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed; no queued events",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "d8075ff1-96b8-4d29-a1a6-376394d6d1a3",
+      "result": "Real SVG pixels prove half-transparent shape and antialiased text base alpha is applied once, with multi-clips, moving/releasing/deleting base; structural invalid links release explicitly without guessing rebind.",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "758f2210-d332-44d4-b604-c147e1bbbc8c",
+      "result": "All 16 modes independently compared between W3C CPU implementation and actual CanvasScene→serializeExport→Resvg, at partial/empty backdrop and every pixel of translucent antialiased ellipse edges. Premultiplied error ≤2 bytes.",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "41b6b416-7ebf-4884-91ae-16cadc24d96f",
+      "result": "Nested scaled/rotated parent, text+adjustment filter, base internal multiply/screen/hue, selected-layer export, project reopening, undo, and full-chain merge real pixels pass.",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "45865c5c-6cbe-4159-a2c2-c6e2895e90cd",
+      "result": "Locked create/release and implicit structural release are blocked; same-parent contiguous ordered base links reject missing/cross-parent/circular/interrupted imports; group duplication remaps internal links.",
+      "evidence": []
+    }
+  ],
+  "risks": [
+    "Pixel evidence uses Resvg against the same actual SVG source; a Tauri/WebKit screenshot session was not run.",
+    "Partial-chain merges or chain merges including hidden members explicitly refuse without mutation. Full visible chain merges preserve base blend semantics. A group participating in an external clipping chain cannot be ungrouped until released/merged. These boundaries are documented in docs/user-guide/layer-clipping.md."
+  ],
+  "remainingIssues": [],
+  "commit": null
+}

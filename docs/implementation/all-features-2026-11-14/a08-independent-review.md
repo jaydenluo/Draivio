@@ -1,0 +1,6 @@
+
+## Repair cycle 2 — exact Chinese command semantics
+
+Original corpus asserted only step counts, masking rename-with-副本 becoming duplicate and layer ordering becoming pixel movement. Added exact tool/argument/dependency expectations; worker first observed failures for rename/order/negated delete. Repair prioritizes rename over copy words, excludes layer ordering from pixel moves, honors negated actions without rejecting 不透明度/不可见, and filters enabled:false capabilities. Copy-followed-by-edit now asks to select generated copy ID and emits no unsafe subsequent edit.
+
+Independent source inspection and actual command: `npm test -- --run src/ai/planning/planner.test.ts src/ai/execution/executor.test.ts src/ai/ui/editRunIntegration.test.ts src/creation/AIComposer.editPlan.test.tsx` exited 0, 4 files / 21 tests (planner 11). Corpus covers 22 exact basic commands, 10 genuinely executable two/three-step compound commands (copy ambiguity kept separately), all ordered dependencies, both order directions, negated selected/named delete and disabled capability. `npm run build` / `vibeplan check` exited 0 before final tests-only addition. Conservative copy-ID clarification is an explicit capability boundary, never an edit to original layer disguised as copy editing.
