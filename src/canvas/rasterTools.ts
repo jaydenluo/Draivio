@@ -102,6 +102,7 @@ export function serializeSvg(svg: SVGElement): { source: string; width: number; 
   const height = Math.round(viewBox?.length === 4 && viewBox[3] > 0 ? viewBox[3] : numericLength('height') || rect.height)
   validateDimensions(width, height)
   const clone = svg.cloneNode(true) as SVGElement
+  clone.querySelectorAll('[data-editor-hidden="true"]').forEach(node => node.removeAttribute('data-editor-hidden'))
   clone.setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns', 'http://www.w3.org/2000/svg')
   clone.setAttribute('width', String(width)); clone.setAttribute('height', String(height))
   return { source: new XMLSerializer().serializeToString(clone), width, height }
@@ -113,7 +114,8 @@ function context2d(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   return context
 }
 
-export async function rasterizeSvg(svg: SVGElement): Promise<HTMLCanvasElement> {
+export async function rasterizeSvg(svg: SVGElement, signal?: AbortSignal): Promise<HTMLCanvasElement> {
+  if (signal?.aborted) throw new DOMException('操作已取消', 'AbortError')
   const { source, width, height } = serializeSvg(svg)
   const canvas = document.createElement('canvas')
   canvas.width = width; canvas.height = height
@@ -122,38 +124,31 @@ export async function rasterizeSvg(svg: SVGElement): Promise<HTMLCanvasElement> 
   try {
     const image = new Image()
     await new Promise<void>((resolve, reject) => {
+      const abort = () => { image.onload = null; image.onerror = null; reject(new DOMException('操作已取消', 'AbortError')) }
+      signal?.addEventListener('abort', abort, { once: true })
       const timer = setTimeout(() => { image.onload = null; image.onerror = null; reject(new Error('SVG 图像解码超时')) }, 15000)
-      image.onload = () => { clearTimeout(timer); resolve() }
+      image.onload = () => { clearTimeout(timer); signal?.removeEventListener('abort', abort); if (signal?.aborted) reject(new DOMException('操作已取消', 'AbortError')); else resolve() }
       image.onerror = () => { clearTimeout(timer); reject(new Error('SVG 图像无法解码')) }
       image.src = url
     })
+    if (signal?.aborted) throw new DOMException('操作已取消', 'AbortError')
     context.drawImage(image, 0, 0, width, height)
     return canvas
   } finally { URL.revokeObjectURL(url) }
 }
 
-function readPixels(canvas: HTMLCanvasElement): ImageData {
+export function readCanvasPixels(canvas: HTMLCanvasElement): ImageData {
   try { return context2d(canvas).getImageData(0, 0, canvas.width, canvas.height) }
   catch (cause) { throw new Error('无法读取画布像素；图像可能含有不允许读取的跨域内容', { cause }) }
 }
 
-export async function sampleCanvasColor(svg: SVGElement, xPct: number, yPct: number): Promise<string> {
-  validatePoint({ x: xPct, y: yPct })
-  return samplePixelColor(readPixels(await rasterizeSvg(svg)), xPct, yPct)
+export async function rasterizeSvgPixels(svg: SVGElement, signal?: AbortSignal): Promise<PixelImage> {
+  const canvas = await rasterizeSvg(svg, signal)
+  const pixels = readCanvasPixels(canvas)
+  return { width: pixels.width, height: pixels.height, data: new Uint8ClampedArray(pixels.data) }
 }
 
-export async function contiguousMagicSelection(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<Selection> {
-  const image = readPixels(await rasterizeSvg(svg))
-  return maskToSelection(floodPixels(image, point, tolerance), image.width, image.height)
-}
-
-export async function eraseBackground(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<string> {
-  const canvas = await rasterizeSvg(svg)
-  const image = readPixels(canvas)
-  return writePng(canvas, eraseFloodPixels(image, point, tolerance))
-}
-
-function writePng(canvas: HTMLCanvasElement, image: PixelImage): string {
+export function encodePng(canvas: HTMLCanvasElement, image: PixelImage): string {
   const context = context2d(canvas)
   const output = context.createImageData(image.width, image.height)
   output.data.set(image.data)
@@ -161,6 +156,29 @@ function writePng(canvas: HTMLCanvasElement, image: PixelImage): string {
   const url = canvas.toDataURL('image/png')
   if (!url.startsWith('data:image/png')) throw new Error('无法将处理结果编码为 PNG 图像')
   return url
+}
+
+export function imageToPng(image: PixelImage): string {
+  validateImage(image)
+  const canvas = document.createElement('canvas')
+  canvas.width = image.width; canvas.height = image.height
+  return encodePng(canvas, image)
+}
+
+export async function sampleCanvasColor(svg: SVGElement, xPct: number, yPct: number): Promise<string> {
+  validatePoint({ x: xPct, y: yPct })
+  return samplePixelColor(readCanvasPixels(await rasterizeSvg(svg)), xPct, yPct)
+}
+
+export async function contiguousMagicSelection(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<Selection> {
+  const image = readCanvasPixels(await rasterizeSvg(svg))
+  return maskToSelection(floodPixels(image, point, tolerance), image.width, image.height)
+}
+
+export async function eraseBackground(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<string> {
+  const canvas = await rasterizeSvg(svg)
+  const image = readCanvasPixels(canvas)
+  return encodePng(canvas, eraseFloodPixels(image, point, tolerance))
 }
 
 /** Projectively maps TL/TR/BR/BL source corners onto a rectangular output.
@@ -265,30 +283,33 @@ export function smudgePixels(image: PixelImage, points: SelectionPoint[], size: 
 }
 
 /** Samples only the original image, maintaining the initial source offset at every dab. */
-export function clonePixels(image: PixelImage, points: SelectionPoint[], source: SelectionPoint, size: number): PixelImage {
+export function clonePixels(image: PixelImage, points: SelectionPoint[], source: SelectionPoint, size: number, options: { opacity?: number; hardness?: number; aligned?: boolean; alignmentOrigin?: SelectionPoint } = {}): PixelImage {
   const dabs = brushDabs(image, points, size)
   validatePoint(source)
-  const sourceX = Math.round(source.x / 100 * (image.width - 1)); const sourceY = Math.round(source.y / 100 * (image.height - 1))
+  const alignedSource = options.aligned !== false && options.alignmentOrigin ? { x: source.x + points[0].x - options.alignmentOrigin.x, y: source.y + points[0].y - options.alignmentOrigin.y } : source
+  const sourceX = Math.round(alignedSource.x / 100 * (image.width - 1)); const sourceY = Math.round(alignedSource.y / 100 * (image.height - 1))
   const dx = sourceX - dabs[0].x; const dy = sourceY - dabs[0].y
+  const opacity = Math.max(0, Math.min(1, (options.opacity ?? 100) / 100)); const hardness = Math.max(0, Math.min(1, (options.hardness ?? 100) / 100))
   const offsets = brushOffsets(size)
   const data = new Uint8ClampedArray(image.data)
   for (const dab of dabs) for (const offset of offsets) {
     const x = dab.x + offset.x; const y = dab.y + offset.y
     const target = pixelOffset(image, x, y)
     const from = pixelOffset(image, x + dx, y + dy)
-    if (target >= 0 && from >= 0) data.set(image.data.subarray(from, from + 4), target)
+    const sourceIndex = from
+    if (target >= 0 && sourceIndex >= 0) { const edge = Math.max(0, Math.min(1, 1 - Math.hypot(offset.x, offset.y) / Math.max(1, size / 2))); const a = opacity * (hardness + (1 - hardness) * edge); for (let c = 0; c < 4; c++) data[target + c] = Math.round(data[target + c] * (1 - a) + image.data[sourceIndex + c] * a) }
   }
   return { width: image.width, height: image.height, data }
 }
 
-export async function smudgeImage(svg: SVGElement, points: SelectionPoint[], size: number, strength: number): Promise<string> {
-  const canvas = await rasterizeSvg(svg)
-  return writePng(canvas, smudgePixels(readPixels(canvas), points, size, strength))
+export async function smudgeImage(svg: SVGElement, points: SelectionPoint[], size: number, strength: number, signal?: AbortSignal): Promise<string> {
+  const canvas = await rasterizeSvg(svg, signal)
+  return encodePng(canvas, smudgePixels(readCanvasPixels(canvas), points, size, strength))
 }
 
-export async function cloneImage(svg: SVGElement, points: SelectionPoint[], source: SelectionPoint, size: number): Promise<string> {
-  const canvas = await rasterizeSvg(svg)
-  return writePng(canvas, clonePixels(readPixels(canvas), points, source, size))
+export async function cloneImage(svg: SVGElement, points: SelectionPoint[], source: SelectionPoint, size: number, options: { opacity?: number; hardness?: number; aligned?: boolean; signal?: AbortSignal } = {}): Promise<string> {
+  const canvas = await rasterizeSvg(svg, options.signal)
+  return encodePng(canvas, clonePixels(readCanvasPixels(canvas), points, source, size, options))
 }
 
 export async function rasterizeSvgPixels(svg: SVGElement): Promise<PixelImage> {

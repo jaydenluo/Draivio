@@ -1,0 +1,14 @@
+# Optional real grounded-instance runtime; model/source artifacts stay outside Git.
+# GroundingDINO/MobileSAM official source roots supplied explicitly in config.
+torch==2.15.0
+torchvision==0.29.2
+transformers==4.44.2
+timm==1.0.12
+numpy>=2,<3
+Pillow>=11,<13
+onnxruntime>=1.19.2,<2
+addict==2.4.0
+yapf>=0.43,<1
+opencv-python>=4.12,<5
+supervision>=0.22,<1
+pycocotools>=2.0.10,<3

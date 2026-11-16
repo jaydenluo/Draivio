@@ -1,0 +1,22 @@
+.document-tabs-bar{display:flex;align-items:stretch;min-width:0;height:32px;background:var(--ink-950);border-bottom:1px solid var(--ink-700)}
+.document-tabs{display:flex;align-items:stretch;min-width:0;overflow-x:auto;scrollbar-width:none;flex:1}
+.document-tabs::-webkit-scrollbar{display:none;width:0;height:0}
+.document-tab{display:flex;align-items:center;flex:0 0 auto;min-width:120px;max-width:230px;border-right:1px solid var(--ink-700);border-top:2px solid transparent;background:var(--ink-900);color:var(--muted)}
+.document-tab.is-active{border-top-color:var(--coral);background:var(--ink-850);color:var(--text)}
+.document-tab>[role=tab]{display:flex;align-items:center;gap:7px;min-width:0;flex:1;height:29px;padding:0 9px 0 12px;background:transparent;font-size:11px;text-align:left}
+.document-tab-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.document-tab-dirty{color:var(--sky);font-size:14px;line-height:1}
+.document-tab-close,.document-tab-add{display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:24px;height:24px;margin:2px 4px 2px 0;border-radius:4px;background:transparent;color:var(--muted);font-size:16px}
+.document-tab-add{width:30px;margin:3px 5px}
+.document-tab-close:hover,.document-tab-add:hover{background:var(--ink-700);color:var(--text)}
+.document-tab-working{color:var(--amber)}
+.canvas-document-host{display:grid;grid-template-rows:32px minmax(0,1fr);min-width:0;min-height:0}
+.active-document-panel{display:grid;min-width:0;min-height:0}
+.document-close-backdrop{position:fixed;inset:0;z-index:120;display:grid;place-items:center;background:#0009}
+.document-close-dialog{width:min(420px,calc(100vw - 40px));padding:22px;border:1px solid var(--ink-700);border-radius:12px;background:var(--ink-900);box-shadow:0 16px 70px #0009}
+.document-close-dialog h2{margin:0 0 12px;font-size:16px;overflow-wrap:anywhere}
+.document-close-dialog p{color:var(--muted);font-size:12px;line-height:1.8}
+.document-close-dialog footer{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+.document-close-dialog button{height:30px;padding:0 12px;border-radius:6px;background:var(--ink-800);font-size:12px}
+.document-close-dialog button.primary{background:var(--coral);color:var(--ink-950)}
+.document-close-dialog button:disabled{opacity:.4;cursor:default}

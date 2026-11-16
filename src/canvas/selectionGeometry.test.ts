@@ -37,6 +37,11 @@ describe('selection geometry in artboard percentages', () => {
     const inverted = invertSelection(a)
     expect(selectionContains(inverted.path, { x: 20, y: 20 })).toBe(false)
     expect(selectionContains(inverted.path, { x: 90, y: 90 })).toBe(true)
+    const restored = invertSelection(inverted)
+    expect(restored.rect).toEqual(a.rect)
+    expect(restored.path).toEqual(a.path)
+    expect(selectionContains(restored.path, { x: 20, y: 20 })).toBe(true)
+    expect(selectionContains(restored.path, { x: 90, y: 90 })).toBe(false)
     const expanded = morphSelection(a, 2)
     expect(selectionContains(expanded.path, { x: 9, y: 20 })).toBe(true)
     const contracted = morphSelection(a, -2)
@@ -67,4 +72,10 @@ describe('selection geometry in artboard percentages', () => {
     }
     expect(selectionContains(combineSelection(null, a, 'add').path, { x: 20, y: 20 })).toBe(true)
   })
+})
+
+it('uses square physical morphology cells on landscape documents', () => {
+ const source = createSelection('rectangle', { x: 40, y: 40, width: 20, height: 20 })
+ const result = morphSelection(source, 2, 1200, 800)
+ expect(result.rect.width * 1200 / 100 - 240).toBeCloseTo(result.rect.height * 800 / 100 - 160, -1)
 })

@@ -48,7 +48,7 @@ test('shapes are real canvas objects; text can be edited and undo restores its c
   fireEvent.keyDown(screen.getByLabelText('编辑画布文字'), { key: 'Enter' })
   expect(doc().canvasTexts[0].text).toBe('春日')
   fireEvent.click(screen.getByRole('button', { name: '撤销' }))
-  expect(doc().canvasTexts[0].text).toBe('双击编辑文字')
+  expect(doc().canvasTexts).toHaveLength(0)
 })
 test('crop and layer transforms preview separately; Escape cancels and Enter commits', () => {
   const target = setup(); tool('裁剪/变换', /^裁剪 /); drag(target)
@@ -62,4 +62,37 @@ test('crop and layer transforms preview separately; Escape cancels and Enter com
   expect(doc().layers[0].transform).toBeUndefined()
   fireEvent.keyDown(window, { key: 'Enter' })
   expect(doc().layers[0].transform.rotation).toBe(35)
+})
+
+test('move tool updates the real layer content during drag before commit', () => {
+  const target = setup(); tool('选择/移动', /^移动/)
+  const sceneLayer = document.querySelector('[data-layer-transform="art"]') as SVGGElement
+  const before = sceneLayer.getAttribute('transform')
+
+  fireEvent.pointerDown(target, { pointerId: 3, clientX: 50, clientY: 60, button: 0 })
+  fireEvent.pointerMove(target, { pointerId: 3, clientX: 150, clientY: 180, buttons: 1 })
+
+  expect(sceneLayer.getAttribute('transform')).not.toBe(before)
+})
+
+test('selection outline does not intercept object dragging with select or move tools', () => {
+  setup()
+  expect(screen.getByLabelText('局部选区')).toBeInTheDocument()
+  expect(screen.queryByLabelText('移动选区')).toBeNull()
+  tool('选择/移动', /^移动/)
+  expect(screen.queryByLabelText('移动选区')).toBeNull()
+  tool('选区', /^矩形选框/)
+  expect(screen.getByLabelText('移动选区')).toBeInTheDocument()
+})
+
+test('select tool moves the visible artwork instead of an empty mask layer underneath it', () => {
+  const target = setup()
+  const original = document.querySelector('.canvas-art [data-layer-transform="art"]')!.getAttribute('transform')
+  fireEvent.pointerDown(target, { pointerId: 4, clientX: 50, clientY: 60, button: 0 })
+  fireEvent.pointerMove(target, { pointerId: 4, clientX: 100, clientY: 100, buttons: 1 })
+  expect(document.querySelector('.canvas-art [data-layer-transform="art"]')!.getAttribute('transform')).not.toBe(original)
+  expect(doc().selectedLayerId).toBe('art')
+  expect(doc().layers.find((layer: { id: string }) => layer.id === 'art').transform).toBeUndefined()
+  fireEvent.pointerUp(target, { pointerId: 4, clientX: 100, clientY: 100, button: 0 })
+  expect(doc().layers.find((layer: { id: string }) => layer.id === 'art').transform.rect.x).toBeCloseTo(10)
 })

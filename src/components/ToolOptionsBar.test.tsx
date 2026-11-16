@@ -30,6 +30,9 @@ test('shows selection controls and persists numeric options through editor state
   expect(screen.getByRole('toolbar', { name: '工具选项' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: '选区模式：新建' })).toHaveAttribute('aria-pressed', 'true')
   expect(screen.getByRole('button', { name: '选区模式：添加' })).toBeInTheDocument()
+  for (const mode of ['新建', '添加', '减去', '相交']) {
+    expect(screen.getByRole('button', { name: `选区模式：${mode}` }).querySelector('svg')).toBeInTheDocument()
+  }
   expect(screen.getByRole('spinbutton', { name: '羽化' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: '固定比例' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: '选区创建蒙版' })).toBeInTheDocument()
@@ -63,6 +66,32 @@ test('updates option fields when switching between brush, text, crop, and naviga
   fireEvent.click(screen.getByRole('button', { name: '切到选择' }))
   expect(screen.getByText('当前工具：选择')).toBeInTheDocument()
   expect(screen.queryByRole('spinbutton', { name: '大小' })).not.toBeInTheDocument()
+})
+
+test('applies and remembers the text color option', () => {
+  renderBar()
+  fireEvent.click(screen.getByRole('button', { name: '切到文字' }))
+  fireEvent.change(screen.getByLabelText('文字颜色'), { target: { value: '#12abef' } })
+  expect(screen.getByTestId('tool-options')).toHaveTextContent('"textColor":"#12abef"')
+  fireEvent.click(screen.getByRole('button', { name: '打开颜色选择器：文字颜色' }))
+  expect(screen.getByRole('button', { name: '最近颜色 #12abef' })).toBeInTheDocument()
+})
+
+test('restores the last text color when the editor starts again', () => {
+  localStorage.setItem('draivio-text-color', '#345678')
+  renderBar()
+  fireEvent.click(screen.getByRole('button', { name: '切到文字' }))
+  expect(screen.getByLabelText('文字颜色')).toHaveValue('#345678')
+  localStorage.removeItem('draivio-text-color')
+})
+
+test('offers quick brush size presets beside the detailed controls', () => {
+  renderBar()
+  fireEvent.click(screen.getByRole('button', { name: '切到画笔' }))
+  const presets = screen.getByRole('group', { name: '常用画笔大小' })
+  expect(presets).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: '48' }))
+  expect(screen.getByRole('spinbutton', { name: '大小' })).toHaveValue(48)
 })
 
 test('edits the shared foreground color for painting and provides mask actions', () => {

@@ -20,20 +20,48 @@ CFG / guidance scale 主要影响提示词引导，不是重绘强度；参考�
 
 当前界面的「强度 48%」是演示参数，尚未映射到真实模型接口，不代表已生效。
 
+## 质量、变化强度和思考深度：本次核查
+
+不能把“强度 48%”直接改名为“质量 48%”。变化强度决定改动程度；质量档位决定模型的生成配置；压缩质量决定文件编码；思考深度则必须由具体接口显式支持。
+
+### Seedream：提示词优化模式
+
+optimize_prompt_options.mode：Seedream 5.0 pro、4.0 支持 standard / fast；本次核查的 5.5、5.0 flash、5.0 lite、4.5 仅支持 standard。标准模式质量更高、耗时更长。这是提示词优化模式，不是重绘强度，也不是可调思考深度。
+
+[官方参数文档](https://docs.volcengine.com/docs/ark/image-generation-api?lang=zh)
+
+### Qwen-Image：智能扩写
+
+prompt_extend 为布尔值，默认 true，控制是否智能改写正向提示词、补充细节；不影响负向提示词。它不是质量百分比，也不是推理深度。关闭后应更认真组织自己的提示词。
+
+[官方参数文档](https://www.alibabacloud.com/help/en/model-studio/qwen-image-api)
+
+### FLUX.2 flex：采样步数与提示词引导
+
+steps 为 1–50，默认 50；guidance 为 1.5–10，默认 5。步数影响细节与计算量；更高 guidance 增强提示词遵循，但可能降低真实感。二者均不是思考深度；这些取值仅适用于所核查的 flex 端点，不能套用到整个 FLUX 系列。
+
+[官方参数文档](https://docs.bfl.ai/api-reference/models/generate-or-edit-an-image-with-flux2-%5Bflex%5D)
+
+### Recraft：图生图变化强度
+
+imageToImage 端点的 strength 为 0–1，0 几乎保留原图，1 与原图最不相似。V3、V4、V4.1 图生图可用，V4.1 Flash 不支持此端点。这是变化程度，不是输出画质。
+
+[官方参数文档](https://www.recraft.ai/docs/api-reference/tools/image-to-image)
+
+### 界面建议（尚未替换参数控件）
+
+按“平台 + 模型 + 具体端点 + 当前操作”决定可用参数。真正支持质量档位的模型显示“质量”；只支持标准／快速模式的模型按实际语义显示模式；编辑强度仅在支持的图生图端点显示。steps 和 guidance 放在高级设置；没有明确的推理配置字段时不显示“思考深度”。切换模型后重新校验和过滤提交参数，不照搬上个模型的值。
+
+OpenAI 官方页面此次返回 403／访问拦截，Google 和 Stability API 参考页连接失败，不能把未核实字段作为当前接入依据。没有在本次调用真实生成接口或验证费用。
+
 ## 已核查的代表性 API 模型
 
 | 模型 / 平台 | 重点方向 |
-
 | --- | --- |
-
 | Seedream 5.5 / 5.0 / 字节跳动 · 火山方舟 | 多图编辑、透明素材与图层工作流 |
-
 | Qwen-Image 2.0 / 2.0 Pro / 阿里云 · 百炼 Model Studio | 文字渲染、写实纹理与指令理解 |
-
 | FLUX.2 系列 / Black Forest Labs · BFL API | 参考图编辑与写实合成 |
-
 | Recraft V4.1 / V4 / V3 / Recraft API | 矢量图、品牌插画与设计素材 |
-
 | Stable Diffusion 3.5 / Stability 图片工具 / Stability AI API / 自部署 | 多种画风、可定制流程与专用编辑 |
 
 ### Seedream 5.5 / 5.0
@@ -46,7 +74,7 @@ CFG / guidance scale 主要影响提示词引导，不是重绘强度；参考�
 
 选择前留意：同一系列版本差异很大：5.5 与 5.0 pro / flash 的常规生成以单图为主，组图功能需查看 5.0 lite / 4.5 / 4.0 等具体版本。透明图、拆层不等于任意图片都能无损拆解。
 
-关于强度：不能把通用强度滑杆直接映射到此系列；需核对具体版本的参数表。
+关于强度：部分版本提供 optimize_prompt_options.mode 的 standard / fast 选项；这是优化模式，不是重绘强度或思考深度。
 
 官方来源：
 
@@ -62,7 +90,7 @@ CFG / guidance scale 主要影响提示词引导，不是重绘强度；参考�
 
 选择前留意：所核查的生成接口 n 为 1–6；尺寸受总像素限制，地区可用版本不同。不能把“支持中文提示词”当成中文字形永远准确。
 
-关于强度：本次核查的生成参数包含尺寸、数量和提示词扩写等，不能据此宣称支持通用编辑强度。
+关于强度：prompt_extend 控制智能提示词扩写；不能把它当作编辑强度或质量百分比。
 
 官方来源：
 
@@ -78,7 +106,7 @@ CFG / guidance scale 主要影响提示词引导，不是重绘强度；参考�
 
 选择前留意：官方页面区分 API 最多 8 张参考图与 Playground 最多 10 张，不能混用。接口采用异步提交与轮询；preview 与固定快照的可复现性要求也不同。
 
-关于强度：自然语言编辑不意味着提供传统重绘强度；按具体端点确认可调字段。
+关于强度：FLUX.2 flex 暴露 steps（1–50）和 guidance（1.5–10），不是传统重绘强度，也不是思考深度；其他端点需分别确认。
 
 官方来源：
 
@@ -95,7 +123,7 @@ CFG / guidance scale 主要影响提示词引导，不是重绘强度；参考�
 
 选择前留意：并非所有版本都支持同样的编辑工具或矢量输出。SVG 是矢量文件，PNG 透明图和 SVG 不是同一回事；排版编辑还要核对版本。
 
-关于强度：图生图、remix 和风格工具的参数要分别查看；不要给所有 Recraft 模型共用一个强度数值。
+关于强度：已核查 imageToImage 的 strength：0–1，0 几乎保留原图、1 最不相似；支持 V3、V4、V4.1，V4.1 Flash 不支持该端点。其他工具需另查。
 
 官方来源：
 

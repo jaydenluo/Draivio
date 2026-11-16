@@ -1,0 +1,6 @@
+import {expect,it} from 'vitest';import {insertAnchor,pathToSvg,removeAnchor,toggleSmooth,type EditablePath} from './pathGeometry';import {booleanShape,booleanToSvg} from './booleanShapes'
+const p:EditablePath={fillRule:'evenodd',closed:true,anchors:[{x:10,y:10},{x:90,y:10},{x:90,y:90},{x:10,y:90}]}
+it('keeps editable anchors and emits closed SVG',()=>{const q=insertAnchor(p,1,{x:50,y:10});expect(pathToSvg(q)).toContain('Z');expect(removeAnchor(q,1).anchors).toHaveLength(4)})
+it('toggles smooth controls and preserves corner semantics',()=>{const q=toggleSmooth(p,1,true);expect(q.anchors[1].out).toBeTruthy();expect(toggleSmooth(q,1,false).anchors[1].corner).toBe(true)})
+it('keeps boolean sources editable',()=>{const b=booleanShape(p,p,'exclude');expect(booleanToSvg(b).editableSources).toHaveLength(2)})
+it('evaluates overlap and disjoint boolean interiors independently',async()=>{const {booleanContains}=await import('./booleanShapes');const right={...p,anchors:p.anchors.map(a=>({...a,x:a.x+40}))};for(const [mode,expected] of [['union',true],['difference',false],['intersect',true],['exclude',false]] as const)expect(booleanContains(booleanShape(p,right,mode),{x:60,y:50})).toBe(expected);expect(booleanContains(booleanShape(p,right,'difference'),{x:20,y:50})).toBe(true);expect(booleanContains(booleanShape(p,right,'intersect'),{x:20,y:50})).toBe(false)})

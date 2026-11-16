@@ -17,11 +17,24 @@ function StateProbe() {
 test('opens a group flyout from its corner trigger and lists child tools', () => {
   renderRail()
 
-  fireEvent.click(screen.getByRole('button', { name: '打开工具组菜单：画笔' }))
+  const trigger = screen.getByRole('button', { name: '打开工具组菜单：画笔' })
+  expect(trigger).not.toHaveClass('expanded')
+  fireEvent.click(trigger)
 
   expect(screen.getByRole('menu', { name: '画笔工具' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '打开工具组菜单：画笔' })).toHaveClass('expanded')
   expect(screen.getByRole('menuitem', { name: /铅笔/ })).toBeInTheDocument()
   expect(screen.getByRole('menuitem', { name: /渐变画笔/ })).toBeInTheDocument()
+})
+
+test('toggles the same group flyout closed from the corner trigger', () => {
+  renderRail()
+  const trigger = screen.getByRole('button', { name: '打开工具组菜单：画笔' })
+  fireEvent.click(trigger)
+  expect(trigger).toHaveAttribute('aria-expanded', 'true')
+  fireEvent.click(trigger)
+  expect(trigger).toHaveAttribute('aria-expanded', 'false')
+  expect(screen.queryByRole('menu', { name: '画笔工具' })).not.toBeInTheDocument()
 })
 
 test('clicking a group main button selects that group recent tool', () => {
@@ -41,6 +54,17 @@ test('selecting a child tool updates the active tool and closes the flyout', () 
   expect(screen.getByRole('button', { name: '工具组：画笔' })).toHaveAttribute('aria-pressed', 'true')
   expect(screen.getByTestId('active-tool')).toHaveTextContent('pencil')
   expect(screen.queryByRole('menu', { name: '画笔工具' })).not.toBeInTheDocument()
+})
+
+test('closes the current flyout when another tool group is selected', () => {
+  renderRail()
+  fireEvent.click(screen.getByRole('button', { name: '打开工具组菜单：画笔' }))
+  expect(screen.getByRole('menu', { name: '画笔工具' })).toBeInTheDocument()
+
+  fireEvent.click(screen.getByRole('button', { name: '工具组：选区' }))
+
+  expect(screen.queryByRole('menu', { name: '画笔工具' })).not.toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '工具组：选区' })).toHaveAttribute('aria-pressed', 'true')
 })
 
 test('closes a flyout on outside click or Escape', async () => {

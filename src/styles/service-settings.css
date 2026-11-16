@@ -1,0 +1,71 @@
+.service-settings-backdrop { position:fixed; inset:0; z-index:100; display:flex; align-items:center; justify-content:center; padding:24px; background:#0008; }
+.service-settings { position:relative; width:680px; max-width:100%; min-height:240px; max-height:calc(100dvh - 48px); box-sizing:border-box; overflow:auto; overscroll-behavior:contain; padding:20px; border:1px solid var(--ink-700); border-radius:8px; background:var(--ink-850); box-shadow:0 16px 48px #0007; font-size:13px; }
+.service-settings header,.service-settings footer,.service-settings-row { display:flex; align-items:center; gap:6px; }
+.service-settings header { margin-bottom:14px; }
+.service-settings header>strong { font-size:16px; }
+.service-settings header>span,.service-settings footer>span,.service-settings-row>span { flex:1; min-width:0; }
+.service-settings button { min-height:32px; padding:5px 10px; border:1px solid var(--ink-700); border-radius:3px; background:var(--ink-800); font-size:12px; }
+.service-settings button:hover { border-color:var(--muted); }
+.service-settings button:disabled { opacity:.5; cursor:default; }
+.service-settings-row { min-height:40px; border-bottom:1px solid var(--ink-700); }
+.service-settings-row>span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.service-settings small,.service-storage-note { color:var(--muted); font-size:11px; }
+.service-settings-row input[type=checkbox] { width:13px; height:13px; margin:0 3px 0 0; accent-color:var(--sky); }
+.service-settings fieldset { margin:8px 0 0; padding:0; border:0; min-width:0; }
+.service-settings label { display:grid; grid-template-columns:84px minmax(0,1fr); align-items:center; margin:10px 0; font-size:13px; }
+.service-settings input:not([type=checkbox]),.service-settings select { height:34px; padding:5px 8px; border-radius:3px; font-size:13px; }
+.service-key-field { display:flex; gap:4px; min-width:0; }
+.service-key-field input { min-width:0; flex:1; }
+.service-key-field button { flex-shrink:0; white-space:nowrap; }
+.service-settings summary { color:var(--muted); cursor:pointer; font-size:12px; }
+.service-settings footer { margin-top:16px; padding-top:12px; border-top:1px solid var(--ink-700); }
+.service-settings footer button[type=submit] { border-color:#617b8e; }
+.service-settings .service-delete { color:#ffa593; }
+.service-settings-status { margin:9px 0 0; font-size:11px; color:var(--sky); overflow-wrap:anywhere; }
+.service-storage-note { margin:10px 0 0; }
+.service-protocol-info { margin:6px 0; color:var(--muted); font-size:11px; overflow-wrap:anywhere; }
+.service-settings details a { font-size:11px; color:var(--sky); }
+
+.service-settings button:focus-visible,.service-settings summary:focus-visible { outline:2px solid var(--sky); outline-offset:2px; }
+.account-billing-options { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:24px 0; }
+.account-billing-options button { min-height:64px; font-size:14px; }
+@media (max-width:600px) {
+  .service-settings-backdrop { padding:12px; }
+  .service-settings { padding:16px; max-height:calc(100dvh - 24px); }
+  .service-settings label { grid-template-columns:76px minmax(0,1fr); }
+}
+
+.service-settings-backdrop--drawer { justify-content:flex-end; padding:0; }
+.service-settings--drawer { display:flex; flex-direction:column; width:520px; max-width:100vw; height:100dvh; max-height:100dvh; min-height:0; overflow:hidden; border-radius:0; border-top:0; border-right:0; border-bottom:0; }
+.service-settings--drawer>header { flex-shrink:0; margin-bottom:6px; }
+.service-drawer-description { flex-shrink:0; margin:0 0 14px; color:var(--muted); font-size:12px; }
+.service-settings--drawer .service-settings-list { flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+.service-settings--drawer .service-settings-row { min-height:68px; gap:12px; }
+.service-source-copy { display:flex; flex:1; flex-direction:column; gap:5px; min-width:0; padding:10px 0; }
+.service-source-copy>strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; font-weight:500; }
+.service-drawer-footer { flex-shrink:0; border-top:1px solid var(--ink-700); padding-top:10px; }
+.service-drawer-footer .service-storage-note { margin:0; }
+.service-model-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:10px 0 6px; }
+.service-model-toolbar>span { margin-left:auto; color:var(--muted); font-size:12px; }
+.service-model-picker { margin:12px 0; padding:12px; border:1px solid var(--ink-700); border-radius:5px; }
+.service-model-picker>input { width:100%; }
+.service-model-list { max-height:220px; overflow:auto; overscroll-behavior:contain; }
+.service-settings .service-model-option { display:flex; align-items:center; gap:9px; margin:0; padding:8px 4px; font-size:12px; cursor:pointer; }
+.service-model-option>span { overflow-wrap:anywhere; }
+.service-model-option>input { flex-shrink:0; accent-color:var(--sky); }
+.service-settings input[type=checkbox]:not([type=range]):not(.numeric-scrubber-input) { width:14px; height:14px; padding:0; flex:0 0 14px; margin:0; accent-color:var(--sky); }
+.service-settings-row>button { flex-shrink:0; white-space:nowrap; }
+
+.service-assistant-settings { flex-shrink:0; padding-bottom:12px; border-bottom:1px solid var(--ink-700); }
+.service-assistant-settings>p { color:var(--muted); font-size:11px; line-height:1.5; }
+.service-assistant-settings select { min-width:0; max-width:100%; }
+.service-settings .service-model-capabilities { display:flex; flex-wrap:wrap; gap:6px 14px; padding:8px 0; border-bottom:1px solid var(--ink-700); }
+.service-model-capabilities legend { overflow-wrap:anywhere; font-size:12px; }
+.service-settings .service-model-capabilities label { display:flex; gap:6px; margin:2px 0; font-size:12px; }
+/* Modal titlebars and actions stay visible while long forms scroll. */
+.service-settings>.dialog-titlebar{margin:0 0 12px;min-height:32px}.service-settings .dialog-titlebar .dialog-close{min-height:28px;border:0;padding:0;border-radius:6px}.service-settings .dialog-titlebar strong{font-size:16px}
+.service-settings.service-source-editor{display:flex;flex-direction:column;width:600px;min-height:0;overflow:hidden;padding:18px 20px}.service-source-editor>form{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}.service-source-editor>form>fieldset{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 8px 8px 0;margin:0}.service-source-editor>form>footer{flex-shrink:0;margin-top:8px;padding-top:12px}.service-source-editor>form>footer button[type=submit]{border-color:var(--coral);background:var(--coral);color:var(--ink-950)}.service-source-editor label{grid-template-columns:62px minmax(0,1fr);gap:10px;margin:9px 0}.service-source-editor input:not([type=checkbox]),.service-source-editor select{border:1px solid var(--ink-700);border-radius:6px;background:var(--ink-900);color:var(--text);min-width:0;width:100%}.service-source-editor details{padding:10px 0;border-bottom:1px solid var(--ink-700)}.service-source-editor summary{color:var(--text)}.service-source-editor>.service-storage-note{flex-shrink:0;line-height:1.5;padding-top:2px}
+.service-settings.billing-dialog{width:440px;min-height:0;padding:18px 20px}.billing-description{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.billing-dialog .account-billing-options{gap:10px;margin:18px 0 12px}.billing-dialog .account-billing-options button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:118px;padding:14px;border-radius:8px;text-align:left}.billing-dialog .account-billing-options button[aria-pressed=true]{border-color:var(--coral);background:rgba(255,118,95,.08);box-shadow:inset 0 0 0 1px var(--coral)}.billing-dialog .account-billing-options strong{font-size:20px}.billing-dialog .account-billing-options strong small{font-size:11px;font-weight:400}.billing-dialog .account-billing-options button>span{font-size:16px;color:var(--text)}.billing-dialog .account-billing-options button>small{font-size:10px;color:var(--muted)}.billing-note{color:var(--faint);font-size:11px;line-height:1.5}.billing-total{display:flex;flex:1;flex-direction:column;gap:4px}.billing-total strong{font-size:18px}.billing-confirm{background:var(--coral)!important;color:var(--ink-950)!important;border-color:var(--coral)!important}
+@media(max-width:480px){.service-settings.service-source-editor,.service-settings.billing-dialog{padding:14px}.service-source-editor label{grid-template-columns:48px minmax(0,1fr);gap:8px}}
+.service-settings-backdrop--drawer{padding:16px}.service-settings--drawer{height:min(840px,calc(100dvh - 32px));max-height:calc(100dvh - 32px);border:1px solid var(--ink-700);border-radius:10px}.service-source-actions{display:flex;justify-content:flex-end;gap:8px;margin-bottom:10px}
+.service-source-editor .service-editor-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-right:8px}.service-source-editor .service-editor-scroll>fieldset{margin:0;padding:0 0 8px;overflow:visible}.service-source-editor>form>footer{position:relative;background:var(--ink-850);z-index:1}

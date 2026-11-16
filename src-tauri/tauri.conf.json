@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Draivio",
+  "productName": "Draivio AI 图片创作",
   "version": "0.1.0",
   "identifier": "com.draivio.app",
   "build": {
@@ -12,13 +12,16 @@
   "app": {
     "windows": [
       {
-        "title": "Draivio",
+        "title": "",
         "width": 1440,
         "height": 900,
         "minWidth": 1020,
         "minHeight": 680,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "decorations": false,
+        "center": true,
+        "backgroundColor": "#0d1013"
       }
     ],
     "security": {

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { expect, test } from 'vitest'
 import { AppShell } from '../app/AppShell'
 import { EditorProvider } from '../state/editor'
@@ -81,8 +81,9 @@ test('ignores tool shortcuts while editing text or account fields', () => {
   editable.remove()
 
   fireEvent.click(screen.getByRole('button', { name: '账户设置' }))
-  fireEvent.click(screen.getByRole('button', { name: 'API Key' }))
-  const accountInput = screen.getByRole('textbox', { name: 'API Key 输入框' })
+  fireEvent.click(screen.getByRole('button', { name: '服务来源' }))
+  fireEvent.click(screen.getByRole('button', { name: '添加来源' }))
+  const accountInput = within(screen.getByRole('dialog', { name: '添加服务来源' })).getByRole('textbox', { name: '名称' })
   accountInput.focus()
   fireEvent.keyDown(accountInput, { key: 'b' })
   expect(activeTool()).toBe('select')

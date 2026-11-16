@@ -12,6 +12,18 @@ test('serializes a complete SVG and crops by percentage without editor overlays'
   expect(output).toContain('fill="red"')
 })
 
+test('export clips visible workspace overflow to document or crop bounds', () => {
+  document.body.innerHTML = '<svg class="canvas-art" viewBox="0 0 500 625" style="overflow:visible"><text x="450" y="50">超出画布的文字</text></svg>'
+  const svg = document.querySelector('svg')!
+  for (const crop of [null, { x: 10, y: 20, width: 50, height: 40 }]) {
+    const exported = new DOMParser().parseFromString(serializeEditorSvg(svg, crop), 'image/svg+xml').documentElement
+    expect((exported as unknown as SVGSVGElement).style.overflow).toBe('hidden')
+    expect(exported.getAttribute('width')).toBe(crop ? '250' : '500')
+    expect(exported.getAttribute('height')).toBe(crop ? '250' : '625')
+  }
+  expect(svg.style.overflow).toBe('visible')
+})
+
 test('reads image data only after the browser confirms it can decode the file', async () => {
   expect(isImageFile(new File(['x'], 'a.png', { type: 'image/png' }))).toBe(true)
   expect(isImageFile(new File(['x'], 'a.txt', { type: 'text/plain' }))).toBe(false)

@@ -1,0 +1,65 @@
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {afterEach, beforeEach, expect, it, vi} from 'vitest'
+import {CloudAccountDialog} from './CloudAccountDialog'
+
+vi.mock('./CloudServiceConfig',()=>({CloudServiceConfig:()=>null}))
+const api=vi.hoisted(()=>({codeLogin:vi.fn(),requestCode:vi.fn(),passwordLogin:vi.fn(),register:vi.fn(),resetPassword:vi.fn(),cancelPendingAuthentication:vi.fn()}))
+vi.mock('./cloudAccount',()=>({cloudAccount:api}))
+beforeEach(()=>{Object.values(api).forEach(fn=>fn.mockReset())})
+afterEach(()=>vi.useRealTimers())
+
+it('submits password login without persisting the password and closes only on success',async()=>{
+ const close=vi.fn();render(<CloudAccountDialog onClose={close}/> )
+ fireEvent.change(screen.getByLabelText('邮箱'),{target:{value:'person@example.com'}})
+ fireEvent.change(screen.getByLabelText('密码'),{target:{value:'not-a-real-secret'}})
+ api.passwordLogin.mockRejectedValueOnce(new Error('邮箱或密码不正确'))
+ fireEvent.click(screen.getByRole('button',{name:'登录'}))
+ await screen.findByRole('alert');expect(close).not.toHaveBeenCalled()
+ api.passwordLogin.mockResolvedValueOnce(undefined)
+ fireEvent.click(screen.getByRole('button',{name:'登录'}))
+ await waitFor(()=>expect(close).toHaveBeenCalledOnce())
+ expect(api.passwordLogin).toHaveBeenLastCalledWith('person@example.com','not-a-real-secret')
+ expect(JSON.stringify(localStorage)).not.toContain('not-a-real-secret')
+})
+
+it('uses the same register and password-reset purposes as the shared cloud',async()=>{
+ render(<CloudAccountDialog onClose={vi.fn()}/> )
+ fireEvent.click(screen.getByRole('button',{name:'注册账户'}))
+ fireEvent.change(screen.getByLabelText('邮箱'),{target:{value:'new@example.com'}})
+ fireEvent.change(screen.getByLabelText('密码'),{target:{value:'a-long-password'}})
+ fireEvent.click(screen.getByRole('button',{name:'发送验证码'}))
+ await waitFor(()=>expect(api.requestCode).toHaveBeenCalledWith('new@example.com','register'))
+ fireEvent.change(screen.getByLabelText('验证码'),{target:{value:'123456'}})
+ fireEvent.click(screen.getByRole('button',{name:'注册'}))
+ await waitFor(()=>expect(api.register).toHaveBeenCalledWith('new@example.com','123456','a-long-password'))
+ fireEvent.click(screen.getByRole('button',{name:'找回密码'}))
+ fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'replacement-password'}})
+ fireEvent.change(screen.getByLabelText('验证码'),{target:{value:'654321'}})
+ fireEvent.click(screen.getByRole('button',{name:'重置密码'}))
+ await waitFor(()=>expect(api.resetPassword).toHaveBeenCalledWith('new@example.com','654321','replacement-password'))
+ await screen.findByText('密码已重置，请使用新密码登录')
+})
+
+it('invalidates pending authentication on close and ignores its late UI completion',async()=>{
+ let finish!:()=>void;api.passwordLogin.mockImplementation(()=>new Promise<void>(r=>{finish=r}))
+ const close=vi.fn(),view=render(<CloudAccountDialog onClose={close}/> )
+ fireEvent.change(screen.getByLabelText('邮箱'),{target:{value:'person@example.com'}})
+ fireEvent.change(screen.getByLabelText('密码'),{target:{value:'not-a-real-secret'}})
+ fireEvent.click(screen.getByRole('button',{name:'登录'}))
+ await waitFor(()=>expect(api.passwordLogin).toHaveBeenCalledOnce())
+ view.unmount();expect(api.cancelPendingAuthentication).toHaveBeenCalled()
+ await act(async()=>finish());expect(close).not.toHaveBeenCalled()
+})
+
+it('supports code login without asking for a password',async()=>{
+ const close=vi.fn();render(<CloudAccountDialog onClose={close}/>)
+ fireEvent.click(screen.getByRole('button',{name:'验证码登录'}))
+ expect(screen.queryByLabelText('密码')).not.toBeInTheDocument()
+ fireEvent.change(screen.getByLabelText('邮箱'),{target:{value:'member@example.com'}})
+ fireEvent.click(screen.getByRole('button',{name:'发送验证码'}))
+ await waitFor(()=>expect(api.requestCode).toHaveBeenCalledWith('member@example.com','login'))
+ fireEvent.change(screen.getByLabelText('验证码'),{target:{value:'123456'}})
+ fireEvent.click(screen.getByRole('button',{name:'登录'}))
+ await waitFor(()=>expect(api.codeLogin).toHaveBeenCalledWith('member@example.com','123456'))
+ expect(close).toHaveBeenCalledOnce();expect(api.passwordLogin).not.toHaveBeenCalled()
+})

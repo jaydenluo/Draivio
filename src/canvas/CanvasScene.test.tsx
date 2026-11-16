@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import { expect, it, test } from 'vitest'
 import { initialEditorState, type EditorState } from '../state/editor'
-import { CanvasScene } from './CanvasScene'
+import { CanvasSceneView as CanvasScene } from './CanvasScene'
 import { createSelection } from './selectionGeometry'
 import { createBrushStroke } from './BrushEngine'
 
@@ -41,6 +41,24 @@ test('transforms a layer around its center and exports clipped shapes, multi-lin
   expect(view.container.querySelector('mask[data-eraser="eraser"]')!.parentElement!.nextElementSibling!.querySelector('image')).toBeInTheDocument()
 })
 
+test('exports paragraph text with typography spacing, wrapping and text rotation', () => {
+  const state = stateWith()
+  state.canvasTexts = [{ id: 'paragraph', layerId: 'top', x: 10, y: 15, text: '一二三四五六', layout: 'paragraph', width: 60, height: 80, fontFamily: 'sans-serif', fontSize: 24, fontWeight: '400', color: '#123456', align: 'left', lineHeight: 1.8, letterSpacing: 2, rotation: 18 }]
+  const view = render(<CanvasScene state={state} />)
+  const node = view.container.querySelector('[data-text="paragraph"]')!
+  expect(node).toHaveAttribute('transform', 'rotate(18 50 93.75)')
+  expect(node).toHaveAttribute('letter-spacing', '2')
+  expect(Array.from(node.querySelectorAll('tspan'),span=>span.textContent)).toEqual(['一二','三四','五六'])
+  expect(node.querySelector('tspan:nth-child(2)')).toHaveAttribute('dy', String(24 * 1.8))
+})
+
+test('hides the export text while its matching canvas editor is active', () => {
+  const state = stateWith()
+  state.canvasTexts = [{ id: 'editing-text', layerId: 'top', x: 10, y: 15, text: '编辑中', fontFamily: 'sans-serif', fontSize: 24, fontWeight: '400', color: '#123456', align: 'left' }]
+  const view = render(<CanvasScene state={state} editingTextId="editing-text" />)
+  expect(view.container.querySelector('[data-text="editing-text"]')).toHaveAttribute('data-editor-hidden', 'true')
+})
+
 test('applies masks only when committed and keeps red previews outside the export SVG', () => {
   const mask = { selection: createSelection('rectangle', { x: 25, y: 25, width: 50, height: 50 }), strokes: [], inverted: false, applied: false }
   const state = stateWith({ activeTool: 'mask', activeToolId: 'mask', activeToolGroup: 'mask', layerMasks: { top: mask } })
@@ -62,3 +80,24 @@ test('previews attach to the right layer without mutating document state or reus
   const ids = [...view.container.querySelectorAll('[id]')].map((node) => node.id)
   expect(new Set(ids).size).toBe(ids.length)
 })
+
+test('hidden ancestors suppress descendant content and mask preview', () => {
+  const state = stateWith({ activeToolGroup: 'mask', selectedLayerId: 'top', layerMasks: { top: { strokes: [], inverted: false, applied: false } } })
+  state.layers = [{ ...state.layers[0], id: 'group', children: ['top'], visible: false }, { ...state.layers[0], groupId: 'group' }, state.layers[1]]
+  const view = render(<CanvasScene state={state} />)
+  expect(view.container.querySelector('[data-layer-id="top"]')).toBeNull()
+  expect(view.container.querySelector('[aria-label="蒙版红色预览"]')).toBeNull()
+})
+
+test('composites overlapping children together before applying isolated group opacity', () => {
+  const state = stateWith()
+  state.layers = [{ ...state.layers[0], id: 'group', opacity: 50, blendMode: '正常', source: undefined, children: ['top', 'base'] }, { ...state.layers[0], groupId: 'group' }, { ...state.layers[1], groupId: 'group' }]
+  const view = render(<CanvasScene state={state} />)
+  const group = view.container.querySelector('[data-layer-id="group"]')!
+  expect(group).toHaveAttribute('opacity', '0.5')
+  expect(group).toHaveStyle({ isolation: 'isolate' })
+  expect(group.querySelectorAll('.scene-layer')).toHaveLength(2)
+  expect(group.querySelector('[data-layer-id="top"]')).toHaveAttribute('opacity', '0.4')
+  expect([...group.querySelectorAll('.scene-layer')].map((node) => node.getAttribute('data-layer-id'))).toEqual(['base', 'top'])
+})
+it('renders local text stroke style through SVG export',()=>{const state=structuredClone(initialEditorState);state.canvasTexts=[{id:'run',layerId:'art',x:10,y:10,text:'描边',fontFamily:'sans-serif',fontSize:24,fontWeight:'400',color:'#fff',align:'left',runs:[{start:0,end:2,color:'#fff',stroke:'#f00'}]} as any];state.sceneOrder=['run'];const {container}=render(<CanvasScene state={state}/>);const text=container.querySelector('[data-text="run"]')!;expect(text.querySelector('tspan[stroke="#f00"]')).toHaveTextContent('描边')})
