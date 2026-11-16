@@ -5,6 +5,7 @@ import type { ToolId } from './toolTypes'
 
 /** Emitted when Escape cancels an in-progress canvas gesture. */
 export const TOOL_CANCEL_EVENT = 'draivio:cancel'
+export const CANVAS_FIT_EVENT = 'draivio:fit-canvas'
 
 const TOOL_KEYS: Record<string, ToolId> = {
   v: 'select', m: 'rectangle-select', l: 'lasso-select', p: 'pen',
@@ -63,8 +64,7 @@ export function useToolShortcuts() {
           dispatch({ type: 'set-zoom', zoom: state.zoom + (key === '-' ? -10 : 10) })
         } else if (key === '0') {
           event.preventDefault()
-          dispatch({ type: 'set-zoom', zoom: 100 })
-          dispatch({ type: 'set-canvas-offset', x: 0, y: 0 })
+          window.dispatchEvent(new Event(CANVAS_FIT_EVENT))
         } else if (key === '1') {
           event.preventDefault()
           dispatch({ type: 'set-zoom', zoom: 100 })

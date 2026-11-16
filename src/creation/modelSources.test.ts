@@ -11,6 +11,6 @@ describe('model sources', () => {
 
   it('filters models by selected source', () => {
     expect(getModelsForSource('openai-custom').map((model) => model.code)).toEqual(['gpt-image-2.5'])
-    expect(getModelsForSource('draivio-cloud')[0]?.displayName).toBe('Image Pro')
+    expect(getModelsForSource('draivio-cloud')).toEqual([])
   })
 })

@@ -3,6 +3,7 @@ import { TOOL_GROUPS, toolRegistry } from '../tools/toolRegistry'
 import { useEditor, type Tool } from '../state/editor'
 import type { ToolGroupDefinition } from '../tools/toolTypes'
 import { ToolFlyout } from './ToolFlyout'
+import { ToolIcon } from './ToolIcon'
 
 const LONG_PRESS_MS = 250
 
@@ -16,8 +17,8 @@ export function ToolGroupEntry({ group, active, selectedToolId, expanded = false
   const handlePointerDown = (event: React.PointerEvent) => { longPressRef.current = false; clearLongPress(); if (event.button !== 0 || group.tools.length < 2) return; timerRef.current = setTimeout(() => { longPressRef.current = true; if (mainButtonRef.current) onOpen(group, mainButtonRef.current) }, LONG_PRESS_MS) }
   const handleClick = () => { clearLongPress(); if (longPressRef.current) { longPressRef.current = false; return }; onSelect(selectedDefinition.id) }
   return <div className={`tool-group-entry ${active ? 'active' : ''}`}>
-    <button ref={mainButtonRef} type="button" className={`tool-group-button ${active ? 'active' : ''}`} aria-label={`工具组：${group.label}`} aria-pressed={active} onPointerDown={handlePointerDown} onPointerUp={clearLongPress} onPointerCancel={clearLongPress} onPointerLeave={clearLongPress} onClick={handleClick}><span aria-hidden="true">{selectedDefinition.glyph ?? '·'}</span><small>{group.label}</small></button>
-    {group.tools.length > 1 ? <button type="button" className="tool-group-menu-trigger" aria-label={`打开工具组菜单：${group.label}`} aria-haspopup="menu" aria-expanded={expanded} onClick={(event) => { event.stopPropagation(); onOpen(group, event.currentTarget) }}><span aria-hidden="true" /></button> : null}
+    <button ref={mainButtonRef} type="button" className={`tool-group-button ${active ? 'active' : ''}`} aria-label={`工具组：${group.label}`} aria-pressed={active} onPointerDown={handlePointerDown} onPointerUp={clearLongPress} onPointerCancel={clearLongPress} onPointerLeave={clearLongPress} onClick={handleClick}><ToolIcon toolId={selectedDefinition.id} /><small>{group.label}</small></button>
+    {group.tools.length > 1 ? <button type="button" className={`tool-group-menu-trigger ${expanded ? 'expanded' : ''}`} aria-label={`打开工具组菜单：${group.label}`} aria-haspopup="menu" aria-expanded={expanded} onClick={(event) => { event.stopPropagation(); onOpen(group, event.currentTarget) }}><span aria-hidden="true" /></button> : null}
   </div>
 }
 
@@ -27,9 +28,12 @@ export function ToolRail() {
   const [openGroupId, setOpenGroupId] = useState<typeof activeGroup.id | null>(null)
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
   const railRef = useRef<HTMLElement>(null)
-  const selectTool = (tool: Tool) => dispatch({ type: 'select-tool', tool })
-  const openFlyout = (group: ToolGroupDefinition, nextAnchor: HTMLElement) => { setOpenGroupId(group.id); setAnchor(nextAnchor) }
+  const openFlyout = (group: ToolGroupDefinition, nextAnchor: HTMLElement) => {
+    if (openGroupId === group.id) { setOpenGroupId(null); setAnchor(null); return }
+    setOpenGroupId(group.id); setAnchor(nextAnchor)
+  }
   const closeFlyout = (restoreFocus = false) => { if (restoreFocus) anchor?.focus(); setOpenGroupId(null); setAnchor(null) }
+  const selectTool = (tool: Tool) => { closeFlyout(); dispatch({ type: 'select-tool', tool }) }
   useEffect(() => {
     if (!openGroupId) return
     const handlePointerDown = (event: PointerEvent) => { if (!railRef.current?.contains(event.target as Node)) closeFlyout() }
@@ -41,6 +45,6 @@ export function ToolRail() {
   const openSelectedTool = openGroup ? state.recentToolByGroup[openGroup.id] ?? openGroup.defaultToolId : null
   return <aside ref={railRef} className="tool-rail" aria-label="画布工具">
     <div className="tool-group-rail" aria-label="工具组">{TOOL_GROUPS.map((group) => <ToolGroupEntry key={group.id} group={group} active={group.id === activeGroup.id} expanded={group.id === openGroupId} selectedToolId={state.recentToolByGroup[group.id] ?? group.defaultToolId} onSelect={selectTool} onOpen={openFlyout} />)}</div>
-    {openGroup && openSelectedTool ? <ToolFlyout group={openGroup} selectedToolId={openSelectedTool} anchor={anchor} onSelect={selectTool} onClose={() => closeFlyout(true)} /> : null}
+    {openGroup && openSelectedTool ? <ToolFlyout group={openGroup} selectedToolId={openSelectedTool} anchor={anchor} recentColors={state.recentColors} onColorSelect={(color) => dispatch({ type: 'set-brush-color', color })} onSelect={selectTool} onClose={() => closeFlyout(true)} /> : null}
   </aside>
 }

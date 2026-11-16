@@ -8,7 +8,8 @@ export type ToolGroupId =
   | 'text-shape'
   | 'color-fill'
   | 'navigation'
-  | 'enhance'
+  | 'cutout'
+  | 'upscale'
 
 export type ToolId =
   | 'select'
@@ -29,8 +30,12 @@ export type ToolId =
   | 'smudge'
   | 'eraser'
   | 'background-eraser'
+  | 'remove-object'
+  | 'dodge'
+  | 'burn'
   | 'healing'
   | 'clone-stamp'
+  | 'patch'
   | 'mask'
   | 'mask-quick'
   | 'mask-gradient'

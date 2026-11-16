@@ -1,0 +1,18 @@
+.service-settings.cloud-account-dialog{width:min(420px,calc(100vw - 32px))}
+.cloud-account-dialog p{font-size:12px;line-height:1.6;color:var(--muted);margin:12px 0}
+.cloud-account-tabs{display:flex;gap:16px;margin:8px 0 14px}
+.cloud-account-tabs button{background:transparent;border:0;padding:4px 0;color:var(--muted);cursor:pointer}
+.cloud-account-tabs button[aria-pressed=true]{color:var(--ink-100);font-weight:600}
+.cloud-account-dialog form{display:grid;gap:14px}
+.cloud-account-dialog label{display:grid;gap:6px;font-size:12px}
+.cloud-account-dialog input{min-width:0;width:100%;height:34px;box-sizing:border-box}
+.cloud-account-code{display:flex;align-items:center;gap:8px}
+.cloud-account-code input{flex:1}
+.cloud-account-code button{white-space:nowrap}
+.cloud-account-dialog footer{display:flex;gap:8px;justify-content:flex-end;padding-top:4px}
+.cloud-account-dialog [role=alert]{color:var(--danger,#d45c5c)}
+.cloud-service-config { margin:10px 0; padding:8px 0; border-top:1px solid var(--ink-700); }
+.cloud-service-config summary { cursor:pointer; color:var(--muted); font-size:12px; }
+.cloud-service-config label { display:block; margin-top:8px; }
+.cloud-service-config input { width:100%; margin:4px 0; }
+.cloud-service-config small { display:block; color:var(--muted); margin-bottom:6px; }

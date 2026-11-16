@@ -1,0 +1,5081 @@
+[
+  {
+    "id": "zh-001",
+    "instruction": "将图层“主体”向右移动5像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "subject",
+          "dx": {
+            "min": 4.999999,
+            "max": 5.000001
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.x",
+        "equals": 10
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-002",
+    "instruction": "将图层“主体”缩放为0.25倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "subject",
+          "sx": {
+            "min": 0.249999,
+            "max": 0.250001
+          },
+          "sy": {
+            "min": 0.249999,
+            "max": 0.250001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.width",
+        "equals": 1.25
+      },
+      {
+        "layerId": "subject",
+        "path": "transform.rect.height",
+        "equals": 1.25
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-003",
+    "instruction": "将图层“主体”旋转-90度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "subject",
+          "degrees": {
+            "min": -90.000001,
+            "max": -89.999999
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rotation",
+        "equals": -90
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-004",
+    "instruction": "将图层“主体”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "subject",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-005",
+    "instruction": "将图层“主体”不透明度设置为0%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "subject",
+          "value": {
+            "min": -1e-06,
+            "max": 1e-06
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "opacity",
+        "equals": 0
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-006",
+    "instruction": "隐藏图层“主体”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "subject",
+          "visible": false
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "visible",
+        "equals": false
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-007",
+    "instruction": "将图层“主体”混合模式设为正片叠底",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "subject",
+          "blendMode": "正片叠底"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "blendMode",
+        "equals": "正片叠底"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-008",
+    "instruction": "将图层“主体”重命名为“主体终稿”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "subject",
+          "name": "主体终稿"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "name",
+        "equals": "主体终稿"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-009",
+    "instruction": "复制图层“主体”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "duplicate",
+        "args": {
+          "layerId": "subject"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "$sourceCount",
+        "equals": 2
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 8
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-010",
+    "instruction": "删除图层“主体”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "delete",
+        "args": {
+          "layerId": "subject"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "$absent",
+        "equals": true
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 6
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-011",
+    "instruction": "锁定图层“主体”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "subject",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-012",
+    "instruction": "将图层“主体”下移一层",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "reorder",
+        "args": {
+          "layerId": "subject",
+          "direction": "down"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "$index",
+        "equals": 1
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-013",
+    "instruction": "将图层“主体”和图层“标题”分组",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "group",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title"
+          ]
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": null,
+        "path": "$groupContains",
+        "equals": [
+          "subject",
+          "title"
+        ]
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-014",
+    "instruction": "把所有六个可编辑图层按画布左对齐",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "align",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title",
+            "logo",
+            "decoration",
+            "caption",
+            "badge"
+          ],
+          "mode": "left",
+          "target": "canvas"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.x",
+        "equals": 0
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.x",
+        "equals": 0
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.x",
+        "equals": 0
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 0
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.x",
+        "equals": 0
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.x",
+        "equals": 0
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-015",
+    "instruction": "把图层“主体”、“标题”、“徽标”水平等距分布",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "distribute",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title",
+            "logo"
+          ],
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.x",
+        "equals": 22.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-016",
+    "instruction": "将图层“标题”向右移动12像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "title",
+          "dx": {
+            "min": 11.999999,
+            "max": 12.000001
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.x",
+        "equals": 32
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-017",
+    "instruction": "将图层“标题”缩放为0.5倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "title",
+          "sx": {
+            "min": 0.499999,
+            "max": 0.500001
+          },
+          "sy": {
+            "min": 0.499999,
+            "max": 0.500001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.width",
+        "equals": 2.5
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.height",
+        "equals": 2.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-018",
+    "instruction": "将图层“标题”旋转-30度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "title",
+          "degrees": {
+            "min": -30.000001,
+            "max": -29.999999
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rotation",
+        "equals": -30
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-019",
+    "instruction": "将图层“标题”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "title",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-020",
+    "instruction": "将图层“标题”不透明度设置为10%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "title",
+          "value": {
+            "min": 9.999999,
+            "max": 10.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "opacity",
+        "equals": 10
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-021",
+    "instruction": "隐藏图层“标题”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "title",
+          "visible": false
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "visible",
+        "equals": false
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-022",
+    "instruction": "将图层“标题”混合模式设为滤色",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "title",
+          "blendMode": "滤色"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "blendMode",
+        "equals": "滤色"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-023",
+    "instruction": "将图层“标题”重命名为“标题终稿”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "title",
+          "name": "标题终稿"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "name",
+        "equals": "标题终稿"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-024",
+    "instruction": "复制图层“标题”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "duplicate",
+        "args": {
+          "layerId": "title"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "$sourceCount",
+        "equals": 2
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 8
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-025",
+    "instruction": "删除图层“标题”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "delete",
+        "args": {
+          "layerId": "title"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "$absent",
+        "equals": true
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 6
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-026",
+    "instruction": "锁定图层“标题”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "title",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-027",
+    "instruction": "将图层“标题”上移一层",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "reorder",
+        "args": {
+          "layerId": "title",
+          "direction": "up"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "$index",
+        "equals": 0
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-028",
+    "instruction": "将图层“标题”和图层“徽标”分组",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "group",
+        "args": {
+          "layerIds": [
+            "title",
+            "logo"
+          ]
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": null,
+        "path": "$groupContains",
+        "equals": [
+          "title",
+          "logo"
+        ]
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-029",
+    "instruction": "把所有六个可编辑图层按画布右对齐",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "align",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title",
+            "logo",
+            "decoration",
+            "caption",
+            "badge"
+          ],
+          "mode": "right",
+          "target": "canvas"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.x",
+        "equals": 95
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.x",
+        "equals": 95
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.x",
+        "equals": 95
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 95
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.x",
+        "equals": 95
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.x",
+        "equals": 95
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-030",
+    "instruction": "把图层“标题”、“徽标”、“装饰”垂直等距分布",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "distribute",
+        "args": {
+          "layerIds": [
+            "title",
+            "logo",
+            "decoration"
+          ],
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.y",
+        "equals": 40.0
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-031",
+    "instruction": "将图层“徽标”向右移动24像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "logo",
+          "dx": {
+            "min": 23.999999,
+            "max": 24.000001
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.x",
+        "equals": 64
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-032",
+    "instruction": "将图层“徽标”缩放为0.75倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "logo",
+          "sx": {
+            "min": 0.749999,
+            "max": 0.750001
+          },
+          "sy": {
+            "min": 0.749999,
+            "max": 0.750001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.width",
+        "equals": 3.75
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.height",
+        "equals": 3.75
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-033",
+    "instruction": "将图层“徽标”旋转15度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "logo",
+          "degrees": {
+            "min": 14.999999,
+            "max": 15.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rotation",
+        "equals": 15
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-034",
+    "instruction": "将图层“徽标”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "logo",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-035",
+    "instruction": "将图层“徽标”不透明度设置为33%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "logo",
+          "value": {
+            "min": 32.999999,
+            "max": 33.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "opacity",
+        "equals": 33
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-036",
+    "instruction": "隐藏图层“徽标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "logo",
+          "visible": false
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "visible",
+        "equals": false
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-037",
+    "instruction": "将图层“徽标”混合模式设为叠加",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "logo",
+          "blendMode": "叠加"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "blendMode",
+        "equals": "叠加"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-038",
+    "instruction": "将图层“徽标”重命名为“徽标终稿”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "logo",
+          "name": "徽标终稿"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "name",
+        "equals": "徽标终稿"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-039",
+    "instruction": "复制图层“徽标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "duplicate",
+        "args": {
+          "layerId": "logo"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "$sourceCount",
+        "equals": 2
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 8
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-040",
+    "instruction": "删除图层“徽标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "delete",
+        "args": {
+          "layerId": "logo"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "$absent",
+        "equals": true
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 6
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-041",
+    "instruction": "锁定图层“徽标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "logo",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-042",
+    "instruction": "将图层“徽标”上移一层",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "reorder",
+        "args": {
+          "layerId": "logo",
+          "direction": "up"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "$index",
+        "equals": 1
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-043",
+    "instruction": "将图层“徽标”和图层“装饰”分组",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "group",
+        "args": {
+          "layerIds": [
+            "logo",
+            "decoration"
+          ]
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": null,
+        "path": "$groupContains",
+        "equals": [
+          "logo",
+          "decoration"
+        ]
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-044",
+    "instruction": "把所有六个可编辑图层按画布顶部对齐",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "align",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title",
+            "logo",
+            "decoration",
+            "caption",
+            "badge"
+          ],
+          "mode": "top",
+          "target": "canvas"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.y",
+        "equals": 0
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.y",
+        "equals": 0
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.y",
+        "equals": 0
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.y",
+        "equals": 0
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.y",
+        "equals": 0
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.y",
+        "equals": 0
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-045",
+    "instruction": "把图层“徽标”、“装饰”、“说明”水平等距分布",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "distribute",
+        "args": {
+          "layerIds": [
+            "logo",
+            "decoration",
+            "caption"
+          ],
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 57.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-046",
+    "instruction": "将图层“装饰”向右移动40像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "decoration",
+          "dx": {
+            "min": 39.999999,
+            "max": 40.000001
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 100
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-047",
+    "instruction": "将图层“装饰”缩放为1.25倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "decoration",
+          "sx": {
+            "min": 1.249999,
+            "max": 1.250001
+          },
+          "sy": {
+            "min": 1.249999,
+            "max": 1.250001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.width",
+        "equals": 6.25
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.height",
+        "equals": 6.25
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-048",
+    "instruction": "将图层“装饰”旋转45度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "decoration",
+          "degrees": {
+            "min": 44.999999,
+            "max": 45.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rotation",
+        "equals": 45
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-049",
+    "instruction": "将图层“装饰”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "decoration",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-050",
+    "instruction": "将图层“装饰”不透明度设置为50%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "decoration",
+          "value": {
+            "min": 49.999999,
+            "max": 50.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "opacity",
+        "equals": 50
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-051",
+    "instruction": "隐藏图层“装饰”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "decoration",
+          "visible": false
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "visible",
+        "equals": false
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-052",
+    "instruction": "将图层“装饰”混合模式设为柔光",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "decoration",
+          "blendMode": "柔光"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "blendMode",
+        "equals": "柔光"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-053",
+    "instruction": "将图层“装饰”重命名为“装饰终稿”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "decoration",
+          "name": "装饰终稿"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "name",
+        "equals": "装饰终稿"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-054",
+    "instruction": "复制图层“装饰”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "duplicate",
+        "args": {
+          "layerId": "decoration"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "$sourceCount",
+        "equals": 2
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 8
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-055",
+    "instruction": "删除图层“装饰”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "delete",
+        "args": {
+          "layerId": "decoration"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "$absent",
+        "equals": true
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 6
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-056",
+    "instruction": "锁定图层“装饰”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "decoration",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-057",
+    "instruction": "将图层“装饰”上移一层",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "reorder",
+        "args": {
+          "layerId": "decoration",
+          "direction": "up"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "$index",
+        "equals": 2
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-058",
+    "instruction": "将图层“装饰”和图层“说明”分组",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "group",
+        "args": {
+          "layerIds": [
+            "decoration",
+            "caption"
+          ]
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": null,
+        "path": "$groupContains",
+        "equals": [
+          "decoration",
+          "caption"
+        ]
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-059",
+    "instruction": "把所有六个可编辑图层按画布底部对齐",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "align",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title",
+            "logo",
+            "decoration",
+            "caption",
+            "badge"
+          ],
+          "mode": "bottom",
+          "target": "canvas"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.y",
+        "equals": 95
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.y",
+        "equals": 95
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.y",
+        "equals": 95
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.y",
+        "equals": 95
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.y",
+        "equals": 95
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.y",
+        "equals": 95
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-060",
+    "instruction": "把图层“装饰”、“说明”、“角标”垂直等距分布",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "distribute",
+        "args": {
+          "layerIds": [
+            "decoration",
+            "caption",
+            "badge"
+          ],
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.y",
+        "equals": 75.0
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-061",
+    "instruction": "将图层“说明”向右移动64像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "caption",
+          "dx": {
+            "min": 63.999999,
+            "max": 64.000001
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.x",
+        "equals": 139
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-062",
+    "instruction": "将图层“说明”缩放为1.5倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "caption",
+          "sx": {
+            "min": 1.499999,
+            "max": 1.500001
+          },
+          "sy": {
+            "min": 1.499999,
+            "max": 1.500001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.width",
+        "equals": 7.5
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.height",
+        "equals": 7.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-063",
+    "instruction": "将图层“说明”旋转90度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "caption",
+          "degrees": {
+            "min": 89.999999,
+            "max": 90.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rotation",
+        "equals": 90
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-064",
+    "instruction": "将图层“说明”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "caption",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-065",
+    "instruction": "将图层“说明”不透明度设置为80%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "caption",
+          "value": {
+            "min": 79.999999,
+            "max": 80.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "opacity",
+        "equals": 80
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-066",
+    "instruction": "隐藏图层“说明”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "caption",
+          "visible": false
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "visible",
+        "equals": false
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-067",
+    "instruction": "将图层“说明”混合模式设为差值",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "caption",
+          "blendMode": "差值"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "blendMode",
+        "equals": "差值"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-068",
+    "instruction": "将图层“说明”重命名为“说明终稿”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "caption",
+          "name": "说明终稿"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "name",
+        "equals": "说明终稿"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-069",
+    "instruction": "复制图层“说明”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "duplicate",
+        "args": {
+          "layerId": "caption"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "$sourceCount",
+        "equals": 2
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 8
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-070",
+    "instruction": "删除图层“说明”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "delete",
+        "args": {
+          "layerId": "caption"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "$absent",
+        "equals": true
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 6
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-071",
+    "instruction": "锁定图层“说明”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "caption",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-072",
+    "instruction": "将图层“说明”上移一层",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "reorder",
+        "args": {
+          "layerId": "caption",
+          "direction": "up"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "$index",
+        "equals": 3
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-073",
+    "instruction": "将图层“说明”和图层“角标”分组",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "group",
+        "args": {
+          "layerIds": [
+            "caption",
+            "badge"
+          ]
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": null,
+        "path": "$groupContains",
+        "equals": [
+          "caption",
+          "badge"
+        ]
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-074",
+    "instruction": "把所有六个可编辑图层按画布水平居中",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "align",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title",
+            "logo",
+            "decoration",
+            "caption",
+            "badge"
+          ],
+          "mode": "center-horizontal",
+          "target": "canvas"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.x",
+        "equals": 47.5
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.x",
+        "equals": 47.5
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.x",
+        "equals": 47.5
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 47.5
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.x",
+        "equals": 47.5
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.x",
+        "equals": 47.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-075",
+    "instruction": "把图层“主体”、“装饰”、“角标”水平等距分布",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "distribute",
+        "args": {
+          "layerIds": [
+            "subject",
+            "decoration",
+            "badge"
+          ],
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 47.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-076",
+    "instruction": "将图层“角标”向右移动80像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "badge",
+          "dx": {
+            "min": 79.999999,
+            "max": 80.000001
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rect.x",
+        "equals": 170
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-077",
+    "instruction": "将图层“角标”缩放为2倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "badge",
+          "sx": {
+            "min": 1.999999,
+            "max": 2.000001
+          },
+          "sy": {
+            "min": 1.999999,
+            "max": 2.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rect.width",
+        "equals": 10
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.height",
+        "equals": 10
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-078",
+    "instruction": "将图层“角标”旋转180度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "badge",
+          "degrees": {
+            "min": 179.999999,
+            "max": 180.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rotation",
+        "equals": 180
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-079",
+    "instruction": "将图层“角标”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "badge",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-080",
+    "instruction": "将图层“角标”不透明度设置为100%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "badge",
+          "value": {
+            "min": 99.999999,
+            "max": 100.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "opacity",
+        "equals": 100
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-081",
+    "instruction": "隐藏图层“角标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "badge",
+          "visible": false
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "visible",
+        "equals": false
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-082",
+    "instruction": "将图层“角标”混合模式设为正常",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "badge",
+          "blendMode": "正常"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "blendMode",
+        "equals": "正常"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-083",
+    "instruction": "将图层“角标”重命名为“角标终稿”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "badge",
+          "name": "角标终稿"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "name",
+        "equals": "角标终稿"
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-084",
+    "instruction": "复制图层“角标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "duplicate",
+        "args": {
+          "layerId": "badge"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "$sourceCount",
+        "equals": 2
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 8
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-085",
+    "instruction": "删除图层“角标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "delete",
+        "args": {
+          "layerId": "badge"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "$absent",
+        "equals": true
+      },
+      {
+        "layerId": null,
+        "path": "layers.length",
+        "equals": 6
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-086",
+    "instruction": "锁定图层“角标”",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "badge",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-087",
+    "instruction": "将图层“角标”上移一层",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "reorder",
+        "args": {
+          "layerId": "badge",
+          "direction": "up"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "$index",
+        "equals": 4
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-088",
+    "instruction": "将图层“角标”和图层“主体”分组",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "group",
+        "args": {
+          "layerIds": [
+            "badge",
+            "subject"
+          ]
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": null,
+        "path": "$groupContains",
+        "equals": [
+          "badge",
+          "subject"
+        ]
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-089",
+    "instruction": "把所有六个可编辑图层按画布垂直居中",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "align",
+        "args": {
+          "layerIds": [
+            "subject",
+            "title",
+            "logo",
+            "decoration",
+            "caption",
+            "badge"
+          ],
+          "mode": "center-vertical",
+          "target": "canvas"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.y",
+        "equals": 47.5
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.y",
+        "equals": 47.5
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.y",
+        "equals": 47.5
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.y",
+        "equals": 47.5
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.y",
+        "equals": 47.5
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.y",
+        "equals": 47.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-090",
+    "instruction": "把图层“主体”、“说明”、“角标”垂直等距分布",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "distribute",
+        "args": {
+          "layerIds": [
+            "subject",
+            "caption",
+            "badge"
+          ],
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.y",
+        "equals": 47.5
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-091",
+    "instruction": "将图层“主体”向右移动8像素，然后将图层“主体”旋转15度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "subject",
+          "dx": {
+            "min": 7.999999,
+            "max": 8.000001
+          },
+          "dy": 0
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "subject",
+          "degrees": {
+            "min": 14.999999,
+            "max": 15.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.x",
+        "equals": 13
+      },
+      {
+        "layerId": "subject",
+        "path": "transform.rotation",
+        "equals": 15
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-092",
+    "instruction": "将图层“标题”向右移动11像素，然后将图层“标题”旋转25度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "title",
+          "dx": {
+            "min": 10.999999,
+            "max": 11.000001
+          },
+          "dy": 0
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "title",
+          "degrees": {
+            "min": 24.999999,
+            "max": 25.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.x",
+        "equals": 31
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rotation",
+        "equals": 25
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-093",
+    "instruction": "将图层“徽标”向右移动14像素，然后将图层“徽标”旋转35度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "logo",
+          "dx": {
+            "min": 13.999999,
+            "max": 14.000001
+          },
+          "dy": 0
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "logo",
+          "degrees": {
+            "min": 34.999999,
+            "max": 35.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.x",
+        "equals": 54
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rotation",
+        "equals": 35
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-094",
+    "instruction": "将图层“装饰”向右移动17像素，然后将图层“装饰”旋转45度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "decoration",
+          "dx": {
+            "min": 16.999999,
+            "max": 17.000001
+          },
+          "dy": 0
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "decoration",
+          "degrees": {
+            "min": 44.999999,
+            "max": 45.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 77
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rotation",
+        "equals": 45
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-095",
+    "instruction": "将图层“说明”向右移动20像素，然后将图层“说明”旋转55度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "caption",
+          "dx": {
+            "min": 19.999999,
+            "max": 20.000001
+          },
+          "dy": 0
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "caption",
+          "degrees": {
+            "min": 54.999999,
+            "max": 55.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.x",
+        "equals": 95
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rotation",
+        "equals": 55
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-096",
+    "instruction": "将图层“角标”向右移动23像素，然后将图层“角标”旋转65度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "badge",
+          "dx": {
+            "min": 22.999999,
+            "max": 23.000001
+          },
+          "dy": 0
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "badge",
+          "degrees": {
+            "min": 64.999999,
+            "max": 65.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rect.x",
+        "equals": 113
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rotation",
+        "equals": 65
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-097",
+    "instruction": "将图层“主体”向上移动8像素，然后将图层“主体”不透明度设置为20%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "subject",
+          "dx": 0,
+          "dy": {
+            "min": -8.000001,
+            "max": -7.999999
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "subject",
+          "value": {
+            "min": 19.999999,
+            "max": 20.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.y",
+        "equals": -3
+      },
+      {
+        "layerId": "subject",
+        "path": "opacity",
+        "equals": 20
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-098",
+    "instruction": "将图层“标题”向上移动11像素，然后将图层“标题”不透明度设置为30%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "title",
+          "dx": 0,
+          "dy": {
+            "min": -11.000001,
+            "max": -10.999999
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "title",
+          "value": {
+            "min": 29.999999,
+            "max": 30.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.y",
+        "equals": 9
+      },
+      {
+        "layerId": "title",
+        "path": "opacity",
+        "equals": 30
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-099",
+    "instruction": "将图层“徽标”向上移动14像素，然后将图层“徽标”不透明度设置为40%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "logo",
+          "dx": 0,
+          "dy": {
+            "min": -14.000001,
+            "max": -13.999999
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "logo",
+          "value": {
+            "min": 39.999999,
+            "max": 40.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.y",
+        "equals": 26
+      },
+      {
+        "layerId": "logo",
+        "path": "opacity",
+        "equals": 40
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-100",
+    "instruction": "将图层“装饰”向上移动17像素，然后将图层“装饰”不透明度设置为50%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "decoration",
+          "dx": 0,
+          "dy": {
+            "min": -17.000001,
+            "max": -16.999999
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "decoration",
+          "value": {
+            "min": 49.999999,
+            "max": 50.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.y",
+        "equals": 43
+      },
+      {
+        "layerId": "decoration",
+        "path": "opacity",
+        "equals": 50
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-101",
+    "instruction": "将图层“说明”向上移动20像素，然后将图层“说明”不透明度设置为60%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "caption",
+          "dx": 0,
+          "dy": {
+            "min": -20.000001,
+            "max": -19.999999
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "caption",
+          "value": {
+            "min": 59.999999,
+            "max": 60.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.y",
+        "equals": 55
+      },
+      {
+        "layerId": "caption",
+        "path": "opacity",
+        "equals": 60
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-102",
+    "instruction": "将图层“角标”向上移动23像素，然后将图层“角标”不透明度设置为70%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "badge",
+          "dx": 0,
+          "dy": {
+            "min": -23.000001,
+            "max": -22.999999
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "badge",
+          "value": {
+            "min": 69.999999,
+            "max": 70.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rect.y",
+        "equals": 67
+      },
+      {
+        "layerId": "badge",
+        "path": "opacity",
+        "equals": 70
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-103",
+    "instruction": "将图层“主体”缩放为0.5倍，然后将图层“主体”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "subject",
+          "sx": {
+            "min": 0.499999,
+            "max": 0.500001
+          },
+          "sy": {
+            "min": 0.499999,
+            "max": 0.500001
+          }
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "subject",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.width",
+        "equals": 2.5
+      },
+      {
+        "layerId": "subject",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-104",
+    "instruction": "将图层“标题”缩放为0.7倍，然后将图层“标题”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "title",
+          "sx": {
+            "min": 0.6999989999999999,
+            "max": 0.700001
+          },
+          "sy": {
+            "min": 0.6999989999999999,
+            "max": 0.700001
+          }
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "title",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.width",
+        "equals": 3.5
+      },
+      {
+        "layerId": "title",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-105",
+    "instruction": "将图层“徽标”缩放为0.9倍，然后将图层“徽标”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "logo",
+          "sx": {
+            "min": 0.899999,
+            "max": 0.900001
+          },
+          "sy": {
+            "min": 0.899999,
+            "max": 0.900001
+          }
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "logo",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.width",
+        "equals": 4.5
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-106",
+    "instruction": "将图层“装饰”缩放为1.1倍，然后将图层“装饰”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "decoration",
+          "sx": {
+            "min": 1.0999990000000002,
+            "max": 1.100001
+          },
+          "sy": {
+            "min": 1.0999990000000002,
+            "max": 1.100001
+          }
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "decoration",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.width",
+        "equals": 5.5
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-107",
+    "instruction": "将图层“说明”缩放为1.3倍，然后将图层“说明”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "caption",
+          "sx": {
+            "min": 1.2999990000000001,
+            "max": 1.300001
+          },
+          "sy": {
+            "min": 1.2999990000000001,
+            "max": 1.300001
+          }
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "caption",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.width",
+        "equals": 6.5
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-108",
+    "instruction": "将图层“角标”缩放为1.5倍，然后将图层“角标”水平翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "badge",
+          "sx": {
+            "min": 1.499999,
+            "max": 1.500001
+          },
+          "sy": {
+            "min": 1.499999,
+            "max": 1.500001
+          }
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "badge",
+          "axis": "horizontal"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rect.width",
+        "equals": 7.5
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.flipX",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-109",
+    "instruction": "将图层“主体”旋转15度，然后将图层“主体”不透明度设置为20%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "subject",
+          "degrees": {
+            "min": 14.999999,
+            "max": 15.000001
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "subject",
+          "value": {
+            "min": 19.999999,
+            "max": 20.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rotation",
+        "equals": 15
+      },
+      {
+        "layerId": "subject",
+        "path": "opacity",
+        "equals": 20
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-110",
+    "instruction": "将图层“标题”旋转25度，然后将图层“标题”不透明度设置为30%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "title",
+          "degrees": {
+            "min": 24.999999,
+            "max": 25.000001
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "title",
+          "value": {
+            "min": 29.999999,
+            "max": 30.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rotation",
+        "equals": 25
+      },
+      {
+        "layerId": "title",
+        "path": "opacity",
+        "equals": 30
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-111",
+    "instruction": "将图层“徽标”旋转35度，然后将图层“徽标”不透明度设置为40%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "logo",
+          "degrees": {
+            "min": 34.999999,
+            "max": 35.000001
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "logo",
+          "value": {
+            "min": 39.999999,
+            "max": 40.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rotation",
+        "equals": 35
+      },
+      {
+        "layerId": "logo",
+        "path": "opacity",
+        "equals": 40
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-112",
+    "instruction": "将图层“装饰”旋转45度，然后将图层“装饰”不透明度设置为50%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "decoration",
+          "degrees": {
+            "min": 44.999999,
+            "max": 45.000001
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "decoration",
+          "value": {
+            "min": 49.999999,
+            "max": 50.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rotation",
+        "equals": 45
+      },
+      {
+        "layerId": "decoration",
+        "path": "opacity",
+        "equals": 50
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-113",
+    "instruction": "将图层“说明”旋转55度，然后将图层“说明”不透明度设置为60%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "caption",
+          "degrees": {
+            "min": 54.999999,
+            "max": 55.000001
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "caption",
+          "value": {
+            "min": 59.999999,
+            "max": 60.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rotation",
+        "equals": 55
+      },
+      {
+        "layerId": "caption",
+        "path": "opacity",
+        "equals": 60
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-114",
+    "instruction": "将图层“角标”旋转65度，然后将图层“角标”不透明度设置为70%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "badge",
+          "degrees": {
+            "min": 64.999999,
+            "max": 65.000001
+          }
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "badge",
+          "value": {
+            "min": 69.999999,
+            "max": 70.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rotation",
+        "equals": 65
+      },
+      {
+        "layerId": "badge",
+        "path": "opacity",
+        "equals": 70
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-115",
+    "instruction": "将图层“主体”重命名为“主体定稿”，然后将图层“主体”向左移动8像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "subject",
+          "name": "主体定稿"
+        }
+      },
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "subject",
+          "dx": {
+            "min": -8.000001,
+            "max": -7.999999
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "name",
+        "equals": "主体定稿"
+      },
+      {
+        "layerId": "subject",
+        "path": "transform.rect.x",
+        "equals": -3
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-116",
+    "instruction": "将图层“标题”重命名为“标题定稿”，然后将图层“标题”向左移动11像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "title",
+          "name": "标题定稿"
+        }
+      },
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "title",
+          "dx": {
+            "min": -11.000001,
+            "max": -10.999999
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "name",
+        "equals": "标题定稿"
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.x",
+        "equals": 9
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-117",
+    "instruction": "将图层“徽标”重命名为“徽标定稿”，然后将图层“徽标”向左移动14像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "logo",
+          "name": "徽标定稿"
+        }
+      },
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "logo",
+          "dx": {
+            "min": -14.000001,
+            "max": -13.999999
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "name",
+        "equals": "徽标定稿"
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.x",
+        "equals": 26
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-118",
+    "instruction": "将图层“装饰”重命名为“装饰定稿”，然后将图层“装饰”向左移动17像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "decoration",
+          "name": "装饰定稿"
+        }
+      },
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "decoration",
+          "dx": {
+            "min": -17.000001,
+            "max": -16.999999
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "name",
+        "equals": "装饰定稿"
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.x",
+        "equals": 43
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-119",
+    "instruction": "将图层“说明”重命名为“说明定稿”，然后将图层“说明”向左移动20像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "caption",
+          "name": "说明定稿"
+        }
+      },
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "caption",
+          "dx": {
+            "min": -20.000001,
+            "max": -19.999999
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "name",
+        "equals": "说明定稿"
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.x",
+        "equals": 55
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-120",
+    "instruction": "将图层“角标”重命名为“角标定稿”，然后将图层“角标”向左移动23像素",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "badge",
+          "name": "角标定稿"
+        }
+      },
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "badge",
+          "dx": {
+            "min": -23.000001,
+            "max": -22.999999
+          },
+          "dy": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "name",
+        "equals": "角标定稿"
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.x",
+        "equals": 67
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-121",
+    "instruction": "将图层“主体”隐藏，然后将图层“主体”锁定",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "subject",
+          "visible": false
+        }
+      },
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "subject",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "visible",
+        "equals": false
+      },
+      {
+        "layerId": "subject",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-122",
+    "instruction": "将图层“标题”隐藏，然后将图层“标题”锁定",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "title",
+          "visible": false
+        }
+      },
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "title",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "visible",
+        "equals": false
+      },
+      {
+        "layerId": "title",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-123",
+    "instruction": "将图层“徽标”隐藏，然后将图层“徽标”锁定",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "logo",
+          "visible": false
+        }
+      },
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "logo",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "visible",
+        "equals": false
+      },
+      {
+        "layerId": "logo",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-124",
+    "instruction": "将图层“装饰”隐藏，然后将图层“装饰”锁定",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "decoration",
+          "visible": false
+        }
+      },
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "decoration",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "visible",
+        "equals": false
+      },
+      {
+        "layerId": "decoration",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-125",
+    "instruction": "将图层“说明”隐藏，然后将图层“说明”锁定",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "caption",
+          "visible": false
+        }
+      },
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "caption",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "visible",
+        "equals": false
+      },
+      {
+        "layerId": "caption",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-126",
+    "instruction": "将图层“角标”隐藏，然后将图层“角标”锁定",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "visibility",
+        "args": {
+          "layerId": "badge",
+          "visible": false
+        }
+      },
+      {
+        "tool": "lock",
+        "args": {
+          "layerId": "badge",
+          "locked": true
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "visible",
+        "equals": false
+      },
+      {
+        "layerId": "badge",
+        "path": "locked",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-127",
+    "instruction": "将图层“主体”混合模式设为滤色，然后将图层“主体”不透明度设置为20%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "subject",
+          "blendMode": "滤色"
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "subject",
+          "value": {
+            "min": 19.999999,
+            "max": 20.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "blendMode",
+        "equals": "滤色"
+      },
+      {
+        "layerId": "subject",
+        "path": "opacity",
+        "equals": 20
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-128",
+    "instruction": "将图层“标题”混合模式设为滤色，然后将图层“标题”不透明度设置为30%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "title",
+          "blendMode": "滤色"
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "title",
+          "value": {
+            "min": 29.999999,
+            "max": 30.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "blendMode",
+        "equals": "滤色"
+      },
+      {
+        "layerId": "title",
+        "path": "opacity",
+        "equals": 30
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-129",
+    "instruction": "将图层“徽标”混合模式设为滤色，然后将图层“徽标”不透明度设置为40%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "logo",
+          "blendMode": "滤色"
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "logo",
+          "value": {
+            "min": 39.999999,
+            "max": 40.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "blendMode",
+        "equals": "滤色"
+      },
+      {
+        "layerId": "logo",
+        "path": "opacity",
+        "equals": 40
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-130",
+    "instruction": "将图层“装饰”混合模式设为滤色，然后将图层“装饰”不透明度设置为50%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "decoration",
+          "blendMode": "滤色"
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "decoration",
+          "value": {
+            "min": 49.999999,
+            "max": 50.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "blendMode",
+        "equals": "滤色"
+      },
+      {
+        "layerId": "decoration",
+        "path": "opacity",
+        "equals": 50
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-131",
+    "instruction": "将图层“说明”混合模式设为滤色，然后将图层“说明”不透明度设置为60%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "caption",
+          "blendMode": "滤色"
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "caption",
+          "value": {
+            "min": 59.999999,
+            "max": 60.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "blendMode",
+        "equals": "滤色"
+      },
+      {
+        "layerId": "caption",
+        "path": "opacity",
+        "equals": 60
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-132",
+    "instruction": "将图层“角标”混合模式设为滤色，然后将图层“角标”不透明度设置为70%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "blend",
+        "args": {
+          "layerId": "badge",
+          "blendMode": "滤色"
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "badge",
+          "value": {
+            "min": 69.999999,
+            "max": 70.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "blendMode",
+        "equals": "滤色"
+      },
+      {
+        "layerId": "badge",
+        "path": "opacity",
+        "equals": 70
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-133",
+    "instruction": "将图层“主体”缩放为0.5倍，然后将图层“主体”旋转15度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "subject",
+          "sx": {
+            "min": 0.499999,
+            "max": 0.500001
+          },
+          "sy": {
+            "min": 0.499999,
+            "max": 0.500001
+          }
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "subject",
+          "degrees": {
+            "min": 14.999999,
+            "max": 15.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.width",
+        "equals": 2.5
+      },
+      {
+        "layerId": "subject",
+        "path": "transform.rotation",
+        "equals": 15
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-134",
+    "instruction": "将图层“标题”缩放为0.7倍，然后将图层“标题”旋转25度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "title",
+          "sx": {
+            "min": 0.6999989999999999,
+            "max": 0.700001
+          },
+          "sy": {
+            "min": 0.6999989999999999,
+            "max": 0.700001
+          }
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "title",
+          "degrees": {
+            "min": 24.999999,
+            "max": 25.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.width",
+        "equals": 3.5
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rotation",
+        "equals": 25
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-135",
+    "instruction": "将图层“徽标”缩放为0.9倍，然后将图层“徽标”旋转35度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "logo",
+          "sx": {
+            "min": 0.899999,
+            "max": 0.900001
+          },
+          "sy": {
+            "min": 0.899999,
+            "max": 0.900001
+          }
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "logo",
+          "degrees": {
+            "min": 34.999999,
+            "max": 35.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.width",
+        "equals": 4.5
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rotation",
+        "equals": 35
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-136",
+    "instruction": "将图层“装饰”缩放为1.1倍，然后将图层“装饰”旋转45度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "decoration",
+          "sx": {
+            "min": 1.0999990000000002,
+            "max": 1.100001
+          },
+          "sy": {
+            "min": 1.0999990000000002,
+            "max": 1.100001
+          }
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "decoration",
+          "degrees": {
+            "min": 44.999999,
+            "max": 45.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.width",
+        "equals": 5.5
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rotation",
+        "equals": 45
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-137",
+    "instruction": "将图层“说明”缩放为1.3倍，然后将图层“说明”旋转55度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "caption",
+          "sx": {
+            "min": 1.2999990000000001,
+            "max": 1.300001
+          },
+          "sy": {
+            "min": 1.2999990000000001,
+            "max": 1.300001
+          }
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "caption",
+          "degrees": {
+            "min": 54.999999,
+            "max": 55.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.width",
+        "equals": 6.5
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rotation",
+        "equals": 55
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-138",
+    "instruction": "将图层“角标”缩放为1.5倍，然后将图层“角标”旋转65度",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "badge",
+          "sx": {
+            "min": 1.499999,
+            "max": 1.500001
+          },
+          "sy": {
+            "min": 1.499999,
+            "max": 1.500001
+          }
+        }
+      },
+      {
+        "tool": "rotate",
+        "args": {
+          "layerId": "badge",
+          "degrees": {
+            "min": 64.999999,
+            "max": 65.000001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rect.width",
+        "equals": 7.5
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rotation",
+        "equals": 65
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-139",
+    "instruction": "将图层“主体”向下移动8像素，然后将图层“主体”缩放为0.5倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "subject",
+          "dx": 0,
+          "dy": {
+            "min": 7.999999,
+            "max": 8.000001
+          }
+        }
+      },
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "subject",
+          "sx": {
+            "min": 0.499999,
+            "max": 0.500001
+          },
+          "sy": {
+            "min": 0.499999,
+            "max": 0.500001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "transform.rect.y",
+        "equals": 13
+      },
+      {
+        "layerId": "subject",
+        "path": "transform.rect.height",
+        "equals": 2.5
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-140",
+    "instruction": "将图层“标题”向下移动11像素，然后将图层“标题”缩放为0.7倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "title",
+          "dx": 0,
+          "dy": {
+            "min": 10.999999,
+            "max": 11.000001
+          }
+        }
+      },
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "title",
+          "sx": {
+            "min": 0.6999989999999999,
+            "max": 0.700001
+          },
+          "sy": {
+            "min": 0.6999989999999999,
+            "max": 0.700001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "transform.rect.y",
+        "equals": 31
+      },
+      {
+        "layerId": "title",
+        "path": "transform.rect.height",
+        "equals": 3.5
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-141",
+    "instruction": "将图层“徽标”向下移动14像素，然后将图层“徽标”缩放为0.9倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "logo",
+          "dx": 0,
+          "dy": {
+            "min": 13.999999,
+            "max": 14.000001
+          }
+        }
+      },
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "logo",
+          "sx": {
+            "min": 0.899999,
+            "max": 0.900001
+          },
+          "sy": {
+            "min": 0.899999,
+            "max": 0.900001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "transform.rect.y",
+        "equals": 54
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.rect.height",
+        "equals": 4.5
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-142",
+    "instruction": "将图层“装饰”向下移动17像素，然后将图层“装饰”缩放为1.1倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "decoration",
+          "dx": 0,
+          "dy": {
+            "min": 16.999999,
+            "max": 17.000001
+          }
+        }
+      },
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "decoration",
+          "sx": {
+            "min": 1.0999990000000002,
+            "max": 1.100001
+          },
+          "sy": {
+            "min": 1.0999990000000002,
+            "max": 1.100001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.y",
+        "equals": 77
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.rect.height",
+        "equals": 5.5
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-143",
+    "instruction": "将图层“说明”向下移动20像素，然后将图层“说明”缩放为1.3倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "caption",
+          "dx": 0,
+          "dy": {
+            "min": 19.999999,
+            "max": 20.000001
+          }
+        }
+      },
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "caption",
+          "sx": {
+            "min": 1.2999990000000001,
+            "max": 1.300001
+          },
+          "sy": {
+            "min": 1.2999990000000001,
+            "max": 1.300001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "transform.rect.y",
+        "equals": 95
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.rect.height",
+        "equals": 6.5
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-144",
+    "instruction": "将图层“角标”向下移动23像素，然后将图层“角标”缩放为1.5倍",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "move",
+        "args": {
+          "layerId": "badge",
+          "dx": 0,
+          "dy": {
+            "min": 22.999999,
+            "max": 23.000001
+          }
+        }
+      },
+      {
+        "tool": "scale",
+        "args": {
+          "layerId": "badge",
+          "sx": {
+            "min": 1.499999,
+            "max": 1.500001
+          },
+          "sy": {
+            "min": 1.499999,
+            "max": 1.500001
+          }
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "transform.rect.y",
+        "equals": 113
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.rect.height",
+        "equals": 7.5
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-145",
+    "instruction": "将图层“主体”重命名为“主体镜像版”，然后将图层“主体”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "subject",
+          "name": "主体镜像版"
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "subject",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "name",
+        "equals": "主体镜像版"
+      },
+      {
+        "layerId": "subject",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-146",
+    "instruction": "将图层“标题”重命名为“标题镜像版”，然后将图层“标题”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "title",
+          "name": "标题镜像版"
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "title",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "title",
+        "path": "name",
+        "equals": "标题镜像版"
+      },
+      {
+        "layerId": "title",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-147",
+    "instruction": "将图层“徽标”重命名为“徽标镜像版”，然后将图层“徽标”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "logo",
+          "name": "徽标镜像版"
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "logo",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "logo",
+        "path": "name",
+        "equals": "徽标镜像版"
+      },
+      {
+        "layerId": "logo",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-148",
+    "instruction": "将图层“装饰”重命名为“装饰镜像版”，然后将图层“装饰”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "decoration",
+          "name": "装饰镜像版"
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "decoration",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "decoration",
+        "path": "name",
+        "equals": "装饰镜像版"
+      },
+      {
+        "layerId": "decoration",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-149",
+    "instruction": "将图层“说明”重命名为“说明镜像版”，然后将图层“说明”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "caption",
+          "name": "说明镜像版"
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "caption",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "caption",
+        "path": "name",
+        "equals": "说明镜像版"
+      },
+      {
+        "layerId": "caption",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-150",
+    "instruction": "将图层“角标”重命名为“角标镜像版”，然后将图层“角标”垂直翻转",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "rename",
+        "args": {
+          "layerId": "badge",
+          "name": "角标镜像版"
+        }
+      },
+      {
+        "tool": "flip",
+        "args": {
+          "layerId": "badge",
+          "axis": "vertical"
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "badge",
+        "path": "name",
+        "equals": "角标镜像版"
+      },
+      {
+        "layerId": "badge",
+        "path": "transform.flipY",
+        "equals": true
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-filter-001",
+    "instruction": "将图层“主体”添加高斯模糊半径1",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "filter",
+        "args": {
+          "layerId": "subject",
+          "kind": "gaussian",
+          "radius": 1,
+          "amount": 0,
+          "angle": 0,
+          "size": 1,
+          "seed": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.kind",
+        "equals": "gaussian"
+      },
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.radius",
+        "equals": 1
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-filter-compound-001",
+    "instruction": "将图层“主体”添加高斯模糊半径1，然后将图层“主体”不透明度设置为60%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "filter",
+        "args": {
+          "layerId": "subject",
+          "kind": "gaussian",
+          "radius": 1,
+          "amount": 0,
+          "angle": 0,
+          "size": 1,
+          "seed": 0
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "subject",
+          "value": 60
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.kind",
+        "equals": "gaussian"
+      },
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.radius",
+        "equals": 1
+      },
+      {
+        "layerId": "subject",
+        "path": "opacity",
+        "equals": 60
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-filter-002",
+    "instruction": "将图层“主体”添加高斯模糊半径2",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "filter",
+        "args": {
+          "layerId": "subject",
+          "kind": "gaussian",
+          "radius": 2,
+          "amount": 0,
+          "angle": 0,
+          "size": 1,
+          "seed": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.kind",
+        "equals": "gaussian"
+      },
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.radius",
+        "equals": 2
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-filter-compound-002",
+    "instruction": "将图层“主体”添加高斯模糊半径2，然后将图层“主体”不透明度设置为70%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "filter",
+        "args": {
+          "layerId": "subject",
+          "kind": "gaussian",
+          "radius": 2,
+          "amount": 0,
+          "angle": 0,
+          "size": 1,
+          "seed": 0
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "subject",
+          "value": 70
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.kind",
+        "equals": "gaussian"
+      },
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.radius",
+        "equals": 2
+      },
+      {
+        "layerId": "subject",
+        "path": "opacity",
+        "equals": 70
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-filter-003",
+    "instruction": "将图层“主体”添加高斯模糊半径3",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "filter",
+        "args": {
+          "layerId": "subject",
+          "kind": "gaussian",
+          "radius": 3,
+          "amount": 0,
+          "angle": 0,
+          "size": 1,
+          "seed": 0
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.kind",
+        "equals": "gaussian"
+      },
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.radius",
+        "equals": 3
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-filter-compound-003",
+    "instruction": "将图层“主体”添加高斯模糊半径3，然后将图层“主体”不透明度设置为80%",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "filter",
+        "args": {
+          "layerId": "subject",
+          "kind": "gaussian",
+          "radius": 3,
+          "amount": 0,
+          "angle": 0,
+          "size": 1,
+          "seed": 0
+        }
+      },
+      {
+        "tool": "opacity",
+        "args": {
+          "layerId": "subject",
+          "value": 80
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.kind",
+        "equals": "gaussian"
+      },
+      {
+        "layerId": "subject",
+        "path": "smartFilters.items.0.radius",
+        "equals": 3
+      },
+      {
+        "layerId": "subject",
+        "path": "opacity",
+        "equals": 80
+      }
+    ],
+    "composite": true
+  },
+  {
+    "id": "zh-adjustment-001",
+    "instruction": "将图层“主体”色温设为10",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "adjustment",
+        "args": {
+          "layerId": "subject",
+          "key": "temperature",
+          "value": 10
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "adjustments.temperature",
+        "equals": 10
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-adjustment-002",
+    "instruction": "将图层“主体”色温设为-20",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "adjustment",
+        "args": {
+          "layerId": "subject",
+          "key": "temperature",
+          "value": -20
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "adjustments.temperature",
+        "equals": -20
+      }
+    ],
+    "composite": false
+  },
+  {
+    "id": "zh-adjustment-003",
+    "instruction": "将图层“主体”色温设为35",
+    "fixture": "original-geometric-v1",
+    "expected": [
+      {
+        "tool": "adjustment",
+        "args": {
+          "layerId": "subject",
+          "key": "temperature",
+          "value": 35
+        }
+      }
+    ],
+    "postconditions": [
+      {
+        "layerId": "subject",
+        "path": "adjustments.temperature",
+        "equals": 35
+      }
+    ],
+    "composite": false
+  }
+]

@@ -1,11 +1,13 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
+import { providerRelayPlugin } from './dev/providerRelay.ts'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), providerRelayPlugin()],
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
+    exclude: ['**/node_modules/**', '**/.worktrees/**', '**/dist/**'],
   },
 })

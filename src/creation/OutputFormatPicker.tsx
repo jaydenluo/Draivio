@@ -1,3 +1,5 @@
+import { DialogTitlebar } from '../ui/DialogTitlebar'
+import { useDraggableDialog } from '../ui/useDraggableDialog'
 import { useEffect, useRef, useState } from 'react'
 import { outputFormats, type OutputRatio } from './outputFormats'
 
@@ -11,34 +13,16 @@ type Props = {
 export function OutputFormatPicker({ ratio, size, onChoose, onClose }: Props) {
   const [activeRatio, setActiveRatio] = useState(ratio === 'auto' ? '1:1' : ratio)
   const root = useRef<HTMLDivElement>(null)
+  const draggable = useDraggableDialog(root)
   const preset = outputFormats.find((format) => format.ratio === activeRatio) ?? outputFormats[0]
 
   useEffect(() => {
     root.current?.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus()
   }, [])
 
-  useEffect(() => {
-    const dismiss = (event: PointerEvent) => {
-      const target = event.target
-      if (target instanceof Element && !root.current?.contains(target) && !target.closest('[aria-controls="output-format-popover"]')) onClose()
-    }
-    const escape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      event.preventDefault()
-      event.stopPropagation()
-      onClose()
-      document.querySelector<HTMLButtonElement>('[aria-controls="output-format-popover"]')?.focus()
-    }
-    document.addEventListener('pointerdown', dismiss)
-    document.addEventListener('keydown', escape)
-    return () => {
-      document.removeEventListener('pointerdown', dismiss)
-      document.removeEventListener('keydown', escape)
-    }
-  }, [onClose])
 
-  return <div ref={root} id="output-format-popover" className="output-format-popover" role="dialog" aria-label="比例与分辨率">
-    <div className="output-format-heading"><strong>比例与分辨率</strong><button type="button" aria-label="关闭比例与分辨率" onClick={onClose}>×</button></div>
+  return <div ref={root} style={draggable.style} onPointerDown={draggable.onPointerDown} id="output-format-popover" className="output-format-popover" role="dialog" aria-label="比例与分辨率">
+    <DialogTitlebar title="比例与分辨率" onClose={onClose} />
     <button type="button" className={`output-format-auto ${ratio === 'auto' ? 'selected' : ''}`} aria-label="Auto 自动比例与分辨率" aria-pressed={ratio === 'auto'} onClick={() => onChoose('auto', 'auto')}><span>Auto</span><small>自动比例与分辨率</small></button>
     <div className="output-format-columns">
       <div className="output-ratios" role="group" aria-label="常用比例"><span className="output-format-caption">比例</span>{outputFormats.map((format) => {

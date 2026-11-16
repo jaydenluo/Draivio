@@ -1,0 +1,17 @@
+{
+  "dino_source": "/absolute/official-GroundingDINO-source",
+  "sam_source": "/absolute/official-MobileSAM-source",
+  "dino": {
+    "path": "/absolute/groundingdino_swint_ogc.pth",
+    "sha256": "3b3ca2563c77c69f651d7bd133e97139c186df06231157a64c507099c52bc799"
+  },
+  "sam": {
+    "path": "/absolute/MobileSAM/weights/mobile_sam.pt",
+    "sha256": "6dbb90523a35330fedd7f1d3dfc66f995213d81b29a5ca8108dbcdd4e37d6c2f"
+  },
+  "vocab": {
+    "path": "/absolute/bert-base-uncased-vocab.txt",
+    "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+  },
+  "box_threshold": 0.3
+}

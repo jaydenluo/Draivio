@@ -1,41 +1,56 @@
+vi.mock('../ai/context/editorPreview', async importOriginal => {
+ const original = await importOriginal<typeof import('../ai/context/editorPreview')>()
+ return {...original,captureRenderedEditorContext:(state:import('../state/editor').EditorState,id:string,scope:import('../ai/context/editorContext').EditorScope)=>original.captureRenderedEditorContext(state,id,scope,async ()=>'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==')}
+})
 import { fireEvent, render, screen } from '@testing-library/react'
 import { act } from 'react'
-import { test, expect, vi, afterEach } from 'vitest'
+import { test, expect, vi, afterEach, beforeEach } from 'vitest'
 import { AppShell } from '../app/AppShell'
 import { EditorProvider, initialEditorState, useEditor, type EditorState } from '../state/editor'
+import { loadConnections } from './serviceConnections'
 
 afterEach(() => vi.useRealTimers())
+beforeEach(async () => {
+  vi.spyOn(window, 'confirm').mockReturnValue(true)
+  localStorage.setItem('draivio-service-connections-v1', JSON.stringify([{ id:'proxy', provider:'OpenAI', name:'中转', baseUrl:'https://proxy.example/v1', apiKey:'test-runtime-key', protocol:'openai_compatible', models:['gpt-image-2.5'], enabled:true, imageCapabilities:{'gpt-image-2.5':{generate:true,edit:true,reference:true,encoding:'base64-json'}}, generation:{multiImage:'split', concurrency:2, sendSize:false} }]))
+  await loadConnections()
+  vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({ data: [{ b64_json: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==' }] })))
+})
+function chooseLocalSource() {
+  fireEvent.click(screen.getByRole('button', { name: '选择模型' }))
+  fireEvent.click(screen.getByRole('button', { name: 'gpt-image-2.5 · OpenAI · 中转' }))
+}
 
-test('uses one AI composer for generation and editing', () => {
+test('uses one AI composer for generation and editing', async () => {
   render(<EditorProvider><AppShell /></EditorProvider>)
-  expect(screen.getByRole('button', { name: '切换到生成新内容' })).toHaveTextContent('修改当前图')
+  expect(screen.getByRole('button', { name: '切换到生成新内容' })).toHaveTextContent('修改')
   fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
   expect(screen.getByRole('button', { name: '切换到修改当前图' })).toHaveTextContent('生成新内容')
   expect(screen.getByPlaceholderText('描述你想要的画面')).toBeInTheDocument()
 })
 
-test('opens a parameter popover from the AI composer', () => {
+test('opens a parameter popover from the AI composer', async () => {
   render(<EditorProvider><AppShell /></EditorProvider>)
   fireEvent.click(screen.getByRole('button', { name: '选择模型' }))
-  expect(screen.getByRole('dialog', { name: '模型参数' })).toBeInTheDocument()
-  expect(screen.getByRole('button', { name: '模型：Image Pro' })).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'Image Fast' }))
-  expect(screen.getByRole('button', { name: '选择模型' })).toHaveTextContent('Image Fast')
+  expect(screen.getByRole('dialog', { name: '选择模型' })).toBeInTheDocument()
+  expect(screen.getByRole('searchbox', { name: '搜索模型或服务来源' })).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button', { name: 'gpt-image-2.5 · OpenAI · 中转' }))
+  expect(screen.getByRole('button', { name: '选择模型' })).toHaveTextContent('gpt-image-2.5')
 })
 
-test('submitting the AI composer shows loading and appends a result', () => {
+test('submitting the AI composer shows loading and appends a result', async () => {
   vi.useFakeTimers()
   render(<EditorProvider><AppShell /></EditorProvider>)
+  chooseLocalSource()
+  fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
   fireEvent.click(screen.getByRole('button', { name: '执行 AI 操作' }))
   expect(screen.getByRole('button', { name: '执行中…' })).toBeDisabled()
-  act(() => {
-    vi.advanceTimersByTime(900)
-  })
+  await act(async () => { await vi.runAllTimersAsync() })
   expect(screen.getByRole('button', { name: '执行 AI 操作' })).toBeEnabled()
-  expect(screen.getByRole('button', { name: '修改当前图 · 1' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '新增图层' })).toBeInTheDocument()
 })
 
-test('selecting a history thumbnail makes it active', () => {
+test('selecting a history thumbnail makes it active', async () => {
   render(<EditorProvider><AppShell /></EditorProvider>)
   const result = screen.getByRole('button', { name: '文生图 · 1' })
   fireEvent.click(result)
@@ -43,36 +58,41 @@ test('selecting a history thumbnail makes it active', () => {
 })
 
 
-test('keeps the submitted scope and intent when the user changes them during execution', () => {
+test('keeps the submitted scope and intent when the user changes them during execution', async () => {
   vi.useFakeTimers()
   let latest: EditorState
   function Observer() { latest = useEditor().state; return null }
   render(<EditorProvider><AppShell /><Observer /></EditorProvider>)
-  fireEvent.click(screen.getByRole('button', { name: '执行 AI 操作' }))
+  chooseLocalSource()
   fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
+  fireEvent.click(screen.getByRole('button', { name: '执行 AI 操作' }))
+  fireEvent.click(screen.getByRole('button', { name: '切换到修改当前图' }))
   fireEvent.keyDown(window, { key: 'Escape' })
-  act(() => vi.advanceTimersByTime(900))
-  const result = latest!.layers[0]
-  expect(result.aiOperation?.mode).toBe('edit')
-  expect(result.aiOperation?.selection).toEqual(initialEditorState.selection)
+  await act(async () => { await vi.runAllTimersAsync() })
+  const result = latest!.aiResults[0]
+  expect(result.request?.mode).toBe('generate')
+  expect(result.request?.selection).toEqual(initialEditorState.selection)
   expect(latest!.selectionVisible).toBe(false)
-  expect(screen.getByRole('button', { name: '修改当前图 · 1图层' })).toHaveAttribute('aria-pressed', 'true')
+  expect(latest!.layers).toHaveLength(initialEditorState.layers.length);expect(result.adopted).toBe(false)
   expect(screen.getByRole('button', { name: '原图图层' })).toBeInTheDocument()
 })
 
 for (const count of [3, 6, 8]) {
-  test(`selects ${count} results and adds the matching number of layers and history entries`, () => {
+  test(`selects ${count} candidates without adding formal layers or content history`, async () => {
     vi.useFakeTimers()
     let latest: EditorState
     function Observer() { latest = useEditor().state; return null }
     render(<EditorProvider><AppShell /><Observer /></EditorProvider>)
+    chooseLocalSource()
     fireEvent.click(screen.getByRole('button', { name: '选择数量' }))
     for (const option of [1, 2, 3, 4, 6, 8]) expect(screen.getByRole('button', { name: `${option} 张` })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: `${count} 张` }))
     expect(screen.getByRole('button', { name: '选择数量' })).toHaveTextContent(`${count} 张`)
-    fireEvent.click(screen.getByRole('button', { name: '执行 AI 操作' }))
-    act(() => vi.advanceTimersByTime(900))
-    expect(latest!.layers).toHaveLength(initialEditorState.layers.length + count)
-    expect(latest!.history).toHaveLength(initialEditorState.history.length + count)
+    fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
+  fireEvent.click(screen.getByRole('button', { name: '执行 AI 操作' }))
+    await act(async () => { await vi.runAllTimersAsync() })
+    expect(latest!.aiResults).toHaveLength(count)
+    expect(latest!.layers).toHaveLength(initialEditorState.layers.length)
+    expect(latest!.history).toHaveLength(initialEditorState.history.length)
   })
 }

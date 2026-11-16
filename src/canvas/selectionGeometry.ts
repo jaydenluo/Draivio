@@ -6,10 +6,10 @@ export type SelectionMode = 'new' | 'add' | 'subtract' | 'intersect'
 export type SelectionPath =
   | { type: 'shape'; kind: SelectionKind; rect: SelectionRect }
   | { type: 'boolean'; mode: Exclude<SelectionMode, 'new'>; left: SelectionPath; right: SelectionPath }
-  | { type: 'inverse'; source: SelectionPath }
+  | { type: 'inverse'; source: SelectionPath; sourceRect: SelectionRect }
   | { type: 'transform'; source: SelectionPath; from: SelectionRect; to: SelectionRect }
   | { type: 'path'; d: string; points: SelectionPoint[] }
-  | { type: 'raster'; rows: string[]; d: string }
+  | { type: 'raster'; rows: string[]; d: string; alpha?: number[]; alphaWidth?: number; alphaHeight?: number }
   | { type: 'affine'; source: SelectionPath; matrix: [number, number, number, number, number, number] }
 export type Selection = { kind: SelectionKind; mode: SelectionMode; rect: SelectionRect; path: SelectionPath; feather: number; fixedRatio: number | null }
 
@@ -64,7 +64,12 @@ export function selectionContains(path: SelectionPath, point: SelectionPoint): b
     return selectionContains(path.source, inverse)
   }
   if (path.type === 'transform') return selectionContains(path.source, { x: path.from.x + (point.x - path.to.x) / path.to.width * path.from.width, y: path.from.y + (point.y - path.to.y) / path.to.height * path.from.height })
-  if (path.type === 'raster') return path.rows[Math.min(path.rows.length - 1, Math.floor(point.y / 100 * path.rows.length))]?.[Math.min(path.rows[0].length - 1, Math.floor(point.x / 100 * path.rows[0].length))] === '1'
+  if (path.type === 'raster') {
+    const x = Math.min(path.rows[0].length - 1, Math.floor(point.x / 100 * path.rows[0].length))
+    const y = Math.min(path.rows.length - 1, Math.floor(point.y / 100 * path.rows.length))
+    const i = y * path.rows[0].length + x
+    return path.alpha ? (path.alpha[i] ?? 0) > 0 : path.rows[y]?.[x] === '1'
+  }
   const left = selectionContains(path.left, point)
   const right = selectionContains(path.right, point)
   return path.mode === 'add' ? left || right : path.mode === 'subtract' ? left && !right : left && right
@@ -82,16 +87,18 @@ export function combineSelection(previous: Selection | null, next: Selection, mo
 }
 
 export function invertSelection(selection: Selection): Selection {
-  return { ...selection, rect: { x: 0, y: 0, width: 100, height: 100 }, path: { type: 'inverse', source: selection.path } }
+  if (selection.path.type === 'inverse') return { ...selection, rect: selection.path.sourceRect, path: selection.path.source }
+  return { ...selection, rect: { x: 0, y: 0, width: 100, height: 100 }, path: { type: 'inverse', source: selection.path, sourceRect: selection.rect } }
 }
 
 /** Expand/contract the actual mask, including holes. One cell is .25% of artboard width.
  * A summed-area table implements square-kernel morphology in linear time.
  * The 400×500 grid has square physical pixels on the 4:5 artboard.
  */
-export function morphSelection(selection: Selection, amount: number): Selection {
+export function morphSelection(selection: Selection, amount: number, documentWidth = 500, documentHeight = 625): Selection {
   if (!Number.isFinite(amount) || amount === 0) return selection
-  const width = 400; const height = 500; const stride = width + 1
+  const scale = Math.min(400 / documentWidth, 500 / documentHeight)
+  const width = Math.max(1, Math.round(documentWidth * scale)); const height = Math.max(1, Math.round(documentHeight * scale)); const stride = width + 1
   const radius = Math.max(1, Math.round(Math.abs(amount) / 100 * width))
   const sums = new Int32Array((width + 1) * (height + 1))
   for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {

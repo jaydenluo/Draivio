@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import guide from './imageModelGuide.json'
+import { useDraggableDialog } from '../ui/useDraggableDialog'
 
 const sections = [
   { id: 'models', label: '模型怎么选' },
@@ -26,6 +27,7 @@ export function ModelGuide({ onClose }: { onClose: () => void }) {
   const [section, setSection] = useState<Section>('models')
   const dialog = useRef<HTMLDivElement>(null)
   const content = useRef<HTMLDivElement>(null)
+  const draggable = useDraggableDialog(dialog, true)
 
   useEffect(() => {
     const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null
@@ -60,8 +62,8 @@ export function ModelGuide({ onClose }: { onClose: () => void }) {
   }
 
   return createPortal(<div className="model-guide-backdrop" onClick={(event) => { if (event.target === event.currentTarget) onClose() }}>
-    <div ref={dialog} className="model-guide" role="dialog" aria-modal="true" aria-labelledby="model-guide-title" aria-describedby="model-guide-intro" onKeyDown={(event) => event.stopPropagation()}>
-      <header className="model-guide-header"><div><span className="model-guide-eyebrow">DRAIVIO · 创作参考</span><h2 id="model-guide-title">图片模型与参数指南</h2></div><button type="button" className="model-guide-close" aria-label="关闭模型指南" onClick={onClose}>×</button></header>
+    <div ref={dialog} style={draggable.style} onPointerDown={draggable.onPointerDown} className="model-guide" role="dialog" aria-modal="true" aria-labelledby="model-guide-title" aria-describedby="model-guide-intro" onKeyDown={(event) => event.stopPropagation()}>
+      <header className="model-guide-header dialog-titlebar"><div><span className="model-guide-eyebrow">DRAIVIO · 创作参考</span><h2 id="model-guide-title">图片模型与参数指南</h2></div><button type="button" className="model-guide-close" aria-label="关闭模型指南" onClick={onClose}>×</button></header>
       <p id="model-guide-intro" className="model-guide-intro">{guide.intro}</p>
       <div className="model-guide-tabs" role="tablist" aria-label="指南章节">{sections.map((item, index) => <button key={item.id} type="button" id={`model-guide-tab-${item.id}`} role="tab" aria-selected={section === item.id} aria-controls={`model-guide-panel-${item.id}`} tabIndex={section === item.id ? 0 : -1} onClick={() => chooseSection(item.id)} onKeyDown={(event) => {
         const nextIndex = event.key === 'ArrowRight' ? (index + 1) % sections.length : event.key === 'ArrowLeft' ? (index + sections.length - 1) % sections.length : event.key === 'Home' ? 0 : event.key === 'End' ? sections.length - 1 : null
@@ -80,6 +82,8 @@ export function ModelGuide({ onClose }: { onClose: () => void }) {
           <div className="model-guide-grid">{guide.models.filter((model) => !model.verified).map((model) => <ModelCard key={model.id} model={model} />)}</div>
         </> : section === 'parameters' ? <>
           <article className="model-guide-strength"><span className="model-guide-eyebrow">先理解变化程度</span><h3>{guide.strength.title}</h3><p>{guide.strength.summary}</p><p>{guide.strength.example}</p><p>{guide.strength.difference}</p><p>{guide.strength.support}</p><p className="model-guide-note">{guide.strength.demo}</p></article>
+          <h3 className="model-guide-section-title">已核查的模型参数示例</h3>
+          <div className="model-guide-grid">{guide.parameterExamples.map((item) => <article className="model-guide-card" key={item.name}><h3>{item.name}</h3><p>{item.meaning}</p><div className="model-guide-sources"><a href={item.url} target="_blank" rel="noopener noreferrer">官方参数文档 ↗</a></div></article>)}</div>
           <div className="model-guide-parameter-list">{guide.parameters.map((item) => <article key={item.name}><h3>{item.name}</h3><p>{item.meaning}</p></article>)}</div>
         </> : <>
           <h3 className="model-guide-section-title">把目标说清楚，比盲目拉高参数更有效</h3>

@@ -1,19 +1,20 @@
 import type { PathPoint } from './pathGeometry'
 
 export type BrushSettings = { size: number; hardness: number; opacity: number; flow: number; smoothing: number; color: string }
-export type BrushStroke = BrushSettings & { id: string; mode: 'paint' | 'erase' | 'mask'; layerId: string; points: PathPoint[] }
+export type BrushPoint = PathPoint & { pressure?: number; tiltX?: number; tiltY?: number }
+export type BrushStroke = BrushSettings & { id: string; mode: 'paint' | 'erase' | 'mask'; layerId: string; points: BrushPoint[] }
 
-export function createBrushStroke(id: string, mode: BrushStroke['mode'], layerId: string, point: PathPoint, settings: BrushSettings): BrushStroke {
+export function createBrushStroke(id: string, mode: BrushStroke['mode'], layerId: string, point: BrushPoint, settings: BrushSettings): BrushStroke {
   return { ...settings, id, mode, layerId, points: [{ ...point }] }
 }
 
-export function appendBrushPoint(stroke: BrushStroke, point: PathPoint): BrushStroke {
+export function appendBrushPoint(stroke: BrushStroke, point: BrushPoint): BrushStroke {
   const previous = stroke.points.at(-1)
   if (!previous) return { ...stroke, points: [point] }
   const weight = Math.max(.15, 1 - stroke.smoothing / 100)
   const next = { x: previous.x + (point.x - previous.x) * weight, y: previous.y + (point.y - previous.y) * weight }
   if (Math.hypot(next.x - previous.x, next.y - previous.y) < .05) return stroke
-  return { ...stroke, points: [...stroke.points, next] }
+  return { ...stroke, points: [...stroke.points, { ...next, pressure: point.pressure, tiltX: point.tiltX, tiltY: point.tiltY }] }
 }
 
 export function hitStroke(stroke: BrushStroke, point: PathPoint, eraserSize: number, canvasWidth = 500, canvasHeight = 625): boolean {
@@ -30,6 +31,6 @@ export function hitStroke(stroke: BrushStroke, point: PathPoint, eraserSize: num
   return false
 }
 
-export function strokeSvgPath(stroke: BrushStroke): string {
-  return stroke.points.map((p, index) => `${index === 0 ? 'M' : 'L'} ${p.x * 5} ${p.y * 6.25}`).join(' ')
+export function strokeSvgPath(stroke: BrushStroke, width = 500, height = 625): string {
+  return stroke.points.map((p, index) => `${index === 0 ? 'M' : 'L'} ${p.x * width / 100} ${p.y * height / 100}`).join(' ')
 }

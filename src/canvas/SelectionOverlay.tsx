@@ -20,6 +20,15 @@ export function maskDefinitions(path: SelectionPath, id: string): ReactNode {
   if (path.type === 'shape') {
     const r = path.rect
     body = path.kind === 'ellipse' ? <ellipse cx={r.x + r.width / 2} cy={r.y + r.height / 2} rx={r.width / 2} ry={r.height / 2} fill="white" /> : <rect {...r} fill="white" />
+  } else if (path.type === 'raster' && path.alpha) {
+    const width=path.alphaWidth??path.rows[0].length,height=path.alphaHeight??path.rows.length
+    const runs:ReactNode[]=[]
+    for(let y=0;y<height;y++)for(let x=0;x<width;){
+      const value=path.alpha[y*width+x]??0,start=x
+      while(x<width&&(path.alpha[y*width+x]??0)===value)x++
+      if(value)runs.push(<rect key={`${y}-${start}`} x={start/width*100} y={y/height*100} width={(x-start)/width*100} height={100/height} fill={`rgb(${value},${value},${value})`}/>)
+    }
+    body=<g shapeRendering="crispEdges">{runs}</g>
   } else if ((path.type === 'raster' || path.type === 'path')) body = <path d={path.d} fill="white" />
   else if (path.type === 'boolean') {
     children = <>{maskDefinitions(path.left, `${id}-l`)}{maskDefinitions(path.right, `${id}-r`)}</>

@@ -1,0 +1,9 @@
+.edit-preview { display: grid; gap: 8px; padding: 10px; border: 1px solid var(--border, #45494e); border-radius: 8px; }
+.edit-preview-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.edit-preview-toolbar strong { flex: 1; }
+.edit-preview-toolbar button { padding: 5px 8px; }
+.edit-preview-toolbar button[aria-pressed="true"] { color: var(--accent, #a6e6d2); }
+.edit-preview-scene { height: 180px; min-height: 100px; background: repeating-conic-gradient(#444 0% 25%, #383838 0% 50%) 50% / 16px 16px; overflow: hidden; }
+.edit-preview-parameters { display: flex; flex-wrap: wrap; gap: 6px; max-height: 110px; overflow-y: auto; }
+.edit-preview-parameters label { display: flex; gap: 4px; align-items: center; font-size: 11px; }
+.edit-preview-parameters input { width: 65px; padding: 3px; }

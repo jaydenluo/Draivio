@@ -13,6 +13,13 @@ test('continuous strokes retain their brush settings and append smoothed points'
   expect(stroke.points).toHaveLength(1)
 })
 
+test('keeps pointer pressure and tilt on individual brush points', () => {
+  const stroke = createBrushStroke('pressure', 'paint', 'layer-a', { x: 10, y: 10, pressure: .25, tiltX: 12, tiltY: -8 }, settings)
+  const next = appendBrushPoint(stroke, { x: 30, y: 40, pressure: .9, tiltX: 20, tiltY: -10 })
+  expect(next.points[0]).toMatchObject({ pressure: .25, tiltX: 12, tiltY: -8 })
+  expect(next.points[1].pressure).toBeCloseTo(.9)
+})
+
 test('eraser hit testing checks line segments in physical canvas coordinates', () => {
   let stroke = createBrushStroke('two', 'paint', 'art', { x: 0, y: 50 }, { ...settings, smoothing: 0 })
   stroke = appendBrushPoint(stroke, { x: 100, y: 50 })

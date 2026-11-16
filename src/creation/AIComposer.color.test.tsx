@@ -1,0 +1,7 @@
+import { fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { expect,it } from 'vitest'
+import { EditorProvider,useEditor,type EditorState } from '../state/editor'
+import { AIComposer } from './AIComposer'
+let latest:EditorState
+function Observe(){latest=useEditor().state;return null}
+it('previews, cancels and adopts local highlighth control through actual Composer without global source mutation',async()=>{render(<EditorProvider><AIComposer/><Observe/></EditorProvider>);fireEvent.click(screen.getByRole('button',{name:'一句话编辑'}));const before=latest.layers;const execute=()=>{fireEvent.change(screen.getByRole('textbox',{name:'AI 操作'}),{target:{value:'在选区降低高光'}});fireEvent.click(screen.getByRole('button',{name:'执行 AI 操作'}))};execute();expect(latest.layers).toBe(before);fireEvent.click(screen.getByRole('button',{name:'取消计划'}));expect(latest.layers).toBe(before);execute();fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}));fireEvent.click(await screen.findByRole('button',{name:'采用预览'}));await waitFor(()=>expect(latest.layers[0].smartFilters?.items[0].adjustments?.highlights).toBe(-10));expect(latest.layers[0].source).toBe(before[0].source);expect(latest.layers[0].adjustments).toEqual(before[0].adjustments);expect(latest.layers[0].smartFilters!.items[0].selection).toBeDefined()})

@@ -3,6 +3,9 @@ import { type Selection, type SelectionPath, type SelectionPoint } from './selec
 export type { TransformDraft } from './TransformOverlay'
 
 export type AffineMatrix = [number, number, number, number, number, number]
+export function multiplyMatrices(a: AffineMatrix, b: AffineMatrix): AffineMatrix {
+  return [a[0]*b[0]+a[2]*b[1],a[1]*b[0]+a[3]*b[1],a[0]*b[2]+a[2]*b[3],a[1]*b[2]+a[3]*b[3],a[0]*b[4]+a[2]*b[5]+a[4],a[1]*b[4]+a[3]*b[5]+a[5]]
+}
 export type LayerAffine = { type: 'affine'; source: SelectionPath; matrix: AffineMatrix }
 
 const EPSILON = 1e-8
@@ -24,25 +27,27 @@ export function invertMatrix(matrix: AffineMatrix): AffineMatrix {
   return [a, b, c, d, -a * matrix[4] - c * matrix[5], -b * matrix[4] - d * matrix[5]]
 }
 
-/** Matches CanvasScene.layerTransformValue, including the physical 500×625 aspect ratio. */
-export function layerMatrix(transform: TransformDraft): AffineMatrix {
+/** Matches CanvasScene.layerTransformValue in the supplied document pixel space. */
+export function layerMatrix(transform: TransformDraft, width = 500, height = 625): AffineMatrix {
   validateTransform(transform)
   const { rect, rotation, flipX, flipY } = transform
   const theta = rotation * Math.PI / 180
   const cos = Math.cos(theta); const sin = Math.sin(theta)
   const sx = rect.width / 100 * (flipX ? -1 : 1); const sy = rect.height / 100 * (flipY ? -1 : 1)
   const m00 = cos * sx; const m01 = -sin * sy; const m10 = sin * sx; const m11 = cos * sy
-  const cx = (rect.x + rect.width / 2) * 5; const cy = (rect.y + rect.height / 2) * 6.25
-  const tx = cx - m00 * 250 - m01 * 312.5; const ty = cy - m10 * 250 - m11 * 312.5
+  const px = width / 100, py = height / 100
+  const cx = (rect.x + rect.width / 2) * px; const cy = (rect.y + rect.height / 2) * py
+  const tx = cx - m00 * width / 2 - m01 * height / 2; const ty = cy - m10 * width / 2 - m11 * height / 2
   // convert physical SVG coordinates into percentage coordinates without losing the 4:5 aspect ratio
-  return [m00, m10 * 5 / 6.25, m01 * 6.25 / 5, m11, tx / 5, ty / 6.25]
+  const local: AffineMatrix = [m00, m10 * px / py, m01 * py / px, m11, tx / px, ty / py]
+  return transform.affine ? multiplyMatrices(transform.affine, local) : local
 }
 
 /** Default maps layer/document-local points to canvas coordinates; inverse maps canvas to local. */
-export function layerPoint(point: SelectionPoint, transform?: TransformDraft, inverse = false): SelectionPoint {
+export function layerPoint(point: SelectionPoint, transform?: TransformDraft, inverse = false, width = 500, height = 625): SelectionPoint {
   validatePoint(point)
   if (!transform) return { ...point }
-  const matrix = layerMatrix(transform)
+  const matrix = layerMatrix(transform, width, height)
   return multiplyPoint(inverse ? invertMatrix(matrix) : matrix, point)
 }
 
@@ -51,9 +56,9 @@ function boundsOf(points: SelectionPoint[]) {
 }
 
 /** Stores the inverse layer matrix so a canvas selection can be rendered inside a transformed layer. */
-export function selectionToLayer(selection: Selection, transform?: TransformDraft): Selection {
+export function selectionToLayer(selection: Selection, transform?: TransformDraft, width = 500, height = 625): Selection {
   if (!transform) return selection
-  const inverse = invertMatrix(layerMatrix(transform))
+  const inverse = invertMatrix(layerMatrix(transform, width, height))
   const rect = selection.rect
   const corners = [{ x: rect.x, y: rect.y }, { x: rect.x + rect.width, y: rect.y }, { x: rect.x + rect.width, y: rect.y + rect.height }, { x: rect.x, y: rect.y + rect.height }].map((point) => multiplyPoint(inverse, point))
   return { ...selection, rect: boundsOf(corners), path: { type: 'affine', source: selection.path, matrix: inverse } }

@@ -64,12 +64,12 @@ test('Escape cancels a centered selection while Alt remains held', () => {
   expect(state()).toEqual(before)
 })
 
-test('switching to selection tool allows moving the interior of a combined selection', () => {
+test('selection tool in new mode can move the interior of a combined selection', () => {
   const target = setup(); tool(/矩形选框/)
   drag(target, [50, 62.5], [200, 250])
   fireEvent.click(screen.getByRole('button', { name: '选区模式：添加' }))
   drag(target, [250, 312.5], [400, 500])
-  fireEvent.keyDown(window, { key: 'v' })
+  fireEvent.click(screen.getByRole('button', { name: '选区模式：新建' }))
   const before = state()
   drag(screen.getByLabelText('移动选区'), [100, 125], [125, 150])
   expect(state().selection.rect.x).toBeCloseTo(before.selection.rect.x + 5)

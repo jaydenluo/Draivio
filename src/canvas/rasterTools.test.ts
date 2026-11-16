@@ -58,6 +58,14 @@ describe('pure pixel tools', () => {
 })
 
 describe('SVG rasterization', () => {
+  it('keeps nested visible SVG layers while excluding hidden branches in a scope fixture', async () => {
+    const node = svg(); node.innerHTML = '<g data-layer-id="visible"><rect width="500" height="625" fill="#ff0000"/></g><g data-layer-id="hidden" visibility="hidden"><rect width="500" height="625" fill="#00ff00"/></g>'
+    const visible = node.cloneNode(true) as SVGElement
+    visible.querySelector('[data-layer-id="hidden"]')?.remove()
+    expect(visible.querySelector('[data-layer-id="visible"] rect')?.getAttribute('fill')).toBe('#ff0000')
+    expect(visible.querySelector('[data-layer-id="hidden"]')).toBeNull()
+    expect(serializeSvg(visible).source).toContain('data-layer-id="visible"')
+  })
   it('serializes an independent SVG with explicit intrinsic width and height', () => {
     const node = svg()
     const result = serializeSvg(node)
@@ -68,6 +76,13 @@ describe('SVG rasterization', () => {
     expect(result.source).toContain('xmlns="http://www.w3.org/2000/svg"')
     expect(node.hasAttribute('width')).toBe(false)
     expect(() => serializeSvg(document.createElementNS('http://www.w3.org/2000/svg', 'g'))).toThrow(Error)
+  })
+  it('restores text hidden only for the on-canvas editor when serializing', () => {
+    const node = svg()
+    node.innerHTML = '<text data-editor-hidden="true">编辑中</text>'
+    const result = serializeSvg(node)
+    expect(result.source).toContain('编辑中')
+    expect(result.source).not.toContain('data-editor-hidden')
   })
   it('rejects unavailable canvas support rather than returning invented pixels or selections', async () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
@@ -181,4 +196,14 @@ describe('smudge and clone pixels', () => {
     await expect(smudgeImage(svg(), [{ x: 0, y: 0 }], 1, 50)).rejects.toThrow(Error)
     await expect(cloneImage(svg(), [{ x: 0, y: 0 }], { x: 0, y: 0 }, 1)).rejects.toThrow(Error)
   })
+})
+
+
+it('aligned clone retains the first stroke offset across strokes while nonaligned restarts the source each stroke', () => {
+  const image = pixels([[10, 20, 30, 40, 50]])
+  const options = { alignmentOrigin: { x: 25, y: 0 }, aligned: true }
+  const aligned = clonePixels(image, [{ x: 75, y: 0 }], { x: 0, y: 0 }, 1, options)
+  const restarted = clonePixels(image, [{ x: 75, y: 0 }], { x: 0, y: 0 }, 1, { ...options, aligned: false })
+  expect(aligned.data[12]).toBe(30)
+  expect(restarted.data[12]).toBe(10)
 })

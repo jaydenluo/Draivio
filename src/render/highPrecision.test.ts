@@ -1,0 +1,9 @@
+import { describe, expect, it } from 'vitest'
+import { capabilityFor, convertPixelBuffer, createPixelBuffer, enforceBudget, readNormalized, writeNormalized } from './pixelBuffer'
+import { applyLayerAdjustmentsToPixelBuffer } from '../imaging/layerAdjustments'
+describe('high precision pixel buffers',()=>{
+ it('keeps 16-bit gradients and float values without uint8 conversion',()=>{const b=createPixelBuffer(3,1,'rgba16');writeNormalized(b,0,[0,0.5,1,1]);writeNormalized(b,1,[1/65535,0.12345,0.99999,1]);expect(b.data).toBeInstanceOf(Uint16Array);expect(readNormalized(b,1)[0]).toBeCloseTo(1/65535,8);const f=createPixelBuffer(1,1,'rgba32f');writeNormalized(f,0,[2.5,1.25,0,1]);expect(readNormalized(f,0)).toEqual([2.5,1.25,0,1])})
+ it('converts with explicit clamp/dither and preserves cancellation',()=>{const f=createPixelBuffer(2,1,'rgba32f');writeNormalized(f,0,[1.5,-.2,.5,1]);const b=convertPixelBuffer(f,'rgba8',{dither:true,seed:1});expect([...b.data].slice(0,4)).toEqual([255,0,128,255]);const c=new AbortController();c.abort();expect(()=>convertPixelBuffer(f,'rgba16',{signal:c.signal})).toThrow('转换已取消')})
+ it('rejects over-budget buffers before allocation and exposes truthful codec capability',()=>{expect(()=>enforceBudget(4096,4096,'rgba32f',1000)).toThrow(/预算/);expect(capabilityFor('rgba16').write).toBe(false);expect(capabilityFor('rgba32f').reason).toMatch(/codec|EXR/i)})
+ it('runs the adjustment chain while retaining rgba16 storage',()=>{const source=createPixelBuffer(1,1,'rgba16',[12345,23456,34567,65535]);const adjusted=applyLayerAdjustmentsToPixelBuffer(source,{brightness:10,contrast:0,saturation:0,temperature:0,sharpness:0,blur:0,shadows:0,highlights:0});expect(adjusted.format).toBe('rgba16');expect(adjusted.data).toBeInstanceOf(Uint16Array);expect(adjusted.data[3]).toBe(65535);expect(adjusted.data[0]).not.toBe(12345)})
+})

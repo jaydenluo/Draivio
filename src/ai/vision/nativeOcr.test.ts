@@ -1,0 +1,4 @@
+import {it,expect} from 'vitest'
+import type {OcrCandidate} from './ocr'
+import {parseNativeOcr,ocrTargetMask} from './nativeOcr'
+it('validates bounds, duplicate identifiers and nondegenerate quadrilaterals',()=>{const c:OcrCandidate={id:'p',text:'99',confidence:.3,quad:[{x:2,y:2},{x:8,y:2},{x:8,y:5},{x:2,y:5}]};expect(parseNativeOcr({width:10,height:10,candidates:[c]},'base')[0].sourceLayerId).toBe('base');expect(()=>parseNativeOcr({width:10,height:10,candidates:[c,c]},'base')).toThrow();expect(()=>parseNativeOcr({width:10,height:10,candidates:[{...c,quad:c.quad.map(()=>({x:2,y:2}))}]},'base')).toThrow();expect(()=>parseNativeOcr({width:10,height:10,candidates:[{...c,quad:c.quad.map(p=>({...p,x:200}))}]},'base')).toThrow();expect(ocrTargetMask(10,10,c).filter(Boolean).length).toBeGreaterThan(18)})
