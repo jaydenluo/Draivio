@@ -1,6 +1,12 @@
+import { AlignmentControls } from './AlignmentControls'
 import { getTool } from '../tools/toolRegistry'
 import { useEditor } from '../state/editor'
 import type { ToolOptions } from '../tools/toolTypes'
+import { useEffect, useState } from 'react'
+import { detectSystemFonts, fontChoices as systemFontChoices } from '../text/systemFonts'
+import { NumericScrubber } from './NumericScrubber'
+import { SelectionModeIcon } from './SelectionModeIcon'
+import { ColorPicker } from './ColorPicker'
 
 type NumberOption = { key: string; label: string; min: number; max: number; defaultValue: number; unit?: string }
 
@@ -13,10 +19,10 @@ const feather: NumberOption = { key: 'feather', label: '羽化', min: 0, max: 10
 const fontSize: NumberOption = { key: 'fontSize', label: '字号', min: 1, max: 500, defaultValue: 24, unit: 'px' }
 
 const selectionModes = [
-  { value: 'new', label: '新建', symbol: '□' },
-  { value: 'add', label: '添加', symbol: '+' },
-  { value: 'subtract', label: '减去', symbol: '−' },
-  { value: 'intersect', label: '相交', symbol: '∩' },
+  { value: 'new', label: '新建' },
+  { value: 'add', label: '添加' },
+  { value: 'subtract', label: '减去' },
+  { value: 'intersect', label: '相交' },
 ] as const
 
 function optionValue(options: ToolOptions, key: string, fallback: string): string {
@@ -25,30 +31,35 @@ function optionValue(options: ToolOptions, key: string, fallback: string): strin
 
 export function ToolOptionsBar() {
   const { state, dispatch } = useEditor()
+  const [fontAvailability, setFontAvailability] = useState<Record<string, boolean>>(() => detectSystemFonts())
+  useEffect(() => {
+    if (!document.fonts) return
+    void document.fonts.ready.then(() => setFontAvailability(detectSystemFonts()))
+  }, [])
   const tool = getTool(state.activeToolId)
   const options = state.toolOptions
   const setOption = (key: string, value: unknown) => dispatch({ type: 'set-tool-options', options: { [key]: value } })
   const numberField = ({ key, label, min, max, defaultValue, unit }: NumberOption) => {
     const stored = options[key]
     const value = typeof stored === 'number' && Number.isFinite(stored) ? stored : defaultValue
-    return <label className="tool-option-field" key={key}>
-      <span>{label}</span>
-      <span className="tool-option-number"><input type="number" aria-label={label} min={min} max={max} value={value} onChange={(event) => {
-        const next = event.currentTarget.valueAsNumber
-        if (Number.isFinite(next)) setOption(key, Math.min(max, Math.max(min, next)))
-      }} />{unit ? <small>{unit}</small> : null}</span>
-    </label>
+    return <NumericScrubber key={key} className="tool-option-field" label={label} value={value} min={min} max={max} unit={unit} onChange={(next) => setOption(key, next)} />
   }
   const selectField = (key: string, label: string, choices: readonly { value: string; label: string }[], fallback: string) =>
     <label className="tool-option-field" key={key}><span>{label}</span><select aria-label={label} value={optionValue(options, key, fallback)} onChange={(event) => setOption(key, event.currentTarget.value)}>{choices.map((choice) => <option key={choice.value} value={choice.value}>{choice.label}</option>)}</select></label>
-  const foregroundField = <label className="tool-option-field tool-option-color"><span>颜色</span><input type="color" aria-label="前景色" value={state.brushColor} onChange={(event) => dispatch({ type: 'set-brush-color', color: event.currentTarget.value })} /></label>
-  const gradientEndField = <label className="tool-option-field tool-option-color"><span>末色</span><input type="color" aria-label="渐变末色" value={optionValue(options, 'gradientEndColor', '#ffffff')} onChange={(event) => setOption('gradientEndColor', event.currentTarget.value)} /></label>
+  const foregroundField = <ColorPicker label="前景色" value={state.brushColor} recentColors={state.recentColors} onChange={(color) => dispatch({ type: 'set-brush-color', color })} onRecentSelect={(color) => dispatch({ type: 'set-brush-color', color })} />
+  const gradientEndField = <ColorPicker label="末色" ariaLabel="渐变末色" value={optionValue(options, 'gradientEndColor', '#ffffff')} recentColors={state.recentColors} onChange={(color) => setOption('gradientEndColor', color)} />
+  const fontChoices = [
+    { value: 'sans-serif', label: '系统无衬线 · 默认' },
+    { value: 'serif', label: '系统衬线 · 默认' },
+    { value: 'monospace', label: '系统等宽 · 默认' },
+    ...systemFontChoices(fontAvailability).map((font) => ({ value: font.value, label: `${font.label} · ${font.category}${font.available ? '' : '（本机未检测到，使用回退字体）'}` })),
+  ]
 
   let controls: React.ReactNode = <span className="tool-options-status">当前工具：{tool?.label ?? '选择'}</span>
   if (tool?.groupId === 'selection') {
     const mode = optionValue(options, 'selectionMode', 'new')
     controls = <>
-      <div className="tool-option-modes" role="group" aria-label="选区模式">{selectionModes.map((entry) => <button key={entry.value} type="button" aria-label={`选区模式：${entry.label}`} title={entry.label} aria-pressed={mode === entry.value} onClick={() => setOption('selectionMode', entry.value)}>{entry.symbol}</button>)}</div>
+      <div className="tool-option-modes" role="group" aria-label="选区模式">{selectionModes.map((entry) => <button key={entry.value} type="button" aria-label={`选区模式：${entry.label}`} title={entry.label} aria-pressed={mode === entry.value} onClick={() => setOption('selectionMode', entry.value)}><SelectionModeIcon mode={entry.value} /></button>)}</div>
       {numberField(feather)}
       <button type="button" disabled={!state.selectionVisible || state.selection.rect.width <= 0 || state.selection.rect.height <= 0} onClick={() => dispatch({ type: 'invert-selection' })} aria-label="反选选区">反选</button>
       <button type="button" disabled={!state.selectionVisible || state.selection.rect.width <= 0 || state.selection.rect.height <= 0} onClick={() => dispatch({ type: 'selection-to-mask' })} aria-label="选区创建蒙版">创建蒙版</button>
@@ -74,10 +85,10 @@ export function ToolOptionsBar() {
     </>
   } else if (tool?.id === 'text') {
     controls = <>
-      {selectField('fontFamily', '字体', [{ value: 'sans-serif', label: '无衬线' }, { value: 'serif', label: '衬线' }, { value: 'monospace', label: '等宽' }], 'sans-serif')}
+      {selectField('fontFamily', '字体', fontChoices, 'sans-serif')}
       {numberField(fontSize)}
       {selectField('fontWeight', '字重', [{ value: '400', label: '常规' }, { value: '500', label: '中等' }, { value: '700', label: '粗体' }], '400')}
-      <label className="tool-option-field tool-option-color"><span>颜色</span><input type="color" aria-label="文字颜色" value={optionValue(options, 'textColor', '#ffffff')} onChange={(event) => setOption('textColor', event.currentTarget.value)} /></label>
+      <ColorPicker label="文字颜色" value={optionValue(options, 'textColor', '#ffffff')} recentColors={state.recentColors} onChange={(color) => setOption('textColor', color)} />
       {selectField('textAlign', '对齐', [{ value: 'left', label: '左对齐' }, { value: 'center', label: '居中' }, { value: 'right', label: '右对齐' }], 'left')}
     </>
   } else if (tool?.id === 'crop' || tool?.id === 'perspective-crop') {
@@ -92,5 +103,5 @@ export function ToolOptionsBar() {
     controls = <span className="tool-options-status">拖动控制点变换 · Enter 确认 · Esc 取消</span>
   }
 
-  return <div className="tool-options-bar" role="toolbar" aria-label="工具选项"><strong className="tool-options-name">{tool?.label ?? '选择'}</strong><div className="tool-options-controls">{controls}</div></div>
+  return <div className="tool-options-bar" role="toolbar" aria-label="工具选项"><strong className="tool-options-name">{tool?.label ?? '选择'}</strong><div className="tool-options-controls">{state.selectedLayerIds.length > 1 ? <AlignmentControls /> : controls}</div></div>
 }

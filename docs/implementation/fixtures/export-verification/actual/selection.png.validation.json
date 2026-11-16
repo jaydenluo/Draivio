@@ -1,0 +1,158 @@
+{
+  "file": "/Users/szys/.codex/worktrees/ai-editing-roadmap/Draivio/docs/implementation/fixtures/export-verification/actual/selection.png",
+  "scenario": "blocks-selection",
+  "passed": true,
+  "requestedFormat": "png",
+  "decodedFormat": "PNG",
+  "decodedMime": "image/png",
+  "capturedMime": null,
+  "capturedMimeChecked": false,
+  "size": [
+    96,
+    96
+  ],
+  "bytes": 1618,
+  "probes": [
+    {
+      "label": "red exists here before elliptical clip; must become transparent",
+      "xy": [
+        4,
+        4
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "label": "red inside ellipse",
+      "xy": [
+        16,
+        16
+      ],
+      "expected": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "actual": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "green inside ellipse",
+      "xy": [
+        79,
+        16
+      ],
+      "expected": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "actual": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "blue inside ellipse",
+      "xy": [
+        16,
+        79
+      ],
+      "expected": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "actual": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "yellow inside ellipse",
+      "xy": [
+        79,
+        79
+      ],
+      "expected": [
+        255,
+        255,
+        0,
+        128
+      ],
+      "actual": [
+        255,
+        255,
+        0,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "label": "transparent center",
+      "xy": [
+        48,
+        48
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "label": "transparent elliptical corner",
+      "xy": [
+        91,
+        91
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    }
+  ],
+  "errors": []
+}

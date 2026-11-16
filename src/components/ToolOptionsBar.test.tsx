@@ -30,6 +30,9 @@ test('shows selection controls and persists numeric options through editor state
   expect(screen.getByRole('toolbar', { name: '工具选项' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: '选区模式：新建' })).toHaveAttribute('aria-pressed', 'true')
   expect(screen.getByRole('button', { name: '选区模式：添加' })).toBeInTheDocument()
+  for (const mode of ['新建', '添加', '减去', '相交']) {
+    expect(screen.getByRole('button', { name: `选区模式：${mode}` }).querySelector('svg')).toBeInTheDocument()
+  }
   expect(screen.getByRole('spinbutton', { name: '羽化' })).toBeInTheDocument()
   expect(screen.getByRole('checkbox', { name: '固定比例' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: '选区创建蒙版' })).toBeInTheDocument()

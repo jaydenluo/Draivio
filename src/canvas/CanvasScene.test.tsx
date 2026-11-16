@@ -62,3 +62,23 @@ test('previews attach to the right layer without mutating document state or reus
   const ids = [...view.container.querySelectorAll('[id]')].map((node) => node.id)
   expect(new Set(ids).size).toBe(ids.length)
 })
+
+test('hidden ancestors suppress descendant content and mask preview', () => {
+  const state = stateWith({ activeToolGroup: 'mask', selectedLayerId: 'top', layerMasks: { top: { strokes: [], inverted: false, applied: false } } })
+  state.layers = [{ ...state.layers[0], id: 'group', children: ['top'], visible: false }, { ...state.layers[0], groupId: 'group' }, state.layers[1]]
+  const view = render(<CanvasScene state={state} />)
+  expect(view.container.querySelector('[data-layer-id="top"]')).toBeNull()
+  expect(view.container.querySelector('[aria-label="蒙版红色预览"]')).toBeNull()
+})
+
+test('composites overlapping children together before applying isolated group opacity', () => {
+  const state = stateWith()
+  state.layers = [{ ...state.layers[0], id: 'group', opacity: 50, blendMode: '正常', source: undefined, children: ['top', 'base'] }, { ...state.layers[0], groupId: 'group' }, { ...state.layers[1], groupId: 'group' }]
+  const view = render(<CanvasScene state={state} />)
+  const group = view.container.querySelector('[data-layer-id="group"]')!
+  expect(group).toHaveAttribute('opacity', '0.5')
+  expect(group).toHaveStyle({ isolation: 'isolate' })
+  expect(group.querySelectorAll('.scene-layer')).toHaveLength(2)
+  expect(group.querySelector('[data-layer-id="top"]')).toHaveAttribute('opacity', '0.4')
+  expect([...group.querySelectorAll('.scene-layer')].map((node) => node.getAttribute('data-layer-id'))).toEqual(['base', 'top'])
+})

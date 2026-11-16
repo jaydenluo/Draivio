@@ -1,0 +1,79 @@
+{
+  "format": "draivio",
+  "schemaVersion": 2,
+  "metadata": {
+    "id": "F03 independent color blocks",
+    "name": "F03 independent color blocks"
+  },
+  "assets": {
+    "image-1": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAABAUlEQVR4nO3dQQ4CIRAAQfDl/hwT/YFsgm5XhTMwSZ9hDAAAAAAAAADgbubuBuu9zpkXzLBlnZ1/zL35H9fdhH8kgDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxAogTAAAAAAAAAAAAAAAAAAAAAMCP2/p7/mOtcdS8YIbvrTWe46A59873QkicAOIEECeAOAHECSBOAHECiBNAnADiBBAngDgBxAkgTgBxAogTQJwA4gQQJ4A4AcQJIE4AcQKIE0CcAOIEECeAOAHECSBOAAAAAAAAAAAAN/MCxzUJf9rxjbwAAAAASUVORK5CYII="
+  },
+  "document": {
+    "documentWidth": 128,
+    "documentHeight": 128,
+    "documentBackground": "transparent",
+    "layers": [
+      {
+        "id": "blocks",
+        "name": "blocks",
+        "className": "layer-art",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常",
+        "source": "asset:image-1",
+        "thumbnail": "asset:image-1"
+      }
+    ],
+    "selectedLayerId": "blocks",
+    "selectedLayerIds": [
+      "blocks"
+    ],
+    "canvasTexts": [],
+    "canvasShapes": [],
+    "brushStrokes": [],
+    "layerMasks": {},
+    "aiResults": [],
+    "selection": {
+      "kind": "ellipse",
+      "mode": "new",
+      "rect": {
+        "x": 12.5,
+        "y": 12.5,
+        "width": 75,
+        "height": 75
+      },
+      "path": {
+        "type": "shape",
+        "kind": "ellipse",
+        "rect": {
+          "x": 12.5,
+          "y": 12.5,
+          "width": 75,
+          "height": 75
+        }
+      },
+      "feather": 0,
+      "fixedRatio": null
+    },
+    "selectionRect": {
+      "x": 12.5,
+      "y": 12.5,
+      "width": 75,
+      "height": 75
+    },
+    "selectionVisible": true,
+    "cropRect": null,
+    "sceneOrder": [],
+    "prompt": "",
+    "composerMode": "edit",
+    "composerSourceId": "draivio-cloud",
+    "composerParameters": {
+      "model": "fixture",
+      "size": "128 × 128",
+      "ratio": "1:1",
+      "count": "1 张",
+      "strength": "48%"
+    },
+    "history": []
+  }
+}

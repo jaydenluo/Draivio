@@ -81,8 +81,9 @@ test('ignores tool shortcuts while editing text or account fields', () => {
   editable.remove()
 
   fireEvent.click(screen.getByRole('button', { name: '账户设置' }))
-  fireEvent.click(screen.getByRole('button', { name: 'API Key' }))
-  const accountInput = screen.getByRole('textbox', { name: 'API Key 输入框' })
+  fireEvent.click(screen.getByRole('button', { name: '服务来源' }))
+  fireEvent.click(screen.getByRole('button', { name: '添加来源' }))
+  const accountInput = screen.getByLabelText('名称')
   accountInput.focus()
   fireEvent.keyDown(accountInput, { key: 'b' })
   expect(activeTool()).toBe('select')

@@ -1,0 +1,11 @@
+.recovery-control { position: fixed; right: 8px; bottom: 4px; z-index: 10; display: flex; gap: 4px; font-size: 11px; }
+.recovery-control > button { color: var(--text-muted, #aaa); background: var(--panel, #1c1e22); border: 1px solid #383b42; border-radius: 4px; font-size: 11px; padding: 3px 7px; }
+.recovery-content { padding: 14px; display: grid; gap: 10px; max-height: min(60vh, 520px); overflow-y: auto; }
+.recovery-preference { display: flex; align-items: center; gap: 6px; }
+.recovery-content small { display: block; color: var(--text-muted, #aaa); font-size: 11px; }
+.recovery-row { display: flex; gap: 8px; align-items: center; border-top: 1px solid #34363c; padding-top: 10px; }
+.recovery-row > span:not(.recovery-placeholder) { flex: 1; min-width: 0; }
+.recovery-row strong { overflow: hidden; text-overflow: ellipsis; display: block; }
+.recovery-row img, .recovery-placeholder { width: 42px; height: 42px; object-fit: contain; background: #2b2e35; border-radius: 3px; display: grid; place-items: center; flex-shrink: 0; }
+.recovery-confirm { border: 1px solid #9c7350; padding: 10px; border-radius: 4px; }
+.recovery-confirm button + button { margin-left: 8px; }

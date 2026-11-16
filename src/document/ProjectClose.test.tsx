@@ -1,0 +1,36 @@
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { beforeEach, expect, it, vi } from 'vitest'
+import { EditorProvider } from '../state/editor'
+import { ProjectFileControl } from './ProjectFileControl'
+const native = vi.hoisted(() => ({ close: undefined as undefined | ((event: { preventDefault: () => void }) => void), destroy: vi.fn(), save: vi.fn() }))
+vi.mock('@tauri-apps/api/core', () => ({ isTauri: () => true }))
+vi.mock('@tauri-apps/api/window', () => ({ getCurrentWindow: () => ({ onCloseRequested: async (callback: typeof native.close) => { native.close = callback; return () => {} }, destroy: native.destroy }) }))
+vi.mock('./projectStorage', () => ({ hasProjectPicker: () => true, openProjectFile: vi.fn(), saveProjectFile: native.save }))
+beforeEach(() => { native.destroy.mockReset(); native.save.mockReset() })
+it('intercepts a dirty native close and supports Cancel, failed Save, and Discard', async () => {
+  render(<EditorProvider><ProjectFileControl /></EditorProvider>)
+  const preventDefault = vi.fn()
+  act(() => native.close!({ preventDefault }))
+  expect(preventDefault).toHaveBeenCalledOnce()
+  fireEvent.click(screen.getByRole('button', { name: '取消切换' }))
+  expect(native.destroy).not.toHaveBeenCalled()
+  act(() => native.close!({ preventDefault }))
+  native.save.mockResolvedValueOnce(null)
+  fireEvent.click(screen.getByRole('button', { name: '保存并继续' }))
+  await waitFor(() => expect(screen.getByRole('button', { name: '保存并继续' })).toBeEnabled())
+  expect(native.destroy).not.toHaveBeenCalled()
+  native.save.mockRejectedValueOnce(new Error('disk full'))
+  fireEvent.click(screen.getByRole('button', { name: '保存并继续' }))
+  await waitFor(() => expect(native.save).toHaveBeenCalledTimes(2))
+  await waitFor(() => expect(screen.getByRole('button', { name: '保存并继续' })).toBeEnabled())
+  expect(native.destroy).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: '放弃修改' }))
+  expect(native.destroy).toHaveBeenCalledOnce()
+})
+it('closes only after Save completed successfully', async () => {
+  native.save.mockResolvedValueOnce({ name: 'saved.draivio', token: 'saved' })
+  render(<EditorProvider><ProjectFileControl /></EditorProvider>)
+  act(() => native.close!({ preventDefault: vi.fn() }))
+  fireEvent.click(screen.getByRole('button', { name: '保存并继续' }))
+  await waitFor(() => expect(native.destroy).toHaveBeenCalledOnce())
+})

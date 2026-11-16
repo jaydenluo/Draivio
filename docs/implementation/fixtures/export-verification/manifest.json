@@ -1,0 +1,278 @@
+{
+  "schemaVersion": 1,
+  "provenance": "Analytic coordinates and colors; no product-export output used as an oracle.",
+  "scenarios": {
+    "blocks-canvas": {
+      "project": "color-blocks.draivio",
+      "size": [
+        128,
+        128
+      ],
+      "probes": [
+        {
+          "x": 4,
+          "y": 4,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "transparent corner"
+        },
+        {
+          "x": 32,
+          "y": 32,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "label": "red"
+        },
+        {
+          "x": 96,
+          "y": 32,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "label": "green"
+        },
+        {
+          "x": 32,
+          "y": 96,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "label": "blue"
+        },
+        {
+          "x": 96,
+          "y": 96,
+          "rgba": [
+            255,
+            255,
+            0,
+            128
+          ],
+          "label": "half alpha yellow"
+        },
+        {
+          "x": 64,
+          "y": 64,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "transparent center"
+        }
+      ]
+    },
+    "blocks-selection": {
+      "project": "color-blocks.draivio",
+      "size": [
+        96,
+        96
+      ],
+      "cropOrigin": [
+        16,
+        16
+      ],
+      "probes": [
+        {
+          "x": 4,
+          "y": 4,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "red exists here before elliptical clip; must become transparent"
+        },
+        {
+          "x": 16,
+          "y": 16,
+          "rgba": [
+            255,
+            0,
+            0,
+            255
+          ],
+          "label": "red inside ellipse"
+        },
+        {
+          "x": 79,
+          "y": 16,
+          "rgba": [
+            0,
+            255,
+            0,
+            255
+          ],
+          "label": "green inside ellipse"
+        },
+        {
+          "x": 16,
+          "y": 79,
+          "rgba": [
+            0,
+            0,
+            255,
+            255
+          ],
+          "label": "blue inside ellipse"
+        },
+        {
+          "x": 79,
+          "y": 79,
+          "rgba": [
+            255,
+            255,
+            0,
+            128
+          ],
+          "label": "yellow inside ellipse"
+        },
+        {
+          "x": 48,
+          "y": 48,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "transparent center"
+        },
+        {
+          "x": 91,
+          "y": 91,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "transparent elliptical corner"
+        }
+      ]
+    },
+    "effects-canvas": {
+      "project": "effects.draivio",
+      "size": [
+        128,
+        128
+      ],
+      "probes": [
+        {
+          "x": 90,
+          "y": 88,
+          "rgba": [
+            64,
+            128,
+            192,
+            64
+          ],
+          "label": "brightness doubled; child .5 × parent .5 alpha"
+        },
+        {
+          "x": 90,
+          "y": 104,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "masked half after flip and rotation"
+        },
+        {
+          "x": 32,
+          "y": 32,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "original square position cleared by transform"
+        },
+        {
+          "x": 120,
+          "y": 120,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "transparent background"
+        }
+      ],
+      "inkRegions": [
+        {
+          "rect": [
+            4,
+            4,
+            48,
+            28
+          ],
+          "minAlphaPixels": 30,
+          "label": "font-independent nonempty magenta F03 text"
+        }
+      ]
+    },
+    "effects-layer": {
+      "project": "effects.draivio",
+      "size": [
+        128,
+        128
+      ],
+      "probes": [
+        {
+          "x": 90,
+          "y": 88,
+          "rgba": [
+            64,
+            128,
+            192,
+            64
+          ],
+          "label": "selected effect with parent group opacity included"
+        },
+        {
+          "x": 90,
+          "y": 104,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "selected layer retains applied mask"
+        },
+        {
+          "x": 12,
+          "y": 12,
+          "rgba": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "text sibling excluded"
+        }
+      ]
+    }
+  }
+}

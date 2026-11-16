@@ -1,0 +1,27 @@
+{
+  "changedFiles": [],
+  "criteria": [
+    {
+      "id": "c6be8bf4-d9fa-4e58-9972-1395a84a5591",
+      "passed": true,
+      "reason": "基础编辑操作的结果具备撤销、保存和导出链路：documentHistory.ts 快照覆盖画布、图层、选区、蒙版、文字和变换；projectFormat.ts 持久化对应内容；CanvasScene.tsx 与 exportScene.ts 将这些内容纳入导出。已检查相关测试断言，所提供实际运行结果显示通过。此结论针对操作结果；历史时间线本身不会随项目保存。"
+    },
+    {
+      "id": "11029c87-4e81-4eb1-b266-8ebe82c59247",
+      "passed": false,
+      "reason": "多文档与尺寸状态存在实际缺口。DocumentWorkspaceProvider.tsx:24 仅按 documentRevision 是否为 initial 判定 dirty，保存不会清除此标记；ProjectFileControl.tsx:94 保存后调用 close(id, false)，仍会被 dirty 拒绝，且未处理失败反馈。非活动标签的“保存并关闭”请求又被第93行直接忽略。另外第120行调用 workspace.create() 丢弃新建对话框传入的宽高和背景，而 create() 固定使用初始状态，因此多尺寸状态要求不成立。"
+    },
+    {
+      "id": "09da4a0b-eafb-4fb2-a57d-58a350283461",
+      "passed": false,
+      "reason": "批量导出未形成可验收的产品行为：全源码引用检查显示 exportBatch 仅被 batchExport.test.ts 调用，ExportDialog.tsx 只有单次导出入口。两个批量测试使用字符串回调，未验证真实图像编码、文件输出或浏览器操作。提供的573项测试通过及构建通过不能补足批量导出的端到端自动化和浏览器验收要求。"
+    }
+  ],
+  "outcome": "failed",
+  "remainingIssues": [
+    "保存状态与标签 dirty 状态未统一，保存并关闭及非活动标签关闭反馈不完整。",
+    "工作区新建文档忽略用户指定的尺寸和背景。",
+    "批量导出缺少产品入口、真实文件输出测试及浏览器验收。"
+  ],
+  "summary": "独立只读审查结果：1项通过、2项不通过。已检查实际源码和测试断言，并结合提供的实际检查输出；未修改本地文件或云端状态。"
+}

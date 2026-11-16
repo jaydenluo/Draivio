@@ -17,25 +17,6 @@ export function OutputFormatPicker({ ratio, size, onChoose, onClose }: Props) {
     root.current?.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus()
   }, [])
 
-  useEffect(() => {
-    const dismiss = (event: PointerEvent) => {
-      const target = event.target
-      if (target instanceof Element && !root.current?.contains(target) && !target.closest('[aria-controls="output-format-popover"]')) onClose()
-    }
-    const escape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return
-      event.preventDefault()
-      event.stopPropagation()
-      onClose()
-      document.querySelector<HTMLButtonElement>('[aria-controls="output-format-popover"]')?.focus()
-    }
-    document.addEventListener('pointerdown', dismiss)
-    document.addEventListener('keydown', escape)
-    return () => {
-      document.removeEventListener('pointerdown', dismiss)
-      document.removeEventListener('keydown', escape)
-    }
-  }, [onClose])
 
   return <div ref={root} id="output-format-popover" className="output-format-popover" role="dialog" aria-label="比例与分辨率">
     <div className="output-format-heading"><strong>比例与分辨率</strong><button type="button" aria-label="关闭比例与分辨率" onClick={onClose}>×</button></div>

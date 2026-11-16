@@ -1,41 +1,63 @@
-import { useState } from 'react'
-import { getModelsForSource, getSourceById, modelSources, type ModelSourceId } from './modelSources'
+import { useEffect, useRef, useState } from 'react'
+import { useServiceSources, type ModelSourceId } from './modelSources'
+import { openServiceSettings } from './ServiceSourceSettings'
+import '../styles/model-picker.css'
 
 type Props = {
   sourceId: ModelSourceId
   modelCode: string
-  initialOpen?: 'source' | 'model' | null
+  compact?: boolean
+  onClose?: () => void
   onSourceChange: (sourceId: ModelSourceId, modelCode: string) => void
   onModelChange: (modelCode: string) => void
 }
 
-export function ModelSourcePicker({ sourceId, modelCode, initialOpen = null, onSourceChange, onModelChange }: Props) {
-  const [open, setOpen] = useState<'source' | 'model' | null>(initialOpen)
-  const source = getSourceById(sourceId) ?? modelSources[0]
-  const model = getModelsForSource(source.id).find((item) => item.code === modelCode) ?? source.models[0]
-
-  return <div className="model-source-picker">
-    <div className="model-source-fields">
-      <div className="model-source-field">
-        <span className="field-label">服务来源</span>
-        <button className="model-source-button" aria-label={`服务来源：${source.summary}`} aria-expanded={open === 'source'} onClick={() => setOpen(open === 'source' ? null : 'source')}>
-          <span><strong>{source.summary}</strong><small>{source.billingLabel}</small></span><span aria-hidden="true">⌄</span>
-        </button>
-        {open === 'source' ? <div className="model-source-popover" role="dialog" aria-label="选择服务来源">
-          {modelSources.map((item) => <button key={item.id} className={item.id === source.id ? 'selected' : ''} onClick={() => { onSourceChange(item.id, item.models[0].code); setOpen(null) }}>
-            <span><strong>{item.providerName}</strong><small>{item.protocolLabel ? `${item.protocolLabel} · ` : ''}{item.billingLabel}</small></span>
-          </button>)}
-        </div> : null}
+export function ModelSourcePicker({ sourceId, modelCode, compact = false, onClose, onSourceChange, onModelChange }: Props) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const input = useRef<HTMLInputElement>(null)
+  const { sources } = useServiceSources()
+  const source = sources.find(item => item.id === sourceId)
+  const selected = source?.models.find(item => item.code === modelCode)
+  const expanded = compact || open
+  useEffect(() => { if (expanded) input.current?.focus() }, [expanded])
+  const term = search.trim().toLowerCase()
+  const groups = sources.filter(item => item.enabled !== false && item.models.length).map(item => ({
+    ...item,
+    label: item.billingMode === 'credits' ? item.providerName : item.summary,
+    models: item.models.filter(model => `${model.displayName} ${model.code} ${item.summary}`.toLowerCase().includes(term)),
+  })).filter(item => item.models.length)
+  const close = () => { setOpen(false); setSearch(''); onClose?.() }
+  const choose = (nextSource: string, nextModel: string) => {
+    if (nextSource === sourceId) onModelChange(nextModel)
+    else onSourceChange(nextSource, nextModel)
+    close()
+  }
+  return <div className={`model-source-picker${compact ? ' is-compact' : ''}`}>
+    {!compact ? <button className="model-picker-trigger" aria-label={`选择模型：${selected?.displayName ?? '请选择'} · ${source?.summary ?? '来源不可用'}`} aria-expanded={open} aria-haspopup="dialog" title={`${selected?.displayName ?? '请选择模型'} · ${source?.summary ?? '来源不可用'}`} onClick={() => { setOpen(!open); setSearch('') }}>
+      <span><strong>{selected?.displayName ?? '请选择模型'}</strong><small>{source?.summary ?? '来源未配置、已停用或已删除'}</small></span><span aria-hidden="true">⌄</span>
+    </button> : null}
+    {expanded ? <div className="model-picker-panel" role="dialog" aria-label="选择模型" onKeyDown={event => {
+      if (event.key === 'Escape' && !compact) { event.preventDefault(); event.stopPropagation(); close() }
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        const options = [...event.currentTarget.querySelectorAll<HTMLElement>('input, button[data-model-option]')]
+        const index = options.indexOf(document.activeElement as HTMLElement)
+        if (index >= 0) { event.preventDefault(); options[Math.max(0, Math.min(options.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1)))]?.focus() }
+      }
+    }}>
+      <div className="model-picker-heading"><strong>选择模型</strong></div>
+      <input ref={input} type="search" className="model-picker-search" aria-label="搜索模型或服务来源" placeholder="搜索模型或服务来源…" value={search} onChange={event => setSearch(event.target.value)} />
+      <div className="model-picker-results">
+        {groups.map(group => <section className="model-picker-group" key={group.id} aria-label={group.label}>
+          <div className="model-picker-group-heading"><span>{group.label}</span><small>{group.billingMode === 'credits' ? '使用积分' : group.billingLabel}</small></div>
+          {group.models.map(model => {
+            const active = group.id === sourceId && model.code === modelCode
+            return <button type="button" data-model-option key={model.code} className={`model-picker-option${active ? ' selected' : ''}`} aria-label={`${model.displayName} · ${group.label}`} aria-pressed={active} title={`${model.displayName} · ${group.label}`} onClick={() => choose(group.id, model.code)}><span className="model-picker-check" aria-hidden="true">{active ? '✓' : ''}</span><span>{model.displayName}</span></button>
+          })}
+        </section>)}
+        {!groups.length ? <p className="model-picker-empty">没有匹配的模型</p> : null}
       </div>
-      <div className="model-source-field">
-        <span className="field-label">模型</span>
-        <button className="model-source-button model-button" aria-label={`模型：${model.displayName}`} aria-expanded={open === 'model'} onClick={() => setOpen(open === 'model' ? null : 'model')}>
-          <span><strong>{model.displayName}</strong><small>{source.protocolLabel ?? 'Draivio 模型服务'}</small></span><span aria-hidden="true">⌄</span>
-        </button>
-        {open === 'model' ? <div className="model-source-popover" role="dialog" aria-label="选择模型">
-          {source.models.map((item) => <button key={item.code} className={item.code === model.code ? 'selected' : ''} onClick={() => { onModelChange(item.code); setOpen(null) }}>{item.displayName}</button>)}
-        </div> : null}
-      </div>
-    </div>
+      <div className="model-picker-footer"><button type="button" onClick={() => { close(); openServiceSettings() }}>管理服务来源<span aria-hidden="true">↗</span></button></div>
+    </div> : null}
   </div>
 }

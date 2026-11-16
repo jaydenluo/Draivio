@@ -8,7 +8,7 @@ test('moves the same composer between the canvas and the sidebar without losing 
   const input = screen.getByRole('textbox', { name: 'AI 操作' })
   fireEvent.change(input, { target: { value: '把天空改成蓝色' } })
   fireEvent.click(screen.getByRole('button', { name: '选择模型' }))
-  fireEvent.click(screen.getByRole('button', { name: 'Image Fast' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Image Fast · Draivio 云端' }))
   fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
 
   fireEvent.click(screen.getByRole('button', { name: '移到右侧' }))
@@ -32,12 +32,15 @@ test('minimizes and restores the composer in either placement while preserving i
   for (const placement of ['floating', 'right']) {
     if (placement === 'right') fireEvent.click(screen.getByRole('button', { name: '移到右侧' }))
     fireEvent.click(screen.getByRole('button', { name: '最小化 AI 对话框' }))
-    expect(screen.queryByRole('textbox', { name: 'AI 操作' })).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'AI 操作' })).toHaveValue('保留这条修改描述')
+    expect(screen.getByRole('button', { name: '执行 AI 操作' })).toBeInTheDocument()
     const composer = screen.getByRole('region', { name: 'AI 操作' })
     expect(composer).toHaveAttribute('data-placement', placement)
     expect(within(composer).queryByRole('button', { name: '选择数量' })).not.toBeInTheDocument()
+    fireEvent.change(screen.getByRole('textbox', { name: 'AI 操作' }), { target: { value: '收起后继续修改' } })
     fireEvent.click(screen.getByRole('button', { name: '展开 AI 对话框' }))
-    expect(screen.getByRole('textbox', { name: 'AI 操作' })).toHaveValue('保留这条修改描述')
+    expect(screen.getByRole('textbox', { name: 'AI 操作' })).toHaveValue('收起后继续修改')
+    fireEvent.change(screen.getByRole('textbox', { name: 'AI 操作' }), { target: { value: '保留这条修改描述' } })
     expect(screen.getByRole('button', { name: '选择数量' })).toHaveTextContent('2 张')
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   }

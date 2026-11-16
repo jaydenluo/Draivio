@@ -1,0 +1,26 @@
+{
+  "changedFiles": [],
+  "criteria": [
+    {
+      "id": "c6be8bf4-d9fa-4e58-9972-1395a84a5591",
+      "passed": true,
+      "reason": "源码确认基础操作结果具备撤销、保存和导出链路：documentHistory.ts 快照覆盖画布、图层、选区、蒙版、文字和变换；projectFormat.ts 序列化对应内容；CanvasScene.tsx 和 exportScene.tsx 将其纳入导出。相关测试断言覆盖混合历史恢复、文字与图层往返、选区蒙版导出，提供的实际检查显示通过。此结论针对操作结果，历史撤销栈不随项目保存。"
+    },
+    {
+      "id": "11029c87-4e81-4eb1-b266-8ebe82c59247",
+      "passed": false,
+      "reason": "仍存在项目状态丢失：DocumentWorkspaceProvider.tsx:31 使用 active.id 作为 EditorProvider 的 key，切换标签会卸载其子组件；ProjectFileControl.tsx:16-18 将项目名称、保存位置和保存指纹仅存于组件本地状态，重新激活标签后重置为未命名、无保存位置、未保存。另名称修改不更新标签 dirty（:138），而 DocumentTabs.tsx:25 仅依赖该 dirty 判断是否确认关闭，因此初始文档仅改名称即可被直接关闭。现有项目控件测试未与工作区标签集成，不能排除这些缺口。"
+    },
+    {
+      "id": "09da4a0b-eafb-4fb2-a57d-58a350283461",
+      "passed": false,
+      "reason": "批量入口已接入，但批量导出的浏览器验收仍不可核实。ExportDialog.test.tsx:77 起的测试把编码替换为固定 PNG Blob，并模拟 anchor.click，只验证调用次数；无法证明实际下载完整的多格式文件。仓库虽有单文件导出样例及验证材料，却未发现可核实的批量浏览器输出。提供的实际检查只有 Vitest、构建和 Vibe Plan 检查；弹窗选项可见及执行报告中的浏览器声明不能证明批量行为验收通过。"
+    }
+  ],
+  "outcome": "failed",
+  "remainingIssues": [
+    "标签切换丢失项目名称、保存目的地和保存状态，名称修改关闭保护不完整。",
+    "缺少批量导出的真实浏览器完整下载及文件格式验证证据。"
+  ],
+  "summary": "独立只读审查：1项通过、2项失败。已检查实际源码和测试断言，并结合所提供实际检查输出；未修改文件或云端状态，未重跑会产生写入的测试和构建。"
+}

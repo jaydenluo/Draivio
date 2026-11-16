@@ -1,0 +1,317 @@
+{
+  "state": "created_planned_linked_verified",
+  "createdTaskIds": {
+    "A01": "3fe3accf-0bfd-40bb-873d-01e9c02f6626",
+    "A02": "e3ac5120-efde-4c7f-b053-a7a0826eaff5",
+    "A03": "beeba626-ccf0-4071-bb39-af5d4b042ab9",
+    "A04": "c0258b81-7048-4424-a77f-965dfff0ea7f",
+    "A05": "1787311c-549f-49d5-8f86-22577f8f2437",
+    "A06": "578528f7-2294-4915-99fb-fd85d77d32a6",
+    "A07": "564b5b94-30a1-4a80-9ad2-1dd1efd4d7e4",
+    "A08": "d6e7cfa7-99f5-4da0-9098-92702a68b1d8",
+    "A09": "9177717e-d54c-46e3-b83e-9b3675552713",
+    "A10": "ed8b6dd2-e2c9-49ab-8656-e65c6fc5ef4e",
+    "A11": "e1b99a91-2b3b-4c03-9ca8-9f77eb7a3c30",
+    "A12": "e955e655-c33d-4e20-aa62-c8a3a1f44b5b",
+    "A13": "7505abfa-075d-405d-bcdd-9ffe9de8eb1f",
+    "A14": "8d7c82b8-0211-4068-8b7c-7342f1b79425",
+    "A15": "f451dc4f-d6d7-4a21-9178-b692673289f2",
+    "A16": "2553bc91-6db9-43e0-8378-552c50d3dbea",
+    "A17": "220e882d-60db-4891-962b-555a43819d94",
+    "A18": "5446b035-c5b0-4fdf-8c7b-e11d1fe8451f",
+    "A19": "b2431637-e693-4cae-bb40-2909c03508f5",
+    "A20": "e5e34889-fad7-4d36-b81e-72c9eafe778e",
+    "A21": "ee15408c-900f-4045-8c5a-6be30dfb22da",
+    "A22": "e845dcb5-6e8b-45d0-b45d-a7129aeee830",
+    "A23": "1fc69f79-2bc3-418c-b07d-0f8b4b962ecb",
+    "A24": "d0905d23-8b35-4295-96f2-be9d7a6569b1",
+    "A25": "b58231aa-9702-4727-bcb3-fe7de39e2e31",
+    "A26": "c9c9a008-a96f-4cc6-9087-4046908f3346",
+    "A27": "fc3e6f3d-63e1-4b43-8ccc-445c79ba36a4",
+    "A28": "50dd5e0f-3913-4242-8884-f624335b860a",
+    "A29": "8d439639-69fc-4fd8-b370-6902efd2f01a",
+    "A30": "4326f70d-1119-4f4e-bb66-081095b1a341",
+    "A31": "65482a83-9916-4164-8f93-b314539f19f7",
+    "A32": "0bd0c9b8-75e6-4f3d-9e7a-168d48f167ae",
+    "A33": "a80140dc-841e-4a91-86d2-1fbe7a3937e5",
+    "A34": "f869d0b1-e563-4ac4-8269-adddd115221a",
+    "A35": "6bab7ff2-efdb-4bea-92c4-4736f6cc4f83",
+    "A37": "ada2179a-3971-4ede-88d7-727a58c846f3",
+    "A36": "9110cc9a-1498-4365-9768-23baddf97337"
+  },
+  "uploadedPlans": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16",
+    "A17",
+    "A18",
+    "A19",
+    "A20",
+    "A21",
+    "A22",
+    "A23",
+    "A24",
+    "A25",
+    "A26",
+    "A27",
+    "A28",
+    "A29",
+    "A30",
+    "A31",
+    "A32",
+    "A33",
+    "A34",
+    "A35",
+    "A37",
+    "A36"
+  ],
+  "linkedDependencies": [
+    "A01",
+    "A02",
+    "A03",
+    "A04",
+    "A05",
+    "A06",
+    "A07",
+    "A08",
+    "A09",
+    "A10",
+    "A11",
+    "A12",
+    "A13",
+    "A14",
+    "A15",
+    "A16",
+    "A17",
+    "A18",
+    "A19",
+    "A20",
+    "A21",
+    "A22",
+    "A23",
+    "A24",
+    "A25",
+    "A26",
+    "A27",
+    "A28",
+    "A29",
+    "A30",
+    "A31",
+    "A32",
+    "A33",
+    "A34",
+    "A35",
+    "A37",
+    "A36"
+  ],
+  "remoteMutations": 110,
+  "checks": [
+    {
+      "command": "本地规划完整性检查（JSON、37项字段、计划文件、34项引用、依赖闭环）",
+      "exitCode": 0,
+      "result": "passed"
+    },
+    {
+      "command": "vibeplan check",
+      "exitCode": 0,
+      "result": "passed"
+    },
+    {
+      "command": "git diff --check",
+      "exitCode": 0,
+      "result": "passed"
+    },
+    {
+      "command": "npm test -- --run",
+      "result": "311 tests / 76 files passed on R01 initial snapshot; independent review still found extraction/sorting defects",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed on R01 initial snapshot",
+      "exitCode": 0
+    },
+    {
+      "label": "2026-11-14-stable-2",
+      "tests": {
+        "command": "npm test -- --run --maxWorkers=4",
+        "exitCode": 0,
+        "files": 90,
+        "passed": 425,
+        "log": "/tmp/draivio-root-stable-2-tests.log"
+      },
+      "build": {
+        "command": "npm run build",
+        "exitCode": 0,
+        "log": "/tmp/draivio-root-stable-2-build.log"
+      },
+      "rust": {
+        "command": "env CARGO_TARGET_DIR=/tmp/draivio-ai-editing-cargo-target cargo test --offline --manifest-path src-tauri/Cargo.toml project_files -- --nocapture",
+        "exitCode": 0,
+        "passed": 1,
+        "log": "/tmp/draivio-root-project-rust-tests.log"
+      },
+      "scope": "Pre raster repair; evidence not acceptance."
+    },
+    {
+      "label": "2026-11-14-final-pre-roadmap",
+      "tests": {
+        "command": "npm test -- --run --maxWorkers=4",
+        "exitCode": 0,
+        "files": 91,
+        "passed": 428,
+        "log": "/tmp/draivio-root-final-tests.log"
+      },
+      "build": {
+        "command": "npm run build",
+        "exitCode": 0,
+        "log": "/tmp/draivio-root-final-build.log"
+      },
+      "rust": {
+        "command": "env CARGO_TARGET_DIR=/tmp/draivio-ai-editing-cargo-target cargo test --offline --manifest-path src-tauri/Cargo.toml",
+        "exitCode": 0,
+        "log": "/tmp/draivio-root-final-rust.log"
+      },
+      "vibeplan": {
+        "command": "vibeplan check",
+        "exitCode": 0,
+        "log": "/tmp/draivio-root-final-vibe.log"
+      },
+      "scope": "Current source after R02/R03/R04 repairs; does not accept remote tasks."
+    },
+    {
+      "label": "2026-11-14-f02-final",
+      "tests": {
+        "command": "npm test -- --run --maxWorkers=4",
+        "exitCode": 0,
+        "files": 95,
+        "passed": 476,
+        "log": "/tmp/draivio-f02-final-verified-tests.log"
+      },
+      "build": {
+        "command": "npm run build",
+        "exitCode": 0,
+        "log": "/tmp/draivio-f02-final-verified-build.log"
+      },
+      "vibeplan": {
+        "command": "vibeplan check",
+        "exitCode": 0,
+        "log": "/tmp/draivio-f02-final-verified-vibe.log"
+      },
+      "scope": "A02/F02 ready for review, not acceptance or whole-roadmap completion."
+    },
+    {
+      "label": "2026-11-14-f03-final",
+      "tests": {
+        "command": "npm test -- --run --maxWorkers=4",
+        "exitCode": 0,
+        "files": 97,
+        "passed": 526,
+        "log": "/tmp/draivio-f03-final-tests.log"
+      },
+      "build": {
+        "command": "npm run build",
+        "exitCode": 0,
+        "log": "/tmp/draivio-f03-final-build.log"
+      },
+      "vibeplan": {
+        "command": "vibeplan check",
+        "exitCode": 0,
+        "log": "/tmp/draivio-f03-final-vibe.log"
+      },
+      "scope": "F03两阶段审核和独立浏览器像素验证通过，交付in_review，不等于人审通过。"
+    },
+    {
+      "label": "2026-11-14-f07-final",
+      "tests": {
+        "command": "npm test -- --run --maxWorkers=4",
+        "exitCode": 0,
+        "files": 100,
+        "passed": 565,
+        "log": "/tmp/draivio-f07-final-tests.log"
+      },
+      "build": {
+        "command": "npm run build",
+        "exitCode": 0,
+        "log": "/tmp/draivio-f07-final-build.log"
+      },
+      "vibeplan": {
+        "command": "vibeplan check",
+        "exitCode": 0,
+        "log": "/tmp/draivio-f07-final-vibe.log"
+      },
+      "scope": "F07独立需求/质量与browser几何通过，交付in_review，不自批准。"
+    }
+  ],
+  "remainingIssues": [
+    "Real image editing/inpainting API path is not implemented; ImageGeneration explicitly supports text-to-image only.",
+    "Logout remains disabled until authentication/session service exists; browser keys remain plaintext localStorage.",
+    "Large-image WebKit/Tauri performance and transformed transparent-edge cases remain pending.",
+    "Isolated worktree must later carefully integrate with concurrent source changes.",
+    "A02/F02/F03/F07交付待人工验收；整路线后续任务仍待实施，依赖等待验收不绕过。",
+    "F02原生强制终止/系统配额、F03原生编码/真实内存与系统文件选择器仍需平台验收。"
+  ],
+  "authorization": "用户已确认：现在开始实现，使用子代理实现，由主代理验收，保证任务完成并测试通过。涵盖已展示清单创建与实施；不含提交推送。",
+  "executionState": "in_progress",
+  "workspace": "/Users/szys/.codex/worktrees/ai-editing-roadmap/Draivio",
+  "sourceWorkspace": "/Users/szys/AI/Draivio",
+  "taskProgress": {
+    "A01": {
+      "state": "done",
+      "scope": "本轮恢复执行时已读取远端人工验收完成状态；历史本地缺口记录保留为历史，不代表当前仍待验收。"
+    },
+    "R": {
+      "state": "done",
+      "scope": "本轮恢复执行时已读取远端人工验收完成状态；历史本地缺口记录保留为历史，不代表当前仍待验收。"
+    },
+    "F01": {
+      "state": "done",
+      "scope": "本轮恢复执行时已读取远端人工验收完成状态；历史本地缺口记录保留为历史，不代表当前仍待验收。"
+    },
+    "F04": {
+      "state": "done",
+      "scope": "本轮恢复执行时已读取远端人工验收完成状态；历史本地缺口记录保留为历史，不代表当前仍待验收。"
+    },
+    "A02": {
+      "state": "in_review",
+      "scope": "版本化工具协议及三项真实注册工具已通过需求/质量独立复核，31项最终定向测试与构建通过；成功报告version8待人工验收。"
+    },
+    "F02": {
+      "state": "in_review",
+      "scope": "原子IDB/串行周期保存/恢复列表/独立副本实现，两阶段审核关闭慢编码及取消竞态。最终95文件476测试、构建、vibeplan和diff检查通过，新会话浏览器验收通过；原生强制终止/磁盘满/Windows待平台验收。"
+    },
+    "F03": {
+      "state": "in_review",
+      "scope": "真实三格式/选区/图层/已提交crop/SVG导出，资源逐解码、取消隔离与模态键盘保护，两阶段复核通过。最终97文件526测试/build/vibe检查通过，实际下载独立Pillow验证，4K约278ms。"
+    },
+    "F07": {
+      "state": "in_review",
+      "scope": "三基准六方向/外边界分布、父组逆矩阵、key固定、锁定保护、一次undo和保存往返，两阶段审核通过。18对齐/6分布browser数学manifest实证；最终100文件565测试/build/check通过。"
+    }
+  },
+  "remoteVerification": {
+    "result": "passed",
+    "count": 37,
+    "verifiedFields": [
+      "title",
+      "description",
+      "acceptanceCriteria",
+      "dependsOn",
+      "planMarkdown"
+    ]
+  },
+  "audit": "docs/implementation/2026-11-14-comprehensive-audit.md"
+}

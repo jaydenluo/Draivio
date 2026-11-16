@@ -1,0 +1,23 @@
+{
+  "actual": {
+    "solid-free-peer": {
+      "height": 90.25216872582575,
+      "width": 95.9090300386788,
+      "x": 165.08538379664412,
+      "y": 250.8739252024376
+    },
+    "solid-locked-child": {
+      "height": 44.56962009906225,
+      "width": 57.953849792692765,
+      "x": 313.14766118485124,
+      "y": 64.14058804296407
+    },
+    "solid-nested-child": {
+      "height": 54.51043231905835,
+      "width": 61.93503561788686,
+      "x": 165.08538379664412,
+      "y": 59.53326307148621
+    }
+  },
+  "measurement": "Leaf rectangle screen bounds, avoids container local-AABB then ancestor-rotation overestimation."
+}

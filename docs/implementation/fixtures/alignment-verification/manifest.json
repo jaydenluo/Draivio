@@ -1,0 +1,701 @@
+{
+  "schemaVersion": 1,
+  "units": "physical document pixels",
+  "documentSize": [
+    500,
+    400
+  ],
+  "tolerance": 1e-07,
+  "provenance": "Analytic affine corner geometry. No product alignment output used.",
+  "scenarios": {
+    "three-layers": {
+      "initialBoundsPx": {
+        "red": {
+          "x": 40.0,
+          "y": 48.0,
+          "width": 80.0,
+          "height": 80.0
+        },
+        "green": {
+          "x": 193.36860279185586,
+          "y": 116.25128869403571,
+          "width": 123.26279441628824,
+          "height": 103.49742261192856
+        },
+        "blue": {
+          "x": 343.3309524416879,
+          "y": 253.33095244168788,
+          "width": 93.33809511662429,
+          "height": 93.33809511662429
+        }
+      },
+      "selectionBoundsPx": {
+        "x": 40.0,
+        "y": 48.0,
+        "width": 396.6690475583122,
+        "height": 298.6690475583122
+      },
+      "keyLayerId": "green",
+      "alignmentDeltasPx": {
+        "selection": {
+          "left": {
+            "red": {
+              "dx": 0.0,
+              "dy": 0
+            },
+            "green": {
+              "dx": -153.36860279185586,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -303.3309524416879,
+              "dy": 0
+            }
+          },
+          "center-horizontal": {
+            "red": {
+              "dx": 158.3345237791561,
+              "dy": 0
+            },
+            "green": {
+              "dx": -16.6654762208439,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -151.66547622084394,
+              "dy": 0
+            }
+          },
+          "right": {
+            "red": {
+              "dx": 316.6690475583122,
+              "dy": 0
+            },
+            "green": {
+              "dx": 120.03765035016806,
+              "dy": 0
+            },
+            "blue": {
+              "dx": 0.0,
+              "dy": 0
+            }
+          },
+          "top": {
+            "red": {
+              "dx": 0,
+              "dy": 0.0
+            },
+            "green": {
+              "dx": 0,
+              "dy": -68.25128869403571
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -205.33095244168788
+            }
+          },
+          "center-vertical": {
+            "red": {
+              "dx": 0,
+              "dy": 109.33452377915609
+            },
+            "green": {
+              "dx": 0,
+              "dy": 29.3345237791561
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -102.66547622084394
+            }
+          },
+          "bottom": {
+            "red": {
+              "dx": 0,
+              "dy": 218.66904755831217
+            },
+            "green": {
+              "dx": 0,
+              "dy": 126.92033625234791
+            },
+            "blue": {
+              "dx": 0,
+              "dy": 0.0
+            }
+          }
+        },
+        "canvas": {
+          "left": {
+            "red": {
+              "dx": -40.0,
+              "dy": 0
+            },
+            "green": {
+              "dx": -193.36860279185586,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -343.3309524416879,
+              "dy": 0
+            }
+          },
+          "center-horizontal": {
+            "red": {
+              "dx": 170.0,
+              "dy": 0
+            },
+            "green": {
+              "dx": -4.999999999999986,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -140.00000000000003,
+              "dy": 0
+            }
+          },
+          "right": {
+            "red": {
+              "dx": 380.0,
+              "dy": 0
+            },
+            "green": {
+              "dx": 183.36860279185586,
+              "dy": 0
+            },
+            "blue": {
+              "dx": 63.33095244168783,
+              "dy": 0
+            }
+          },
+          "top": {
+            "red": {
+              "dx": 0,
+              "dy": -48.0
+            },
+            "green": {
+              "dx": 0,
+              "dy": -116.25128869403571
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -253.33095244168788
+            }
+          },
+          "center-vertical": {
+            "red": {
+              "dx": 0,
+              "dy": 112.0
+            },
+            "green": {
+              "dx": 0,
+              "dy": 32.000000000000014
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -100.00000000000003
+            }
+          },
+          "bottom": {
+            "red": {
+              "dx": 0,
+              "dy": 272.0
+            },
+            "green": {
+              "dx": 0,
+              "dy": 180.25128869403576
+            },
+            "blue": {
+              "dx": 0,
+              "dy": 53.33095244168783
+            }
+          }
+        },
+        "key": {
+          "left": {
+            "red": {
+              "dx": 153.36860279185586,
+              "dy": 0
+            },
+            "green": {
+              "dx": 0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -149.96234964983202,
+              "dy": 0
+            }
+          },
+          "center-horizontal": {
+            "red": {
+              "dx": 175.0,
+              "dy": 0
+            },
+            "green": {
+              "dx": 0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -135.00000000000003,
+              "dy": 0
+            }
+          },
+          "right": {
+            "red": {
+              "dx": 196.6313972081441,
+              "dy": 0
+            },
+            "green": {
+              "dx": 0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -120.03765035016806,
+              "dy": 0
+            }
+          },
+          "top": {
+            "red": {
+              "dx": 0,
+              "dy": 68.25128869403571
+            },
+            "green": {
+              "dx": 0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -137.07966374765218
+            }
+          },
+          "center-vertical": {
+            "red": {
+              "dx": 0,
+              "dy": 80.0
+            },
+            "green": {
+              "dx": 0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -132.00000000000003
+            }
+          },
+          "bottom": {
+            "red": {
+              "dx": 0,
+              "dy": 91.74871130596426
+            },
+            "green": {
+              "dx": 0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -126.92033625234791
+            }
+          }
+        }
+      },
+      "distributionSelection": {
+        "horizontal": {
+          "order": [
+            "red",
+            "green",
+            "blue"
+          ],
+          "gap": 50.034079012699806,
+          "negative": false,
+          "deltas": {
+            "red": {
+              "dx": 0.0,
+              "dy": 0
+            },
+            "green": {
+              "dx": -23.334523779156058,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -5.684341886080802e-14,
+              "dy": 0
+            }
+          }
+        },
+        "vertical": {
+          "order": [
+            "red",
+            "green",
+            "blue"
+          ],
+          "gap": 10.91676491487965,
+          "negative": false,
+          "deltas": {
+            "red": {
+              "dx": 0,
+              "dy": 0.0
+            },
+            "green": {
+              "dx": 0,
+              "dy": 22.665476220843942
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -2.842170943040401e-14
+            }
+          }
+        }
+      },
+      "distributionKey": {
+        "horizontal": {
+          "order": [
+            "red",
+            "green",
+            "blue"
+          ],
+          "gap": 50.034079012699806,
+          "negative": false,
+          "deltas": {
+            "red": {
+              "dx": 23.334523779156058,
+              "dy": 0
+            },
+            "green": {
+              "dx": 0.0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": 23.334523779156,
+              "dy": 0
+            }
+          },
+          "keyLayerId": "green"
+        },
+        "vertical": {
+          "order": [
+            "red",
+            "green",
+            "blue"
+          ],
+          "gap": 10.91676491487965,
+          "negative": false,
+          "deltas": {
+            "red": {
+              "dx": 0,
+              "dy": -22.665476220843942
+            },
+            "green": {
+              "dx": 0,
+              "dy": 0.0
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -22.66547622084397
+            }
+          },
+          "keyLayerId": "green"
+        }
+      }
+    },
+    "negative-gaps": {
+      "initialBoundsPx": {
+        "red": {
+          "x": 200.0,
+          "y": 140.0,
+          "width": 80.0,
+          "height": 80.0
+        },
+        "green": {
+          "x": 203.36860279185586,
+          "y": 124.25128869403571,
+          "width": 123.26279441628824,
+          "height": 103.49742261192856
+        },
+        "blue": {
+          "x": 203.33095244168786,
+          "y": 145.33095244168786,
+          "width": 93.33809511662426,
+          "height": 93.33809511662429
+        }
+      },
+      "distributionSelection": {
+        "horizontal": {
+          "order": [
+            "red",
+            "blue",
+            "green"
+          ],
+          "gap": -84.9847461623842,
+          "negative": true,
+          "deltas": {
+            "red": {
+              "dx": 0.0,
+              "dy": 0
+            },
+            "blue": {
+              "dx": -8.315698604072054,
+              "dy": 0
+            },
+            "green": {
+              "dx": 0.0,
+              "dy": 0
+            }
+          }
+        },
+        "vertical": {
+          "order": [
+            "green",
+            "red",
+            "blue"
+          ],
+          "gap": -81.20887943213822,
+          "negative": true,
+          "deltas": {
+            "green": {
+              "dx": 0,
+              "dy": 0.0
+            },
+            "red": {
+              "dx": 0,
+              "dy": 6.539831873826046
+            },
+            "blue": {
+              "dx": 0,
+              "dy": -2.842170943040401e-14
+            }
+          }
+        }
+      }
+    },
+    "hierarchy-locks": {
+      "matricesPx": {
+        "rotated-parent": [
+          0.4763139720814413,
+          0.27499999999999997,
+          -0.24999999999999997,
+          0.4330127018922194,
+          168.42150697963967,
+          24.647459621556138
+        ],
+        "nested-child-world": [
+          0.10495774566628491,
+          0.03071153364169741,
+          -0.023640465829831935,
+          0.09788667785441944,
+          174.54156093717896,
+          59.53325679162545
+        ],
+        "locked-ancestor": [
+          0.2819077862357725,
+          -0.10260604299770062,
+          0.10260604299770062,
+          0.2819077862357725,
+          284.00184484151674,
+          69.26995350227065
+        ],
+        "locked-child-world": [
+          0.10340481406628185,
+          -0.018233058655027688,
+          0.015628335990023737,
+          0.08863269777109874,
+          313.1477145499786,
+          73.25713097297418
+        ]
+      },
+      "worldBoundsPx": {
+        "rotated-parent-frame": {
+          "x": 68.42150697963969,
+          "y": 24.647459621556138,
+          "width": 338.1569860407206,
+          "height": 310.7050807568877
+        },
+        "rotated-parent": {
+          "x": 165.0853746052462,
+          "y": 59.53325679162545,
+          "width": 61.93505916507522,
+          "height": 54.51043796261648
+        },
+        "nested-child": {
+          "x": 165.0853746052462,
+          "y": 59.53325679162545,
+          "width": 61.93505916507522,
+          "height": 54.51043796261648
+        },
+        "locked-ancestor": {
+          "x": 284.00184484151674,
+          "y": 17.96693200342034,
+          "width": 181.99631031696651,
+          "height": 164.06613599315932
+        },
+        "locked-child": {
+          "x": 313.1477145499786,
+          "y": 64.14060164546034,
+          "width": 57.9537414291504,
+          "height": 44.56960843595334
+        },
+        "free-peer": {
+          "x": 352.0454813247465,
+          "y": 250.8739084494927,
+          "width": 95.90903735050694,
+          "height": 90.2521831010146
+        }
+      },
+      "alignmentDeltasPxSelection": {
+        "left": {
+          "rotated-parent": {
+            "dx": 0.0,
+            "dy": 0
+          },
+          "free-peer": {
+            "dx": -186.96010671950032,
+            "dy": 0
+          }
+        },
+        "center-horizontal": {
+          "rotated-parent": {
+            "dx": 110.46704245246603,
+            "dy": 0
+          },
+          "free-peer": {
+            "dx": -93.48005335975014,
+            "dy": 0
+          }
+        },
+        "right": {
+          "rotated-parent": {
+            "dx": 220.934084904932,
+            "dy": 0
+          },
+          "free-peer": {
+            "dx": 0.0,
+            "dy": 0
+          }
+        },
+        "top": {
+          "rotated-parent": {
+            "dx": 0,
+            "dy": 0.0
+          },
+          "free-peer": {
+            "dx": 0,
+            "dy": -191.34065165786723
+          }
+        },
+        "center-vertical": {
+          "rotated-parent": {
+            "dx": 0,
+            "dy": 113.54119839813268
+          },
+          "free-peer": {
+            "dx": 0,
+            "dy": -95.67032582893363
+          }
+        },
+        "bottom": {
+          "rotated-parent": {
+            "dx": 0,
+            "dy": 227.08239679626536
+          },
+          "free-peer": {
+            "dx": 0,
+            "dy": 0.0
+          }
+        }
+      },
+      "childOnlyAlignmentDeltasPxSelection": {
+        "left": {
+          "nested-child": {
+            "dx": 0.0,
+            "dy": 0
+          },
+          "free-peer": {
+            "dx": -186.96010671950032,
+            "dy": 0
+          }
+        },
+        "center-horizontal": {
+          "nested-child": {
+            "dx": 110.46704245246603,
+            "dy": 0
+          },
+          "free-peer": {
+            "dx": -93.48005335975014,
+            "dy": 0
+          }
+        },
+        "right": {
+          "nested-child": {
+            "dx": 220.934084904932,
+            "dy": 0
+          },
+          "free-peer": {
+            "dx": 0.0,
+            "dy": 0
+          }
+        },
+        "top": {
+          "nested-child": {
+            "dx": 0,
+            "dy": 0.0
+          },
+          "free-peer": {
+            "dx": 0,
+            "dy": -191.34065165786723
+          }
+        },
+        "center-vertical": {
+          "nested-child": {
+            "dx": 0,
+            "dy": 113.54119839813268
+          },
+          "free-peer": {
+            "dx": 0,
+            "dy": -95.67032582893363
+          }
+        },
+        "bottom": {
+          "nested-child": {
+            "dx": 0,
+            "dy": 227.08239679626536
+          },
+          "free-peer": {
+            "dx": 0,
+            "dy": 0.0
+          }
+        }
+      },
+      "selected": [
+        "rotated-parent",
+        "nested-child",
+        "locked-child",
+        "free-peer"
+      ],
+      "deduplicatedMovableRoots": [
+        "rotated-parent",
+        "free-peer"
+      ],
+      "mustNotMutateLocalTransforms": [
+        "nested-child",
+        "locked-ancestor",
+        "locked-child"
+      ],
+      "rules": [
+        "Moving rotated-parent moves nested-child once through parent; child local transform unchanged.",
+        "locked-child effective ancestor lock prevents all local/world movement.",
+        "World delta must be converted through parent linear inverse for child-only selection."
+      ],
+      "childOnlyExample": {
+        "selected": [
+          "nested-child",
+          "free-peer"
+        ],
+        "requestedChildWorldDeltaPx": [
+          20,
+          -10
+        ],
+        "expectedChildLocalTranslationPx": [
+          22.40092377397959,
+          -37.32050807568877
+        ]
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { AppShell } from './AppShell'
-import { EditorProvider } from '../state/editor'
+import { DocumentWorkspaceProvider } from '../document/DocumentWorkspaceProvider'
 import '../styles/theme.css'
 
-export function App() { return <EditorProvider><AppShell /></EditorProvider> }
+export function App() { return <DocumentWorkspaceProvider><AppShell /></DocumentWorkspaceProvider> }

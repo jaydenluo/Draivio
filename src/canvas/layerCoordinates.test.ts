@@ -53,3 +53,8 @@ describe('selectionToLayer wraps existing geometry in an inverse affine expressi
     expect(selectionToLayer(selection)).toEqual(selection)
   })
 })
+
+it('rotates in physical pixels for landscape documents', () => {
+  const draft = transform({ rect: { x: 0, y: 0, width: 100, height: 100 }, rotation: 90 })
+  close(layerPoint({ x: 100, y: 50 }, draft, false, 1200, 800), { x: 50, y: 125 })
+})

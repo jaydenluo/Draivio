@@ -1,0 +1,91 @@
+{
+  "format": "draivio",
+  "schemaVersion": 2,
+  "metadata": {
+    "id": "adjustment-colorcard-64",
+    "name": "64px 调整像素验收色卡"
+  },
+  "assets": {
+    "image-1": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACH0lEQVR4nO3UMYjScRjGcQcDAwkhIQc5HAwkMPBCSDgHhxMukO6IgxwcBA0kJISEHFwcHCyO44iDbpDDwUBCQuwgBwcDOySEhBBycHAwMDjiICGHp+caI/5Txx34/OAzvNv7+w6vyWQywWw2w2KxwGq1wmazwW63w+FwwOl0wuVywe12w+PxwOv1wufzwe/3IxAIIBgMIhQKYX19HRsbG4hEItja2sL29jai0ShisRji8TiSySRSqRTS6TQymQyy2SxyuRzy+TwKhQKKxSJKpRJ2dnawt7eH/f19HBwcoFwuo1KpoFqtolaroV6vo9Fo4OjoCK1WC+12G51OB91uF71eD/1+H4PBAMPhEKPRCOPxGJPJBNPpFLPZDCcnJzg9PcV8PsdiscDZMymAAiiAAiiAAiiAAiiAAiiAAiiAAixhgOM1D4x4amFjmwNDx7UVQ7XVpqGVprFnmx5DgxcJQwqgAAqgAAqgAAqgAAqgAAqgAAqgAEsZILH6L1foKl2j63SDnOSim3SLbtMduktrFKIw3aP79IAeUozi9Ige0xN6SjnKU4GK9Jx26SW9ojJV6DW9obf0jt5Tmz7QR/pEn+kLfaUxTegbfacf9JN+Ef7+qwIogAIogAIogAIogAIogAIogAIowDIGSCQSOA+Hh4f/3XnsqQAKoAAKoAAKsMwBms0mzoTD4T+WbVaAy7LIRc0KcFkW0Q3QDdANuJD5N9xHVX2wTV81AAAAAElFTkSuQmCC"
+  },
+  "document": {
+    "documentWidth": 64,
+    "documentHeight": 64,
+    "documentBackground": "transparent",
+    "layers": [
+      {
+        "id": "card",
+        "name": "64px 调整像素验收色卡",
+        "className": "layer-art",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常",
+        "source": "asset:image-1",
+        "contentWidth": 64,
+        "contentHeight": 64,
+        "adjustmentsEnabled": true,
+        "adjustments": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        }
+      }
+    ],
+    "selectedLayerId": "card",
+    "selectedLayerIds": [
+      "card"
+    ],
+    "canvasTexts": [],
+    "canvasShapes": [],
+    "brushStrokes": [],
+    "layerMasks": {},
+    "aiResults": [],
+    "selection": {
+      "kind": "rectangle",
+      "mode": "new",
+      "rect": {
+        "x": 10,
+        "y": 10,
+        "width": 30,
+        "height": 30
+      },
+      "path": {
+        "type": "shape",
+        "kind": "rectangle",
+        "rect": {
+          "x": 10,
+          "y": 10,
+          "width": 30,
+          "height": 30
+        }
+      },
+      "feather": 0,
+      "fixedRatio": null
+    },
+    "selectionRect": {
+      "x": 10,
+      "y": 10,
+      "width": 30,
+      "height": 30
+    },
+    "selectionVisible": false,
+    "cropRect": null,
+    "sceneOrder": [],
+    "prompt": "asset:literal prompt",
+    "composerMode": "edit",
+    "composerSourceId": "draivio-cloud",
+    "composerParameters": {
+      "model": "fixture",
+      "size": "2 × 2",
+      "ratio": "1:1",
+      "count": "1 张",
+      "strength": "48%"
+    },
+    "history": []
+  }
+}

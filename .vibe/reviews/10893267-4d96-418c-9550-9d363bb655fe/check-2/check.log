@@ -1,0 +1,30 @@
+Vibe Plan checks passed.
+Vibe Plan
+  CLI:        0.1.19
+  服务版本:   0.1.18 · 协议 1
+  服务能力:   mutation-id, sync-feed, structured-tests, my-work, contributions, work-log-edit, completion-modes
+  Skill:      current
+  Skill 模板: 0.1.19:ebec3fd48d8e · 当前 0.1.19:ebec3fd48d8e
+  登录账号:   骆奕霖 <651715003@qq.com>
+  会话状态:   已验证，滑动续期
+  服务端:     https://vibeplan.szxinjin.cn/api
+  本地项目:   Draivio
+  同步状态:   无待上传事件
+  Daemon:     未运行
+
+任务摘要
+  总任务:     77
+  待审核:     1
+  待规划:     67
+  已完成:     9
+  完成方式:   human 71 · ai 6
+  完成来源:   human 1
+  项目推荐:   图像处理与色彩 · P2 · 12月19日
+
+详细信息
+  项目 ID:    c3263908-e8c1-47ed-ad80-f822e5a73a8f
+  团队 ID:    ec086f33-2e30-4338-82fd-79eabc7269fb
+  组织 ID:    efe178ae-c52c-497f-aca4-e23c3f381a79
+  本地路径:   /Users/szys/.codex/worktrees/ai-editing-roadmap/Draivio
+  Git:        detached · 171d560 · 有未提交改动
+

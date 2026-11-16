@@ -60,5 +60,7 @@ test('captures the chosen format at submission and dismisses the picker with Esc
   fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   act(() => vi.advanceTimersByTime(900))
-  expect(state().layers[0].aiOperation?.parameters).toMatchObject({ ratio: '9:16', size: '1080 × 1920' })
+  expect(state().aiResults[0].request?.parameters).toMatchObject({ ratio: '9:16', size: '1080 × 1920' })
+  expect(state().aiResults[0].adopted).toBe(false)
+  expect(state().layers).toHaveLength(3)
 })

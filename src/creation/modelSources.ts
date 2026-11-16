@@ -1,9 +1,15 @@
-export type ModelSourceId = 'draivio-cloud' | 'openai-custom' | 'volcengine-custom'
+import { getImageProtocol } from './imageProtocols'
+import { useEffect, useSyncExternalStore } from 'react'
+import { isTauri } from '@tauri-apps/api/core'
+import { decodeConnections, loadConnections, saveConnections, type ServiceConnection } from './serviceConnections'
+
+export type ModelSourceId = string
 export type BillingMode = 'credits' | 'provider'
 
 export type SourceModel = {
   code: string
   displayName: string
+  supportsStrength?: boolean
 }
 
 export type ModelSource = {
@@ -14,6 +20,7 @@ export type ModelSource = {
   billingLabel: string
   protocolLabel?: string
   models: SourceModel[]
+  enabled?: boolean
 }
 
 export const modelSources: ModelSource[] = [
@@ -32,7 +39,51 @@ export const modelSources: ModelSource[] = [
 ]
 
 export function getSourceById(sourceId: string): ModelSource | undefined {
-  return modelSources.find((source) => source.id === sourceId)
+  return getAvailableSources().find((source) => source.id === sourceId) ?? modelSources.find((source) => source.id === sourceId)
+}
+
+let connections: ServiceConnection[] = []
+let revision = 0
+let initialized: Promise<void> | undefined
+let loadError = ''
+let ready = !isTauri()
+const listeners = new Set<() => void>()
+function notify() { revision++; listeners.forEach((listener) => listener()) }
+export function getConnections(): ServiceConnection[] {
+  if (!isTauri()) {
+    try { return decodeConnections(JSON.parse(localStorage.getItem('draivio-service-connections-v1') ?? '[]')) } catch { return [] }
+  }
+  return connections
+}
+export function getAvailableSources(): ModelSource[] {
+  return [modelSources[0], ...getConnections().map((connection) => ({
+    id: connection.id, providerName: connection.provider, summary: `${connection.provider} · ${connection.name}`,
+    billingMode: 'provider' as const, billingLabel: `由 ${connection.name} 计费`,
+    protocolLabel: getImageProtocol(connection.protocol).label,
+    models: connection.models.map((code) => ({ code, displayName: code })), enabled: connection.enabled,
+  }))]
+}
+export function isSourceUsable(sourceId: string, modelName: string) {
+  return getAvailableSources().some((source) => source.id === sourceId && source.enabled !== false && source.models.some((model) => model.displayName === modelName))
+}
+export async function updateConnections(next: ServiceConnection[]) {
+  if (!ready) throw new Error('配置尚未读取完成')
+  await saveConnections(next)
+  connections = next
+  loadError = ''
+  notify()
+}
+export function useServiceSources() {
+  useSyncExternalStore((listener) => { listeners.add(listener); return () => { listeners.delete(listener) } }, () => revision)
+  useEffect(() => {
+    if (!initialized) initialized = loadConnections().then((value) => { connections = value; ready = true; loadError = ''; notify() }).catch(() => { loadError = '无法读取服务来源，请检查本地存储'; notify() })
+    const storageChanged = () => notify()
+    window.addEventListener('storage', storageChanged)
+    return () => window.removeEventListener('storage', storageChanged)
+  }, [])
+  let error = loadError
+  if (!isTauri()) { try { decodeConnections(JSON.parse(localStorage.getItem('draivio-service-connections-v1') ?? '[]')); error = '' } catch { error = '无法读取服务来源，请检查本地存储' } }
+  return { connections: getConnections(), sources: getAvailableSources(), error, ready }
 }
 
 export function getModelsForSource(sourceId: string): SourceModel[] {

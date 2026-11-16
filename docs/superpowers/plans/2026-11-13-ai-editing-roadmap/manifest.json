@@ -1,0 +1,1803 @@
+{
+  "schemaVersion": 1,
+  "projectId": "c3263908-e8c1-47ed-ad80-f822e5a73a8f",
+  "state": "created_planned_and_linked",
+  "baseCommit": "171d5606201cc5c44f6292b35bcb5b7c27bc8fb2",
+  "scope": "自然语言驱动的可编辑图像工作流；复用已有34项底层编辑器任务，新增37项AI与缺口任务",
+  "tasks": [
+    {
+      "key": "A01",
+      "title": "编辑能力基线、缺口与 AI 工具覆盖矩阵",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 3,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [],
+      "steps": [
+        "逐项执行现有工具并记录真实像素、历史、保存与导出结果",
+        "建立操作到 reducer、渲染、项目 schema 的映射",
+        "将缺口关联已有任务，给工具设置可用状态与阻塞原因"
+      ],
+      "acceptanceCriteria": [
+        "每个已暴露编辑工具都有真实/模拟/缺失状态及证据",
+        "不把工具图标、协议预设或测试替身视为真实能力",
+        "输出首版与完整目标的可执行验收清单"
+      ],
+      "files": [
+        "src/tools/toolRegistry.ts",
+        "src/state/editor.tsx",
+        "src/engine/raster/composite.ts"
+      ],
+      "validation": "运行现有测试和构建记录真实失败；抽查画笔、选区、调整、导出、AI 结果五条路径",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a01.md",
+      "description": "目标：编辑能力基线、缺口与 AI 工具覆盖矩阵。\n\n实现步骤：\n1. 逐项执行现有工具并记录真实像素、历史、保存与导出结果\n2. 建立操作到 reducer、渲染、项目 schema 的映射\n3. 将缺口关联已有任务，给工具设置可用状态与阻塞原因\n\n完成标准：\n- 每个已暴露编辑工具都有真实/模拟/缺失状态及证据\n- 不把工具图标、协议预设或测试替身视为真实能力\n- 输出首版与完整目标的可执行验收清单\n\n验证样例：运行现有测试和构建记录真实失败；抽查画笔、选区、调整、导出、AI 结果五条路径\n相关文件（新增路径为计划）：src/tools/toolRegistry.ts,src/state/editor.tsx,src/engine/raster/composite.ts\n依赖编号：无\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A02",
+      "title": "AI 工具协议、参数校验与注册表",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 4,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A01"
+      ],
+      "steps": [
+        "定义 toolId、版本、输入输出 schema、对象类型、作用域、副作用及成本类别",
+        "注册执行函数和能力查询",
+        "在执行入口验证参数、权限和资源限制"
+      ],
+      "acceptanceCriteria": [
+        "未知工具、额外参数、NaN、越界和失效对象均拒绝执行",
+        "同一工具只有一套执行语义，UI 与 AI 共享",
+        "能力列表只发布实际可用工具且支持版本兼容"
+      ],
+      "files": [
+        "src/ai/tools/registry.ts",
+        "src/ai/tools/schema.ts"
+      ],
+      "validation": "合法与恶意工具调用表驱动测试，验证拒绝后文档指纹不变",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a02.md",
+      "description": "目标：AI 工具协议、参数校验与注册表。\n\n实现步骤：\n1. 定义 toolId、版本、输入输出 schema、对象类型、作用域、副作用及成本类别\n2. 注册执行函数和能力查询\n3. 在执行入口验证参数、权限和资源限制\n\n完成标准：\n- 未知工具、额外参数、NaN、越界和失效对象均拒绝执行\n- 同一工具只有一套执行语义，UI 与 AI 共享\n- 能力列表只发布实际可用工具且支持版本兼容\n\n验证样例：合法与恶意工具调用表驱动测试，验证拒绝后文档指纹不变\n相关文件（新增路径为计划）：src/ai/tools/registry.ts,src/ai/tools/schema.ts\n依赖编号：A01\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A03",
+      "title": "文档上下文、作用范围与稳定对象绑定",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 4,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A02",
+        "F04",
+        "R"
+      ],
+      "steps": [
+        "提取 documentId、revision、像素尺寸、图层树、有效锁定与当前选区",
+        "提供整图/图层/选区范围及必要的降采样预览",
+        "请求发出时冻结目标 ID 和坐标转换"
+      ],
+      "acceptanceCriteria": [
+        "组锁定、无选区、无图层均有准确处理",
+        "生成途中切换选择不改变请求目标",
+        "画布缩放、旋转和高 DPI 不改变实际编辑坐标"
+      ],
+      "files": [
+        "src/ai/context/editorContext.ts",
+        "src/creation/AIComposer.tsx"
+      ],
+      "validation": "同名图层、嵌套组、非100%缩放、多文档切换、选区失效",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a03.md",
+      "description": "目标：文档上下文、作用范围与稳定对象绑定。\n\n实现步骤：\n1. 提取 documentId、revision、像素尺寸、图层树、有效锁定与当前选区\n2. 提供整图/图层/选区范围及必要的降采样预览\n3. 请求发出时冻结目标 ID 和坐标转换\n\n完成标准：\n- 组锁定、无选区、无图层均有准确处理\n- 生成途中切换选择不改变请求目标\n- 画布缩放、旋转和高 DPI 不改变实际编辑坐标\n\n验证样例：同名图层、嵌套组、非100%缩放、多文档切换、选区失效\n相关文件（新增路径为计划）：src/ai/context/editorContext.ts,src/creation/AIComposer.tsx\n依赖编号：A02,F04,R\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A04",
+      "title": "基础编辑工具的统一命令适配",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A02",
+        "A03",
+        "R",
+        "F04",
+        "F07"
+      ],
+      "steps": [
+        "为移动、缩放、旋转、翻转、对齐、透明度、复制、重命名、分组和排序建立适配器",
+        "复用编辑状态动作而非模拟点击",
+        "加入批量目标与祖先锁定检查"
+      ],
+      "acceptanceCriteria": [
+        "至少12类基础操作可通过结构化指令完成",
+        "参数以文档像素和明确角度单位执行",
+        "操作结果与手动编辑一致，复制对象无共享可变引用"
+      ],
+      "files": [
+        "src/ai/tools/editorTools.ts",
+        "src/state/editor.tsx",
+        "src/layers/PropertiesPanel.tsx"
+      ],
+      "validation": "用同一初始文档对比手动与AI命令，验证最终状态、导出与锁定保护",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a04.md",
+      "description": "目标：基础编辑工具的统一命令适配。\n\n实现步骤：\n1. 为移动、缩放、旋转、翻转、对齐、透明度、复制、重命名、分组和排序建立适配器\n2. 复用编辑状态动作而非模拟点击\n3. 加入批量目标与祖先锁定检查\n\n完成标准：\n- 至少12类基础操作可通过结构化指令完成\n- 参数以文档像素和明确角度单位执行\n- 操作结果与手动编辑一致，复制对象无共享可变引用\n\n验证样例：用同一初始文档对比手动与AI命令，验证最终状态、导出与锁定保护\n相关文件（新增路径为计划）：src/ai/tools/editorTools.ts,src/state/editor.tsx,src/layers/PropertiesPanel.tsx\n依赖编号：A02,A03,R,F04,F07\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A05",
+      "title": "AI 多步事务、预检、回滚与撤销",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A04",
+        "R"
+      ],
+      "steps": [
+        "增加文档事务暂存区与资源引用管理",
+        "执行前校验全计划和基准版本",
+        "本地成功统一提交，失败回滚，撤销重做复用历史"
+      ],
+      "acceptanceCriteria": [
+        "三步操作仅新增一条历史且可完整撤销重做",
+        "第二步失败不得留下第一步或孤立资源",
+        "旧版本结果不得覆盖新编辑，冲突保留候选供用户处理"
+      ],
+      "files": [
+        "src/ai/execution/transaction.ts",
+        "src/state/editor.tsx"
+      ],
+      "validation": "中途失败、版本变化、撤销后分叉、取消、内存资源释放",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a05.md",
+      "description": "目标：AI 多步事务、预检、回滚与撤销。\n\n实现步骤：\n1. 增加文档事务暂存区与资源引用管理\n2. 执行前校验全计划和基准版本\n3. 本地成功统一提交，失败回滚，撤销重做复用历史\n\n完成标准：\n- 三步操作仅新增一条历史且可完整撤销重做\n- 第二步失败不得留下第一步或孤立资源\n- 旧版本结果不得覆盖新编辑，冲突保留候选供用户处理\n\n验证样例：中途失败、版本变化、撤销后分叉、取消、内存资源释放\n相关文件（新增路径为计划）：src/ai/execution/transaction.ts,src/state/editor.tsx\n依赖编号：A04,R\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A06",
+      "title": "推理模型与视觉模型的服务配置",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 4,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A02"
+      ],
+      "steps": [
+        "复用服务来源抽屉与凭据存储，增加文本推理/视觉/图片生成能力标识",
+        "分开选择编辑助手模型与生图模型",
+        "通过能力配置或显式测试声明支持范围"
+      ],
+      "acceptanceCriteria": [
+        "图片生成模型不会默认成为推理模型",
+        "多来源多账号可配置且不改变已选图片模型顺序",
+        "无可用推理模型时明确引导配置，模型列表可访问不等于工具调用可用"
+      ],
+      "files": [
+        "src/creation/serviceConnections.ts",
+        "src/creation/ServiceSourceEditor.tsx",
+        "src/ai/providers/modelCapabilities.ts"
+      ],
+      "validation": "旧配置迁移、同名不同源模型、禁用来源、密钥缺失",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a06.md",
+      "description": "目标：推理模型与视觉模型的服务配置。\n\n实现步骤：\n1. 复用服务来源抽屉与凭据存储，增加文本推理/视觉/图片生成能力标识\n2. 分开选择编辑助手模型与生图模型\n3. 通过能力配置或显式测试声明支持范围\n\n完成标准：\n- 图片生成模型不会默认成为推理模型\n- 多来源多账号可配置且不改变已选图片模型顺序\n- 无可用推理模型时明确引导配置，模型列表可访问不等于工具调用可用\n\n验证样例：旧配置迁移、同名不同源模型、禁用来源、密钥缺失\n相关文件（新增路径为计划）：src/creation/serviceConnections.ts,src/creation/ServiceSourceEditor.tsx,src/ai/providers/modelCapabilities.ts\n依赖编号：A02\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A07",
+      "title": "推理请求适配、结构化输出与视觉输入",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A06"
+      ],
+      "steps": [
+        "实现首个OpenAI兼容聊天/工具调用适配器并抽象接口",
+        "接入共享网络封装、取消、超时和响应体限制",
+        "解析结构化计划，区分工具调用与纯文本能力"
+      ],
+      "acceptanceCriteria": [
+        "浏览器和桌面请求走统一封装，错误走message",
+        "可解析真实工具调用与受schema校验的JSON计划",
+        "凭据不进入计划、历史或日志，不自动重放可能付费请求"
+      ],
+      "files": [
+        "src/ai/providers/chatAdapter.ts",
+        "src/lib/request.ts",
+        "src-tauri/src/network.rs"
+      ],
+      "validation": "401、429、超时、断流、无效JSON、超大响应；真实调用另获授权留证",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a07.md",
+      "description": "目标：推理请求适配、结构化输出与视觉输入。\n\n实现步骤：\n1. 实现首个OpenAI兼容聊天/工具调用适配器并抽象接口\n2. 接入共享网络封装、取消、超时和响应体限制\n3. 解析结构化计划，区分工具调用与纯文本能力\n\n完成标准：\n- 浏览器和桌面请求走统一封装，错误走message\n- 可解析真实工具调用与受schema校验的JSON计划\n- 凭据不进入计划、历史或日志，不自动重放可能付费请求\n\n验证样例：401、429、超时、断流、无效JSON、超大响应；真实调用另获授权留证\n相关文件（新增路径为计划）：src/ai/providers/chatAdapter.ts,src/lib/request.ts,src-tauri/src/network.rs\n依赖编号：A06\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A08",
+      "title": "自然语言规划器与能力约束",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A03",
+        "A04",
+        "A07"
+      ],
+      "steps": [
+        "将中文需求拆成有依赖的工具步骤",
+        "系统提示词注入可用工具与范围，输出经schema验证的计划",
+        "对含糊目标给一次简短澄清，对缺失能力说明替代方案"
+      ],
+      "acceptanceCriteria": [
+        "能规划至少20条基础中文指令和10条两到三步复合指令",
+        "不编造工具、不执行模型返回代码",
+        "删除对象、覆盖内容等明确展示影响，歧义时不猜对象"
+      ],
+      "files": [
+        "src/ai/planning/planner.ts",
+        "src/ai/planning/prompts.ts"
+      ],
+      "validation": "固定语料覆盖相对尺寸、否定指令、同名对象、不可执行要求、提示注入",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a08.md",
+      "description": "目标：自然语言规划器与能力约束。\n\n实现步骤：\n1. 将中文需求拆成有依赖的工具步骤\n2. 系统提示词注入可用工具与范围，输出经schema验证的计划\n3. 对含糊目标给一次简短澄清，对缺失能力说明替代方案\n\n完成标准：\n- 能规划至少20条基础中文指令和10条两到三步复合指令\n- 不编造工具、不执行模型返回代码\n- 删除对象、覆盖内容等明确展示影响，歧义时不猜对象\n\n验证样例：固定语料覆盖相对尺寸、否定指令、同名对象、不可执行要求、提示注入\n相关文件（新增路径为计划）：src/ai/planning/planner.ts,src/ai/planning/prompts.ts\n依赖编号：A03,A04,A07\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A09",
+      "title": "计划执行器、依赖调度与运行状态",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A05",
+        "A08"
+      ],
+      "steps": [
+        "实现planning/validating/running/preview/committed/failed/cancelled状态机",
+        "本地步骤顺序执行，独立读操作可受限并行",
+        "固定stepId避免重复提交，回传真实工具结果"
+      ],
+      "acceptanceCriteria": [
+        "步骤依赖严格执行且成功状态来自实际返回",
+        "重复回调或重复点击不重复写文档",
+        "中断、失败、恢复均有确定状态，不把取消解释成远端退款"
+      ],
+      "files": [
+        "src/ai/execution/executor.ts",
+        "src/ai/execution/runState.ts"
+      ],
+      "validation": "执行顺序、重复事件、错误传播、切文档、取消竞态",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a09.md",
+      "description": "目标：计划执行器、依赖调度与运行状态。\n\n实现步骤：\n1. 实现planning/validating/running/preview/committed/failed/cancelled状态机\n2. 本地步骤顺序执行，独立读操作可受限并行\n3. 固定stepId避免重复提交，回传真实工具结果\n\n完成标准：\n- 步骤依赖严格执行且成功状态来自实际返回\n- 重复回调或重复点击不重复写文档\n- 中断、失败、恢复均有确定状态，不把取消解释成远端退款\n\n验证样例：执行顺序、重复事件、错误传播、切文档、取消竞态\n相关文件（新增路径为计划）：src/ai/execution/executor.ts,src/ai/execution/runState.ts\n依赖编号：A05,A08\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A10",
+      "title": "紧凑的一句话编辑入口与操作反馈",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 4,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A09"
+      ],
+      "steps": [
+        "复用Composer增加AI编辑模式和范围选择",
+        "用简短动作摘要展示计划与结果，提供取消和一次撤销",
+        "保留手动工具入口及键盘操作"
+      ],
+      "acceptanceCriteria": [
+        "输入一句话可完成两到三个真实操作",
+        "常用操作不增加多层菜单，错误统一message",
+        "加载、空状态、无能力和范围清晰，焦点及浮动/停靠模式正常"
+      ],
+      "files": [
+        "src/creation/AIComposer.tsx",
+        "src/ai/ui/EditRunSummary.tsx"
+      ],
+      "validation": "组件测试覆盖范围、回车、取消、失败、重复提交、键盘焦点",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a10.md",
+      "description": "目标：紧凑的一句话编辑入口与操作反馈。\n\n实现步骤：\n1. 复用Composer增加AI编辑模式和范围选择\n2. 用简短动作摘要展示计划与结果，提供取消和一次撤销\n3. 保留手动工具入口及键盘操作\n\n完成标准：\n- 输入一句话可完成两到三个真实操作\n- 常用操作不增加多层菜单，错误统一message\n- 加载、空状态、无能力和范围清晰，焦点及浮动/停靠模式正常\n\n验证样例：组件测试覆盖范围、回车、取消、失败、重复提交、键盘焦点\n相关文件（新增路径为计划）：src/creation/AIComposer.tsx,src/ai/ui/EditRunSummary.tsx\n依赖编号：A09\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A11",
+      "title": "临时预览、前后比较与参数微调",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 5,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A05",
+        "A10"
+      ],
+      "steps": [
+        "预览写入临时视图不污染正式文档",
+        "支持前后切换与采用/放弃",
+        "展示已执行工具的少量关键参数，微调复用工具定义"
+      ],
+      "acceptanceCriteria": [
+        "放弃后文档与历史完全不变",
+        "采用一次提交并可撤销",
+        "微调更新同一效果或候选，不无限叠加且预览与导出一致"
+      ],
+      "files": [
+        "src/ai/ui/EditPreview.tsx",
+        "src/ai/execution/preview.ts"
+      ],
+      "validation": "连续预览、放弃、采用、微调、撤销重做、导出对照",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a11.md",
+      "description": "目标：临时预览、前后比较与参数微调。\n\n实现步骤：\n1. 预览写入临时视图不污染正式文档\n2. 支持前后切换与采用/放弃\n3. 展示已执行工具的少量关键参数，微调复用工具定义\n\n完成标准：\n- 放弃后文档与历史完全不变\n- 采用一次提交并可撤销\n- 微调更新同一效果或候选，不无限叠加且预览与导出一致\n\n验证样例：连续预览、放弃、采用、微调、撤销重做、导出对照\n相关文件（新增路径为计划）：src/ai/ui/EditPreview.tsx,src/ai/execution/preview.ts\n依赖编号：A05,A10\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A12",
+      "title": "常用模糊与风格滤镜算法",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 8,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 2,
+      "dependsOnKeys": [
+        "A02",
+        "F03",
+        "F18"
+      ],
+      "steps": [
+        "实现高斯/方向运动/径向模糊、像素化、颗粒与晕影",
+        "统一边界采样、alpha和处理链参数",
+        "注册AI工具，接入智能滤镜面板及项目保存"
+      ],
+      "acceptanceCriteria": [
+        "六类滤镜都有真实像素实现和可重编辑参数",
+        "默认中性，透明边缘无黑边，随机颗粒可固定种子",
+        "预览和导出同算法，选区外保持不变"
+      ],
+      "files": [
+        "src/filters/blur.ts",
+        "src/filters/stylize.ts",
+        "src/ai/tools/filterTools.ts"
+      ],
+      "validation": "脉冲图验证核、运动方向、透明边缘、固定种子、导出像素对照",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a12.md",
+      "description": "目标：常用模糊与风格滤镜算法。\n\n实现步骤：\n1. 实现高斯/方向运动/径向模糊、像素化、颗粒与晕影\n2. 统一边界采样、alpha和处理链参数\n3. 注册AI工具，接入智能滤镜面板及项目保存\n\n完成标准：\n- 六类滤镜都有真实像素实现和可重编辑参数\n- 默认中性，透明边缘无黑边，随机颗粒可固定种子\n- 预览和导出同算法，选区外保持不变\n\n验证样例：脉冲图验证核、运动方向、透明边缘、固定种子、导出像素对照\n相关文件（新增路径为计划）：src/filters/blur.ts,src/filters/stylize.ts,src/ai/tools/filterTools.ts\n依赖编号：A02,F03,F18\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A13",
+      "title": "锐化、降噪与细节增强",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 2,
+      "dependsOnKeys": [
+        "A12"
+      ],
+      "steps": [
+        "实现Unsharp Mask及保边降噪，分开强度/半径/阈值",
+        "区分清晰度、锐化和AI细节重建",
+        "接入局部mask、预览与工具注册"
+      ],
+      "acceptanceCriteria": [
+        "锐化提升边缘且阈值限制平坦区噪声",
+        "降噪用固定噪声样例证明改善并记录边缘损失",
+        "参数可撤销保存，不把生成细节宣称为真实恢复"
+      ],
+      "files": [
+        "src/filters/sharpen.ts",
+        "src/filters/denoise.ts"
+      ],
+      "validation": "灰阶、彩色噪声、细纹、alpha样例；记录PSNR及边缘指标和前后图",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a13.md",
+      "description": "目标：锐化、降噪与细节增强。\n\n实现步骤：\n1. 实现Unsharp Mask及保边降噪，分开强度/半径/阈值\n2. 区分清晰度、锐化和AI细节重建\n3. 接入局部mask、预览与工具注册\n\n完成标准：\n- 锐化提升边缘且阈值限制平坦区噪声\n- 降噪用固定噪声样例证明改善并记录边缘损失\n- 参数可撤销保存，不把生成细节宣称为真实恢复\n\n验证样例：灰阶、彩色噪声、细纹、alpha样例；记录PSNR及边缘指标和前后图\n相关文件（新增路径为计划）：src/filters/sharpen.ts,src/filters/denoise.ts\n依赖编号：A12\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A14",
+      "title": "透视、镜头畸变与局部形变工具",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 10,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 2,
+      "dependsOnKeys": [
+        "A02",
+        "F04",
+        "F18"
+      ],
+      "steps": [
+        "实现四点透视与径向畸变参数",
+        "实现可保存的局部网格推拉和重置",
+        "AI通过受限控制点工具调用并提供预览"
+      ],
+      "acceptanceCriteria": [
+        "透视几何用已知四边形验证",
+        "形变可撤销、重编辑、保存和导出一致",
+        "人体/产品结构修改必须有预览，不能自动声称保持尺寸真实性"
+      ],
+      "files": [
+        "src/filters/warp.ts",
+        "src/ai/tools/geometryTools.ts"
+      ],
+      "validation": "棋盘格、反向映射孔洞、越界透明度、重复微调",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a14.md",
+      "description": "目标：透视、镜头畸变与局部形变工具。\n\n实现步骤：\n1. 实现四点透视与径向畸变参数\n2. 实现可保存的局部网格推拉和重置\n3. AI通过受限控制点工具调用并提供预览\n\n完成标准：\n- 透视几何用已知四边形验证\n- 形变可撤销、重编辑、保存和导出一致\n- 人体/产品结构修改必须有预览，不能自动声称保持尺寸真实性\n\n验证样例：棋盘格、反向映射孔洞、越界透明度、重复微调\n相关文件（新增路径为计划）：src/filters/warp.ts,src/ai/tools/geometryTools.ts\n依赖编号：A02,F04,F18\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A15",
+      "title": "颜色调整、效果与局部蒙版的 AI 适配",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 2,
+      "dependsOnKeys": [
+        "A04",
+        "F11",
+        "F12",
+        "F13",
+        "F15",
+        "F16",
+        "F18"
+      ],
+      "steps": [
+        "把曝光、白平衡、曲线、色阶、HSL、混合模式和图层效果注册成工具",
+        "参数存入调整层/滤镜而非重画原图",
+        "支持选区范围和中性重置"
+      ],
+      "acceptanceCriteria": [
+        "暖一点、降低高光、只改某颜色可映射真实参数",
+        "局部调整以蒙版混合且选区外像素不变",
+        "图层效果、调整顺序及导出与手动结果一致"
+      ],
+      "files": [
+        "src/ai/tools/adjustmentTools.ts",
+        "src/ai/tools/effectTools.ts"
+      ],
+      "validation": "色卡、肤色、渐变、半透明mask、单项重置和保存往返",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a15.md",
+      "description": "目标：颜色调整、效果与局部蒙版的 AI 适配。\n\n实现步骤：\n1. 把曝光、白平衡、曲线、色阶、HSL、混合模式和图层效果注册成工具\n2. 参数存入调整层/滤镜而非重画原图\n3. 支持选区范围和中性重置\n\n完成标准：\n- 暖一点、降低高光、只改某颜色可映射真实参数\n- 局部调整以蒙版混合且选区外像素不变\n- 图层效果、调整顺序及导出与手动结果一致\n\n验证样例：色卡、肤色、渐变、半透明mask、单项重置和保存往返\n相关文件（新增路径为计划）：src/ai/tools/adjustmentTools.ts,src/ai/tools/effectTools.ts\n依赖编号：A04,F11,F12,F13,F15,F16,F18\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A16",
+      "title": "语义目标定位、分割与蒙版工具",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 8,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 3,
+      "dependsOnKeys": [
+        "A03",
+        "A07",
+        "F09",
+        "F10"
+      ],
+      "steps": [
+        "支持主体/背景/指定物体的语义定位并输出对象候选",
+        "分割返回像素mask，映射原图坐标并支持边缘精修",
+        "低置信度或同类多物体时让用户点选"
+      ],
+      "acceptanceCriteria": [
+        "主体与背景互补正确且边缘支持羽化",
+        "两件衣服等歧义不能静默选择",
+        "低分辨率分析映射回原图无偏移，失败不生成假mask"
+      ],
+      "files": [
+        "src/ai/vision/targetResolver.ts",
+        "src/ai/tools/selectionTools.ts"
+      ],
+      "validation": "多主体、细发丝、透明物体、空结果、旋转缩放坐标样例",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a16.md",
+      "description": "目标：语义目标定位、分割与蒙版工具。\n\n实现步骤：\n1. 支持主体/背景/指定物体的语义定位并输出对象候选\n2. 分割返回像素mask，映射原图坐标并支持边缘精修\n3. 低置信度或同类多物体时让用户点选\n\n完成标准：\n- 主体与背景互补正确且边缘支持羽化\n- 两件衣服等歧义不能静默选择\n- 低分辨率分析映射回原图无偏移，失败不生成假mask\n\n验证样例：多主体、细发丝、透明物体、空结果、旋转缩放坐标样例\n相关文件（新增路径为计划）：src/ai/vision/targetResolver.ts,src/ai/tools/selectionTools.ts\n依赖编号：A03,A07,F09,F10\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A17",
+      "title": "生成编辑路由、能力协商与参数适配",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 3,
+      "dependsOnKeys": [
+        "A02",
+        "A06",
+        "F23",
+        "F24",
+        "F25"
+      ],
+      "steps": [
+        "为参考图编辑、局部填充、移除与扩图建立统一操作接口",
+        "按端点配置选择适配器，分别处理图像/蒙版/尺寸/数量",
+        "复用现有多请求并发策略"
+      ],
+      "acceptanceCriteria": [
+        "首发至少一个真实参考图和mask编辑适配器",
+        "不支持的参数不会发送，转站只返一张时按策略补齐",
+        "新增协议预设不视为适配器已实现，能力不足不静默整图重画"
+      ],
+      "files": [
+        "src/ai/tools/generativeTools.ts",
+        "src/creation/openaiImages.ts",
+        "src/creation/generationOptions.ts"
+      ],
+      "validation": "请求体契约、mask方向、尺寸约束、数量不足、返回URL/base64和畸形响应",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a17.md",
+      "description": "目标：生成编辑路由、能力协商与参数适配。\n\n实现步骤：\n1. 为参考图编辑、局部填充、移除与扩图建立统一操作接口\n2. 按端点配置选择适配器，分别处理图像/蒙版/尺寸/数量\n3. 复用现有多请求并发策略\n\n完成标准：\n- 首发至少一个真实参考图和mask编辑适配器\n- 不支持的参数不会发送，转站只返一张时按策略补齐\n- 新增协议预设不视为适配器已实现，能力不足不静默整图重画\n\n验证样例：请求体契约、mask方向、尺寸约束、数量不足、返回URL/base64和畸形响应\n相关文件（新增路径为计划）：src/ai/tools/generativeTools.ts,src/creation/openaiImages.ts,src/creation/generationOptions.ts\n依赖编号：A02,A06,F23,F24,F25\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A18",
+      "title": "生成任务队列、额度提示与可靠取消",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 3,
+      "dependsOnKeys": [
+        "A09",
+        "A17"
+      ],
+      "steps": [
+        "统一生成jobId、批次、并发、超时、取消与部分成功",
+        "付费前展示目标模型、请求次数和已知费用",
+        "限制重试范围并隔离迟到结果"
+      ],
+      "acceptanceCriteria": [
+        "取消后不再提交新请求，迟到结果不自动写文档",
+        "只重试失败项且不覆盖成功候选",
+        "未知价格明确标未知，拒绝隐式自动付费重试"
+      ],
+      "files": [
+        "src/ai/execution/generationJobs.ts",
+        "src/creation/imageBatch.ts"
+      ],
+      "validation": "429、超时但远端已受理、部分成功、取消竞态和重复回调",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a18.md",
+      "description": "目标：生成任务队列、额度提示与可靠取消。\n\n实现步骤：\n1. 统一生成jobId、批次、并发、超时、取消与部分成功\n2. 付费前展示目标模型、请求次数和已知费用\n3. 限制重试范围并隔离迟到结果\n\n完成标准：\n- 取消后不再提交新请求，迟到结果不自动写文档\n- 只重试失败项且不覆盖成功候选\n- 未知价格明确标未知，拒绝隐式自动付费重试\n\n验证样例：429、超时但远端已受理、部分成功、取消竞态和重复回调\n相关文件（新增路径为计划）：src/ai/execution/generationJobs.ts,src/creation/imageBatch.ts\n依赖编号：A09,A17\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A19",
+      "title": "局部生成合成、保护区域与采用",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 3,
+      "dependsOnKeys": [
+        "A11",
+        "A16",
+        "A18",
+        "R",
+        "F24"
+      ],
+      "steps": [
+        "将生成结果按请求时原图坐标与mask合成",
+        "保护文字、标志和非编辑区域",
+        "结果先为候选，采用时新增图层或可撤销替换"
+      ],
+      "acceptanceCriteria": [
+        "未选区域按原始分辨率逐像素保持",
+        "软边mask按alpha混合且接缝可预览",
+        "结果尺寸不符、目标被删或文档版本变化不覆盖当前作品"
+      ],
+      "files": [
+        "src/ai/compositing/maskedResult.ts",
+        "src/layers/ResultsPanel.tsx"
+      ],
+      "validation": "棋盘格保护区、软边、不同输出尺寸、锁定、跨文档迟到响应",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a19.md",
+      "description": "目标：局部生成合成、保护区域与采用。\n\n实现步骤：\n1. 将生成结果按请求时原图坐标与mask合成\n2. 保护文字、标志和非编辑区域\n3. 结果先为候选，采用时新增图层或可撤销替换\n\n完成标准：\n- 未选区域按原始分辨率逐像素保持\n- 软边mask按alpha混合且接缝可预览\n- 结果尺寸不符、目标被删或文档版本变化不覆盖当前作品\n\n验证样例：棋盘格保护区、软边、不同输出尺寸、锁定、跨文档迟到响应\n相关文件（新增路径为计划）：src/ai/compositing/maskedResult.ts,src/layers/ResultsPanel.tsx\n依赖编号：A11,A16,A18,R,F24\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A20",
+      "title": "AI 布光、背景匹配与合成协调",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 8,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 3,
+      "dependsOnKeys": [
+        "A15",
+        "A19",
+        "F15"
+      ],
+      "steps": [
+        "识别主体与背景，提供光向、色温、强度和接触阴影的有限参数",
+        "局部光色优先调整层，生成式布光单独产生候选",
+        "记录每个步骤对主体的影响"
+      ],
+      "acceptanceCriteria": [
+        "支持至少左/右/顶部光向及主体背景协调",
+        "颜色调整不改产品几何或文字，生成变化有前后比较",
+        "保留蒙版、调整和阴影层，可分别关闭微调"
+      ],
+      "files": [
+        "src/ai/workflows/relight.ts",
+        "src/ai/tools/lightingTools.ts"
+      ],
+      "validation": "产品文字、肤色、透明主体和多光源样例人工评审",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a20.md",
+      "description": "目标：AI 布光、背景匹配与合成协调。\n\n实现步骤：\n1. 识别主体与背景，提供光向、色温、强度和接触阴影的有限参数\n2. 局部光色优先调整层，生成式布光单独产生候选\n3. 记录每个步骤对主体的影响\n\n完成标准：\n- 支持至少左/右/顶部光向及主体背景协调\n- 颜色调整不改产品几何或文字，生成变化有前后比较\n- 保留蒙版、调整和阴影层，可分别关闭微调\n\n验证样例：产品文字、肤色、透明主体和多光源样例人工评审\n相关文件（新增路径为计划）：src/ai/workflows/relight.ts,src/ai/tools/lightingTools.ts\n依赖编号：A15,A19,F15\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A21",
+      "title": "放大、去模糊与修复模型接入",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 3,
+      "dependsOnKeys": [
+        "A17",
+        "A18",
+        "F03"
+      ],
+      "steps": [
+        "统一超分辨率/修复操作能力，接入至少一个真实后端",
+        "支持2倍/4倍、分块重叠合并和取消",
+        "将尺寸增强与生成式细节补全分开标注"
+      ],
+      "acceptanceCriteria": [
+        "输出像素尺寸准确、分块无明显接缝",
+        "保留原图并生成独立候选",
+        "显存/内存不足、文字脸部失真有提示，不宣称还原真实信息"
+      ],
+      "files": [
+        "src/ai/tools/restorationTools.ts",
+        "src/ai/imaging/tiledInference.ts"
+      ],
+      "validation": "小字、人脸、重复纹理、透明图、大图内存与分块边界",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a21.md",
+      "description": "目标：放大、去模糊与修复模型接入。\n\n实现步骤：\n1. 统一超分辨率/修复操作能力，接入至少一个真实后端\n2. 支持2倍/4倍、分块重叠合并和取消\n3. 将尺寸增强与生成式细节补全分开标注\n\n完成标准：\n- 输出像素尺寸准确、分块无明显接缝\n- 保留原图并生成独立候选\n- 显存/内存不足、文字脸部失真有提示，不宣称还原真实信息\n\n验证样例：小字、人脸、重复纹理、透明图、大图内存与分块边界\n相关文件（新增路径为计划）：src/ai/tools/restorationTools.ts,src/ai/imaging/tiledInference.ts\n依赖编号：A17,A18,F03\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A22",
+      "title": "识字、图片文字替换与可编辑排版",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 9,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 3,
+      "dependsOnKeys": [
+        "A07",
+        "A19",
+        "F14"
+      ],
+      "steps": [
+        "优先直接编辑已有文字层",
+        "扁平图片使用OCR提取文字、四边形和置信度，用户确认后擦除并新建文字层",
+        "保存字体替代、行距和对齐参数"
+      ],
+      "acceptanceCriteria": [
+        "现有文字层替换不经过生图",
+        "扁平图片价格替换产生可编辑文字层和独立修补层",
+        "低置信度、多处同字或字体缺失不静默误改"
+      ],
+      "files": [
+        "src/ai/vision/ocr.ts",
+        "src/ai/workflows/replaceText.ts"
+      ],
+      "validation": "倾斜中文、价格、多段文字、缺字体、背景复杂和标志保护",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a22.md",
+      "description": "目标：识字、图片文字替换与可编辑排版。\n\n实现步骤：\n1. 优先直接编辑已有文字层\n2. 扁平图片使用OCR提取文字、四边形和置信度，用户确认后擦除并新建文字层\n3. 保存字体替代、行距和对齐参数\n\n完成标准：\n- 现有文字层替换不经过生图\n- 扁平图片价格替换产生可编辑文字层和独立修补层\n- 低置信度、多处同字或字体缺失不静默误改\n\n验证样例：倾斜中文、价格、多段文字、缺字体、背景复杂和标志保护\n相关文件（新增路径为计划）：src/ai/vision/ocr.ts,src/ai/workflows/replaceText.ts\n依赖编号：A07,A19,F14\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A23",
+      "title": "可编辑操作配方引擎与版本管理",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 4,
+      "dependsOnKeys": [
+        "A09",
+        "A11",
+        "A15"
+      ],
+      "steps": [
+        "定义配方ID、版本、输入槽、参数schema、步骤DAG和适用条件",
+        "使用工具注册表执行，配方无任意脚本",
+        "保存参数、资源绑定与版本迁移"
+      ],
+      "acceptanceCriteria": [
+        "配方可预览、取消、整体撤销并重编辑",
+        "缺工具或输入在执行前阻止并说明",
+        "同一参数和确定性工具输出可重复，生成步骤记录模型与随机性"
+      ],
+      "files": [
+        "src/ai/recipes/schema.ts",
+        "src/ai/recipes/runner.ts"
+      ],
+      "validation": "依赖循环、缺图、旧版本、参数越界、中途失败和历史恢复",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a23.md",
+      "description": "目标：可编辑操作配方引擎与版本管理。\n\n实现步骤：\n1. 定义配方ID、版本、输入槽、参数schema、步骤DAG和适用条件\n2. 使用工具注册表执行，配方无任意脚本\n3. 保存参数、资源绑定与版本迁移\n\n完成标准：\n- 配方可预览、取消、整体撤销并重编辑\n- 缺工具或输入在执行前阻止并说明\n- 同一参数和确定性工具输出可重复，生成步骤记录模型与随机性\n\n验证样例：依赖循环、缺图、旧版本、参数越界、中途失败和历史恢复\n相关文件（新增路径为计划）：src/ai/recipes/schema.ts,src/ai/recipes/runner.ts\n依赖编号：A09,A11,A15\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A24",
+      "title": "电影调色与风格预设配方",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 4,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 4,
+      "dependsOnKeys": [
+        "A23",
+        "A12",
+        "A15"
+      ],
+      "steps": [
+        "提供暖色电影、冷色电影、黑白和复古四种配方",
+        "组合曲线/色彩平衡/颗粒/晕影并暴露强度",
+        "允许参考图分析生成受限参数"
+      ],
+      "acceptanceCriteria": [
+        "四种风格均由可编辑调整产生",
+        "文字和几何不变，风格强度0时恢复原图",
+        "参考图是风格引导而非复制内容"
+      ],
+      "files": [
+        "src/ai/recipes/cinematic.ts"
+      ],
+      "validation": "四套固定图片、色卡、肤色和高光溢出对照",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a24.md",
+      "description": "目标：电影调色与风格预设配方。\n\n实现步骤：\n1. 提供暖色电影、冷色电影、黑白和复古四种配方\n2. 组合曲线/色彩平衡/颗粒/晕影并暴露强度\n3. 允许参考图分析生成受限参数\n\n完成标准：\n- 四种风格均由可编辑调整产生\n- 文字和几何不变，风格强度0时恢复原图\n- 参考图是风格引导而非复制内容\n\n验证样例：四套固定图片、色卡、肤色和高光溢出对照\n相关文件（新增路径为计划）：src/ai/recipes/cinematic.ts\n依赖编号：A23,A12,A15\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A25",
+      "title": "人像自然精修配方",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 8,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 4,
+      "dependsOnKeys": [
+        "A23",
+        "A13",
+        "A16",
+        "A19"
+      ],
+      "steps": [
+        "组合局部瑕疵修复、保边降噪、肤色及眼部轻微增强",
+        "皮肤与五官分mask，默认不改变脸型",
+        "逐项开关与强度控制"
+      ],
+      "acceptanceCriteria": [
+        "至少三种肤色和不同光线样例人工评审",
+        "关闭生成步骤时五官几何保持，皮肤保留纹理",
+        "多人场景选目标，低置信度不处理错误人物"
+      ],
+      "files": [
+        "src/ai/recipes/portrait.ts"
+      ],
+      "validation": "细纹、胡须、眼镜、多人及肤色偏移；记录失败样例",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a25.md",
+      "description": "目标：人像自然精修配方。\n\n实现步骤：\n1. 组合局部瑕疵修复、保边降噪、肤色及眼部轻微增强\n2. 皮肤与五官分mask，默认不改变脸型\n3. 逐项开关与强度控制\n\n完成标准：\n- 至少三种肤色和不同光线样例人工评审\n- 关闭生成步骤时五官几何保持，皮肤保留纹理\n- 多人场景选目标，低置信度不处理错误人物\n\n验证样例：细纹、胡须、眼镜、多人及肤色偏移；记录失败样例\n相关文件（新增路径为计划）：src/ai/recipes/portrait.ts\n依赖编号：A23,A13,A16,A19\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A26",
+      "title": "产品抠图、背景与自然投影配方",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 4,
+      "dependsOnKeys": [
+        "A23",
+        "A16",
+        "A19",
+        "A20",
+        "F15"
+      ],
+      "steps": [
+        "组合抠图、纯色/生成背景、主体位置与接触投影",
+        "默认将产品原像素作为保护层",
+        "阴影独立可调方向、模糊、透明度"
+      ],
+      "acceptanceCriteria": [
+        "纯色背景模式不改变产品文字和几何",
+        "投影独立图层或效果且接触位置可调",
+        "透明/反光物体不佳时可手动精修，不静默重绘商品"
+      ],
+      "files": [
+        "src/ai/recipes/product.ts"
+      ],
+      "validation": "瓶身文字、镂空产品、透明玻璃、脚底接触和导出",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a26.md",
+      "description": "目标：产品抠图、背景与自然投影配方。\n\n实现步骤：\n1. 组合抠图、纯色/生成背景、主体位置与接触投影\n2. 默认将产品原像素作为保护层\n3. 阴影独立可调方向、模糊、透明度\n\n完成标准：\n- 纯色背景模式不改变产品文字和几何\n- 投影独立图层或效果且接触位置可调\n- 透明/反光物体不佳时可手动精修，不静默重绘商品\n\n验证样例：瓶身文字、镂空产品、透明玻璃、脚底接触和导出\n相关文件（新增路径为计划）：src/ai/recipes/product.ts\n依赖编号：A23,A16,A19,A20,F15\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A27",
+      "title": "双重曝光与创意合成配方",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 5,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 4,
+      "dependsOnKeys": [
+        "A23",
+        "A16",
+        "F06"
+      ],
+      "steps": [
+        "提供主体与第二图输入槽",
+        "通过蒙版、混合模式和曲线组合双重曝光",
+        "第二图可导入或生成，支持独立变换"
+      ],
+      "acceptanceCriteria": [
+        "两张源图均保留可编辑",
+        "蒙版、混合比例、第二图位置可微调",
+        "缺少第二图时明确选择输入，不隐式产生付费请求"
+      ],
+      "files": [
+        "src/ai/recipes/doubleExposure.ts"
+      ],
+      "validation": "不同主体轮廓、黑白源图、图片替换及项目重开",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a27.md",
+      "description": "目标：双重曝光与创意合成配方。\n\n实现步骤：\n1. 提供主体与第二图输入槽\n2. 通过蒙版、混合模式和曲线组合双重曝光\n3. 第二图可导入或生成，支持独立变换\n\n完成标准：\n- 两张源图均保留可编辑\n- 蒙版、混合比例、第二图位置可微调\n- 缺少第二图时明确选择输入，不隐式产生付费请求\n\n验证样例：不同主体轮廓、黑白源图、图片替换及项目重开\n相关文件（新增路径为计划）：src/ai/recipes/doubleExposure.ts\n依赖编号：A23,A16,F06\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A28",
+      "title": "海报排版、多尺寸与文字保护配方",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 9,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 4,
+      "dependsOnKeys": [
+        "A23",
+        "A22",
+        "F07",
+        "F14",
+        "F27"
+      ],
+      "steps": [
+        "将标题/正文/图片/标志作为独立对象",
+        "按约束排版和安全边距生成方案",
+        "支持用户指定尺寸及多画板适配，检测溢出和缺字"
+      ],
+      "acceptanceCriteria": [
+        "文字为真实可编辑内容且无截断",
+        "至少竖版/方形/横版三种版式可继续编辑",
+        "生成素材不替代精确文字，商标和原图保护可追溯"
+      ],
+      "files": [
+        "src/ai/recipes/poster.ts"
+      ],
+      "validation": "长中文标题、字体替代、极端比例、多尺寸导出",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a28.md",
+      "description": "目标：海报排版、多尺寸与文字保护配方。\n\n实现步骤：\n1. 将标题/正文/图片/标志作为独立对象\n2. 按约束排版和安全边距生成方案\n3. 支持用户指定尺寸及多画板适配，检测溢出和缺字\n\n完成标准：\n- 文字为真实可编辑内容且无截断\n- 至少竖版/方形/横版三种版式可继续编辑\n- 生成素材不替代精确文字，商标和原图保护可追溯\n\n验证样例：长中文标题、字体替代、极端比例、多尺寸导出\n相关文件（新增路径为计划）：src/ai/recipes/poster.ts\n依赖编号：A23,A22,F07,F14,F27\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A29",
+      "title": "连续对话修改、操作记录与纠错",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 6,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 5,
+      "dependsOnKeys": [
+        "A09",
+        "A11"
+      ],
+      "steps": [
+        "对话绑定documentId与runId，记录目标对象和实际工具结果",
+        "支持再暖一点/撤销刚才/只改背景等跟进",
+        "文档变化后重新解析上下文而非复用旧计划"
+      ],
+      "acceptanceCriteria": [
+        "撤销刚才不撤销用户之后独立手动编辑",
+        "连续微调同一效果不重复堆叠",
+        "切文档不串对话和目标，引用已删对象明确提示"
+      ],
+      "files": [
+        "src/ai/conversation/session.ts",
+        "src/ai/ui/EditRunSummary.tsx"
+      ],
+      "validation": "多轮与手动交错、历史分叉、同名对象、文档切换",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a29.md",
+      "description": "目标：连续对话修改、操作记录与纠错。\n\n实现步骤：\n1. 对话绑定documentId与runId，记录目标对象和实际工具结果\n2. 支持再暖一点/撤销刚才/只改背景等跟进\n3. 文档变化后重新解析上下文而非复用旧计划\n\n完成标准：\n- 撤销刚才不撤销用户之后独立手动编辑\n- 连续微调同一效果不重复堆叠\n- 切文档不串对话和目标，引用已删对象明确提示\n\n验证样例：多轮与手动交错、历史分叉、同名对象、文档切换\n相关文件（新增路径为计划）：src/ai/conversation/session.ts,src/ai/ui/EditRunSummary.tsx\n依赖编号：A09,A11\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A30",
+      "title": "AI 编辑记录持久化与离线恢复",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 5,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 5,
+      "dependsOnKeys": [
+        "A23",
+        "A29",
+        "F01",
+        "F02"
+      ],
+      "steps": [
+        "扩展项目schema存储配方、工具版本、参数、来源和生成候选资源",
+        "重开可查看已执行步骤并手动微调",
+        "崩溃恢复标记未完成任务，不自动重发"
+      ],
+      "acceptanceCriteria": [
+        "项目重开图层、滤镜、蒙版与AI步骤关联完整",
+        "不含API密钥、认证头或临时URL依赖",
+        "旧版本可迁移，无网可编辑已下载结果"
+      ],
+      "files": [
+        "src/ai/persistence/editRecord.ts",
+        "src/document/projectFormat.ts"
+      ],
+      "validation": "离线往返、schema迁移、资源缺失、崩溃恢复、敏感字段扫描",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a30.md",
+      "description": "目标：AI 编辑记录持久化与离线恢复。\n\n实现步骤：\n1. 扩展项目schema存储配方、工具版本、参数、来源和生成候选资源\n2. 重开可查看已执行步骤并手动微调\n3. 崩溃恢复标记未完成任务，不自动重发\n\n完成标准：\n- 项目重开图层、滤镜、蒙版与AI步骤关联完整\n- 不含API密钥、认证头或临时URL依赖\n- 旧版本可迁移，无网可编辑已下载结果\n\n验证样例：离线往返、schema迁移、资源缺失、崩溃恢复、敏感字段扫描\n相关文件（新增路径为计划）：src/ai/persistence/editRecord.ts,src/document/projectFormat.ts\n依赖编号：A23,A29,F01,F02\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A31",
+      "title": "AI 配方批处理、预算与逐项结果",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 5,
+      "dependsOnKeys": [
+        "A18",
+        "A23",
+        "A30",
+        "F28"
+      ],
+      "steps": [
+        "为多个文件批量执行同一配方，先试跑一张再批量",
+        "配置并发、请求次数上限和输出命名",
+        "逐项成功失败记录，重试失败项"
+      ],
+      "acceptanceCriteria": [
+        "原文件不覆盖且同名输出不冲突",
+        "超预算停止排队，取消保留已完成结果",
+        "每个文件独立事务，失败重试不重复收费成功项"
+      ],
+      "files": [
+        "src/ai/batch/recipeBatch.ts"
+      ],
+      "validation": "三文件部分失败、预算耗尽、重启、同名与取消",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a31.md",
+      "description": "目标：AI 配方批处理、预算与逐项结果。\n\n实现步骤：\n1. 为多个文件批量执行同一配方，先试跑一张再批量\n2. 配置并发、请求次数上限和输出命名\n3. 逐项成功失败记录，重试失败项\n\n完成标准：\n- 原文件不覆盖且同名输出不冲突\n- 超预算停止排队，取消保留已完成结果\n- 每个文件独立事务，失败重试不重复收费成功项\n\n验证样例：三文件部分失败、预算耗尽、重启、同名与取消\n相关文件（新增路径为计划）：src/ai/batch/recipeBatch.ts\n依赖编号：A18,A23,A30,F28\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A32",
+      "title": "AI 编辑评测集与质量回归体系",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 7,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 6,
+      "dependsOnKeys": [
+        "A10",
+        "A11"
+      ],
+      "steps": [
+        "建立带预期工具/目标/参数范围的中文语料和合法测试图片",
+        "分离计划正确率、执行正确率、像素保护与视觉质量",
+        "固定模型版本及请求配置，报告失败案例"
+      ],
+      "acceptanceCriteria": [
+        "首版至少60条含20条复合指令，完整目标至少150条覆盖全部发布工具",
+        "确定性命令与保护区断言100%通过，首版规划正确率目标≥90%",
+        "生成结果至少30例双人独立评审，报告通过率和分歧，不用单一相似度代替质量"
+      ],
+      "files": [
+        "src/ai/evaluation/cases.json",
+        "src/ai/evaluation/evaluate.test.ts"
+      ],
+      "validation": "离线mock只验证契约；真实模型评测单列授权、版本、成本、成功率",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a32.md",
+      "description": "目标：AI 编辑评测集与质量回归体系。\n\n实现步骤：\n1. 建立带预期工具/目标/参数范围的中文语料和合法测试图片\n2. 分离计划正确率、执行正确率、像素保护与视觉质量\n3. 固定模型版本及请求配置，报告失败案例\n\n完成标准：\n- 首版至少60条含20条复合指令，完整目标至少150条覆盖全部发布工具\n- 确定性命令与保护区断言100%通过，首版规划正确率目标≥90%\n- 生成结果至少30例双人独立评审，报告通过率和分歧，不用单一相似度代替质量\n\n验证样例：离线mock只验证契约；真实模型评测单列授权、版本、成本、成功率\n相关文件（新增路径为计划）：src/ai/evaluation/cases.json,src/ai/evaluation/evaluate.test.ts\n依赖编号：A10,A11\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A33",
+      "title": "AI 工作流性能、内存与大图处理",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 8,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 6,
+      "dependsOnKeys": [
+        "A12",
+        "A19",
+        "A21",
+        "A30"
+      ],
+      "steps": [
+        "把像素处理放Worker或原生计算并支持分块",
+        "预览降采样、参数防抖、缓存复用",
+        "记录大图与长历史的延迟/内存基线并设置降级上限"
+      ],
+      "acceptanceCriteria": [
+        "指定参考设备下2048px预览目标≤300ms、主线程单任务≤50ms",
+        "8192px支持分块/取消或预先给出明确限制而非崩溃",
+        "20次生成采用/撤销后资源回收，报告实际峰值与不达标项"
+      ],
+      "files": [
+        "src/engine/raster/rasterWorker.ts",
+        "src/ai/imaging/processingScheduler.ts"
+      ],
+      "validation": "基准脚本记录设备、输入、p50/p95、峰值内存及取消延迟",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a33.md",
+      "description": "目标：AI 工作流性能、内存与大图处理。\n\n实现步骤：\n1. 把像素处理放Worker或原生计算并支持分块\n2. 预览降采样、参数防抖、缓存复用\n3. 记录大图与长历史的延迟/内存基线并设置降级上限\n\n完成标准：\n- 指定参考设备下2048px预览目标≤300ms、主线程单任务≤50ms\n- 8192px支持分块/取消或预先给出明确限制而非崩溃\n- 20次生成采用/撤销后资源回收，报告实际峰值与不达标项\n\n验证样例：基准脚本记录设备、输入、p50/p95、峰值内存及取消延迟\n相关文件（新增路径为计划）：src/engine/raster/rasterWorker.ts,src/ai/imaging/processingScheduler.ts\n依赖编号：A12,A19,A21,A30\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A34",
+      "title": "AI 工具调用边界、凭据与数据保护",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 5,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 1,
+      "dependsOnKeys": [
+        "A02",
+        "A03",
+        "A07"
+      ],
+      "steps": [
+        "限制工具白名单、参数/响应体/步骤/像素/资源访问",
+        "将OCR、图像文字和模型输出视为数据",
+        "最小化上传范围并提供云处理提示，复查日志和项目脱敏"
+      ],
+      "acceptanceCriteria": [
+        "提示注入无法调用系统命令、任意文件或任意网络地址",
+        "API密钥不进入上下文、日志、项目和错误消息",
+        "用户可拒绝上传，工具执行前逐次校验范围和有效锁定"
+      ],
+      "files": [
+        "src/ai/security/toolPolicy.ts",
+        "src/lib/request.ts",
+        "src-tauri/src/network.rs"
+      ],
+      "validation": "恶意OCR/计划、路径穿越、超大参数、跨文档引用、密钥扫描",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a34.md",
+      "description": "目标：AI 工具调用边界、凭据与数据保护。\n\n实现步骤：\n1. 限制工具白名单、参数/响应体/步骤/像素/资源访问\n2. 将OCR、图像文字和模型输出视为数据\n3. 最小化上传范围并提供云处理提示，复查日志和项目脱敏\n\n完成标准：\n- 提示注入无法调用系统命令、任意文件或任意网络地址\n- API密钥不进入上下文、日志、项目和错误消息\n- 用户可拒绝上传，工具执行前逐次校验范围和有效锁定\n\n验证样例：恶意OCR/计划、路径穿越、超大参数、跨文档引用、密钥扫描\n相关文件（新增路径为计划）：src/ai/security/toolPolicy.ts,src/lib/request.ts,src-tauri/src/network.rs\n依赖编号：A02,A03,A07\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A35",
+      "title": "跨平台、无障碍与完整工作流验收",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 8,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 6,
+      "dependsOnKeys": [
+        "A24",
+        "A25",
+        "A26",
+        "A27",
+        "A28",
+        "A31",
+        "A32",
+        "A33",
+        "A34",
+        "A37",
+        "F03"
+      ],
+      "steps": [
+        "在macOS/Windows与浏览器执行同一流程",
+        "验证键盘、触控板、焦点、读屏标签与紧凑布局",
+        "真实模型验证生成/局部/扩图/超分并保留独立证据"
+      ],
+      "acceptanceCriteria": [
+        "首版从选层到一句话多步编辑、微调、撤销和导出可完成",
+        "完整目标覆盖全部配方及失败恢复、离线重开",
+        "全量测试/构建/Rust检查通过，真实模型不可用项明确阻塞不能用演示顶替"
+      ],
+      "files": [
+        "src/ai/e2e/workflows.test.tsx",
+        "src/app/AppShell.tsx",
+        "src-tauri/Cargo.toml"
+      ],
+      "validation": "npm test -- --run；npm run build；cargo check --manifest-path src-tauri/Cargo.toml；vibeplan check及平台手工证据",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a35.md",
+      "description": "目标：跨平台、无障碍与完整工作流验收。\n\n实现步骤：\n1. 在macOS/Windows与浏览器执行同一流程\n2. 验证键盘、触控板、焦点、读屏标签与紧凑布局\n3. 真实模型验证生成/局部/扩图/超分并保留独立证据\n\n完成标准：\n- 首版从选层到一句话多步编辑、微调、撤销和导出可完成\n- 完整目标覆盖全部配方及失败恢复、离线重开\n- 全量测试/构建/Rust检查通过，真实模型不可用项明确阻塞不能用演示顶替\n\n验证样例：npm test -- --run；npm run build；cargo check --manifest-path src-tauri/Cargo.toml；vibeplan check及平台手工证据\n相关文件（新增路径为计划）：src/ai/e2e/workflows.test.tsx,src/app/AppShell.tsx,src-tauri/Cargo.toml\n依赖编号：A24,A25,A26,A27,A28,A31,A32,A33,A34,A37,F03\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A37",
+      "title": "画笔、填充、修复、文字与路径的 AI 工具适配",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 9,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 2,
+      "dependsOnKeys": [
+        "A02",
+        "A03",
+        "A05",
+        "F14",
+        "F19",
+        "F21",
+        "F22"
+      ],
+      "steps": [
+        "将选区布尔、填充/渐变、画笔轨迹、仿制/修复、文字/形状与路径操作注册到统一工具",
+        "轨迹采用原图像素坐标和有限控制点，文字保持可编辑对象",
+        "逐项核对工具覆盖矩阵并隐藏没有真实执行器的命令"
+      ],
+      "acceptanceCriteria": [
+        "已发布手动编辑能力均有可调用接口或明确记录不适合自动操作的原因",
+        "AI不能绕过选区、有效锁定、采样来源及轨迹长度限制",
+        "图层、文字、路径、笔画与修复结果可撤销保存并与导出一致"
+      ],
+      "files": [
+        "src/ai/tools/drawingTools.ts",
+        "src/ai/tools/textShapeTools.ts",
+        "src/ai/tools/retouchTools.ts"
+      ],
+      "validation": "固定轨迹的手动与AI像素对照、画笔选区裁切、仿制采样、路径布尔、中文文字和项目往返",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a37.md",
+      "description": "目标：画笔、填充、修复、文字与路径的 AI 工具适配。\n\n实现步骤：\n1. 将选区布尔、填充/渐变、画笔轨迹、仿制/修复、文字/形状与路径操作注册到统一工具\n2. 轨迹采用原图像素坐标和有限控制点，文字保持可编辑对象\n3. 逐项核对工具覆盖矩阵并隐藏没有真实执行器的命令\n\n完成标准：\n- 已发布手动编辑能力均有可调用接口或明确记录不适合自动操作的原因\n- AI不能绕过选区、有效锁定、采样来源及轨迹长度限制\n- 图层、文字、路径、笔画与修复结果可撤销保存并与导出一致\n\n验证样例：固定轨迹的手动与AI像素对照、画笔选区裁切、仿制采样、路径布尔、中文文字和项目往返\n相关文件（新增路径为计划）：src/ai/tools/drawingTools.ts,src/ai/tools/textShapeTools.ts,src/ai/tools/retouchTools.ts\n依赖编号：A02,A03,A05,F14,F19,F21,F22\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    },
+    {
+      "key": "A36",
+      "title": "用户说明、能力声明与分阶段发布验收",
+      "type": "feature",
+      "status": "backlog",
+      "priority": "P2",
+      "estimate": 4,
+      "dueDate": null,
+      "assigneeId": null,
+      "phase": 6,
+      "dependsOnKeys": [
+        "A35"
+      ],
+      "steps": [
+        "编写自然语言示例、作用范围、费用/上传/取消说明和失败恢复指导",
+        "发布时仅开放已验证工具与配方",
+        "逐项汇总验收证据、限制与后续缺口"
+      ],
+      "acceptanceCriteria": [
+        "说明覆盖基础/局部/配方/批量/恢复且与实际一致",
+        "没有全Photoshop兼容或真实细节恢复等失实承诺",
+        "首版与完整目标分别提交审核，未验收能力不标完成"
+      ],
+      "files": [
+        "docs/user-guide/ai-editing.md",
+        "src/ai/capabilities/releaseGates.ts"
+      ],
+      "validation": "用户按说明完成五条典型任务，核对能力开关与任务验收证据",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a36.md",
+      "description": "目标：用户说明、能力声明与分阶段发布验收。\n\n实现步骤：\n1. 编写自然语言示例、作用范围、费用/上传/取消说明和失败恢复指导\n2. 发布时仅开放已验证工具与配方\n3. 逐项汇总验收证据、限制与后续缺口\n\n完成标准：\n- 说明覆盖基础/局部/配方/批量/恢复且与实际一致\n- 没有全Photoshop兼容或真实细节恢复等失实承诺\n- 首版与完整目标分别提交审核，未验收能力不标完成\n\n验证样例：用户按说明完成五条典型任务，核对能力开关与任务验收证据\n相关文件（新增路径为计划）：docs/user-guide/ai-editing.md,src/ai/capabilities/releaseGates.ts\n依赖编号：A35\n\n共同完成要求：所有文档变更可撤销，预览/取消/失败不污染作品；异步操作绑定文档ID、版本和目标；数据接入项目保存、迁移及资源回收；画布与导出语义一致；网络复用共享封装，反馈使用message；界面沿用紧凑Composer及“图层/属性/AI结果”，不以按钮或模拟结果充当真实能力。新增像素能力提供固定样例前后图，模型调用单独记录真实证据和成本。实施前读取最新任务上下文并补齐代码级计划，结束记录命令退出码、逐条证据和剩余问题，进入人工审核。估算是初始工作量天数，不是实际工时或承诺工期。"
+    }
+  ],
+  "existingReferences": [
+    {
+      "key": "F01",
+      "id": "8e0e4c40-174e-4351-b7ff-9f41dc44f297",
+      "title": "建立可恢复编辑状态的 Draivio 项目文件",
+      "status": "in_progress",
+      "version": 4,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "含图片、文字、笔画、形状、蒙版、分组、调整及 AI 结果的项目离线重开后仍可分别编辑，内容和层级一致。",
+        "保存采用临时文件加原子替换；模拟写入失败仍保留原文件，未保存标记不被清除。",
+        "损坏文件、缺失资源、较新版本均给出具体错误且不覆盖当前作品；支持至少一个旧 schema 迁移样例。",
+        "打开/另存为/关闭的取消分支不丢作品；保存不包含密钥，资源路径限制在容器内。",
+        "验证项目往返、资源去重、无网重开和脏状态；记录实际样例文件与重开截图。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f01.md"
+    },
+    {
+      "key": "F02",
+      "id": "6ed0827b-7695-4b62-a4c9-a32e9da456f0",
+      "title": "自动保存、恢复记录与崩溃恢复",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 5,
+      "acceptanceCriteria": [
+        "连续输入仅按保存策略提交；旧保存异步返回不能把较新内容标成已保存。",
+        "强制终止后启动可恢复完整图层与资源；最后一个损坏快照可退到上一个成功快照。",
+        "磁盘满/无权限时展示原因并允许重试，手动项目与上一个成功副本不受损。",
+        "恢复、另存、关闭与多项目恢复以文档 ID 隔离；用户丢弃有二次确认。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f02.md"
+    },
+    {
+      "key": "F03",
+      "id": "86334889-4f25-4c1d-8f34-afdb937b29fd",
+      "title": "PNG、JPEG、WebP 与选区/图层导出",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 7,
+      "acceptanceCriteria": [
+        "三种格式由独立解码器验证 MIME、宽高和像素；PNG/WebP 保留透明，JPEG 底色正确。",
+        "画布预览与导出对照覆盖旋转、翻转、文字、蒙版、分组、不透明度和调整，禁止带出选框及控制柄。",
+        "选区裁切保持选区外透明，图层导出遵守其蒙版与效果，明确是否包含父组效果。",
+        "外链图片 CORS/失效、超大尺寸、编码失败均可解释且不生成空白成功文件。",
+        "增加后续渲染能力时统一扩展导出回归样例；取消导出不改变项目。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f03.md"
+    },
+    {
+      "key": "F04",
+      "id": "206ef3a1-378e-4dcd-8e49-1c95096aa733",
+      "title": "画布尺寸、图像缩放与统一像素坐标",
+      "status": "in_progress",
+      "version": 7,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "导入 1200×800 图片后 100% 对应实际像素；缩放视图到 50% 不改变属性和导出尺寸。",
+        "画布扩边、居中裁切、图像整体缩放分别有预期坐标结果，图片/文字/笔画/蒙版同步。",
+        "尺寸限 1–16384px 并结合渲染预算拒绝不安全面积；非法值不提交，裁切可撤销。",
+        "任意尺寸下选区、拖拽、旋转、AI 贴回坐标一致；旧 500×625 项目迁移无漂移。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f04.md"
+    },
+    {
+      "key": "F05",
+      "id": "fcb42afd-75ad-4118-9793-e0ed297b7935",
+      "title": "组整体变换与图层合并",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "嵌套两级组旋转缩放后子对象局部坐标可继续编辑，解组不跳位。",
+        "合并前后像素对照一致，选中范围外和隐藏层按命令语义保留。",
+        "锁定及祖先锁定禁止合并或变换，混合模式导致的视觉差异有提示且不静默改变。",
+        "整次合并或组拖拽仅产生一次撤销，重开项目后组矩阵与合并资源完整。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f05.md"
+    },
+    {
+      "key": "F06",
+      "id": "fa00ba86-4507-4ae0-91c9-1bc405e94ede",
+      "title": "剪贴蒙版与完整常用混合模式",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "半透明文字/形状基底、多层剪贴、移动基底及释放后显示正确；基底删除有明确重绑定规则。",
+        "每种模式用固定 RGBA 色块和半透明边缘验证预乘 alpha，不仅测试下拉菜单。",
+        "混合和剪贴在嵌套组、导出、撤销、项目重开中一致。",
+        "锁定图层不被改变；不允许跨组产生循环或悬空剪贴链。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f06.md"
+    },
+    {
+      "key": "F07",
+      "id": "c60979b3-31a2-4ecb-97c8-ca2c982120a6",
+      "title": "对齐与等距分布",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 3,
+      "acceptanceCriteria": [
+        "三个不同尺寸和旋转角度对象在三种基准下计算结果正确，关键对象不移动。",
+        "间距分布按对象外边界计算，结果相等，负间距有明确反馈。",
+        "祖先锁定对象不被移动；一次操作统一撤销并可保存重开。",
+        "键盘能操作，中文提示说明按钮含义，窄屏不挤压画布。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f07.md"
+    },
+    {
+      "key": "F08",
+      "id": "3dcae1cb-edf1-4148-96a9-1b883b5b520a",
+      "title": "标尺、参考线、网格与智能吸附",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 5,
+      "acceptanceCriteria": [
+        "25%、100%、400% 缩放下吸附视觉阈值一致，命中优先级固定且不抖动。",
+        "移动、缩放分别吸附，旋转对象采用包围盒；Alt 和禁用开关即时生效。",
+        "参考线新增、修改、删除可撤销并重开保留，锁定参考线不能误拖。",
+        "100 图层场景拖拽记录帧时与吸附查询耗时，避免每帧全图重渲染。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f08.md"
+    },
+    {
+      "key": "F09",
+      "id": "868741ae-597d-48af-a575-1201884a4e4b",
+      "title": "真实主体识别与背景移除",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "真实服务样例返回非矩形主体蒙版，透明边缘无缩放偏移；至少覆盖人像、商品和多主体。",
+        "移除背景创建可编辑蒙版，取消、失败或锁定目标不改原图；撤销恢复完整。",
+        "超时、取消、鉴权失败、尺寸限制有可操作提示，切换文档不把结果贴错目标。",
+        "适配器契约测试和经授权真实调用证据分别记录；调用密钥不写入项目或日志。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f09.md"
+    },
+    {
+      "key": "F10",
+      "id": "e8e211d0-5b0e-4ec0-81d0-5d517fb8dab5",
+      "title": "选择并遮住与蒙版边缘精修",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 7,
+      "acceptanceCriteria": [
+        "硬边商品、半透明发丝、白底彩边样例逐项验证平滑/羽化/位移/去杂边。",
+        "预览切换不改像素；确认仅一个历史项，取消不改变蒙版与源图。",
+        "蒙版翻转、应用、密度和羽化组合有确定顺序，导出与重开一致。",
+        "高分辨率先低清预览后全清提交，提交可取消；边界参数不出现黑边或透明度溢出。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f10.md"
+    },
+    {
+      "key": "F11",
+      "id": "c94960da-5e9a-45dc-b6d6-37a9d0c4281a",
+      "title": "直方图、曝光与准确白平衡",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 5,
+      "acceptanceCriteria": [
+        "灰阶与已知色卡验证曝光一档的线性光关系及中性灰白平衡，默认参数输出不变。",
+        "直方图正确统计透明与选区范围，剪裁警告仅叠加预览不进入导出。",
+        "参数与取样结果可撤销、重置、保存并导出一致。",
+        "拖动参数不阻塞输入，旧直方图计算结果不覆盖最新预览。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f11.md"
+    },
+    {
+      "key": "F12",
+      "id": "5bf6994e-5c2d-46ab-a1b8-b439c6188ba2",
+      "title": "曲线与色阶",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "恒等曲线像素不变，端点、单通道和中间调通过灰阶/色块验证。",
+        "锚点不能越序造成 NaN 或异常过冲；色阶黑白场不能交叉，非法输入拒绝。",
+        "预览、最终导出、保存重开、撤销重做使用同一 LUT/参数顺序。",
+        "键盘添加/移动/删除锚点可用，预设切换可撤销且不影响其他调整。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f12.md"
+    },
+    {
+      "key": "F13",
+      "id": "46c5e27c-1f9c-4614-a45f-df13d499e74d",
+      "title": "HSL、色彩平衡与调整预设",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 5,
+      "acceptanceCriteria": [
+        "六色色卡和灰阶验证范围边界平滑，灰色无异常色相，保持明度选项有数值证据。",
+        "预设往返和不同图尺寸下应用结果一致，旧预设可迁移，非法文件拒绝。",
+        "切换预设、撤销、单项/全部重置保持可预测，重开与导出一致。",
+        "预设缩略图异步生成并可失效更新，不使主界面逐张阻塞。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f13.md"
+    },
+    {
+      "key": "F14",
+      "id": "79956f5e-d48e-4ef3-90d9-575117f1a6d5",
+      "title": "文本框、段落排版与局部文字样式",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "中英文混排、换行、emoji、组合字符、输入法组字不截断；局部样式范围随编辑正确移动。",
+        "文本框缩放与字号缩放有明确不同，溢出可见提示且不静默丢文字。",
+        "字体缺失有替代提示，换字体可撤销；使用已授权字体进行导出与重开对照。",
+        "行距、字距、局部样式、描边/阴影的预览和导出一致；编辑取消和焦点快捷键无冲突。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f14.md"
+    },
+    {
+      "key": "F15",
+      "id": "2f295f3e-dd37-4a5e-931e-f8a26b1ab663",
+      "title": "可重编辑的图层效果",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "五类效果分别覆盖图片透明边缘、文字、形状以及组，不出现画布边外效果被错误裁切。",
+        "参数预览、撤销、样式复制、保存重开与最终导出一致。",
+        "复制样式不会共享可变颜色/渐变对象，关闭效果恢复原始外观。",
+        "负值、透明色、极大模糊有边界校验并估算扩展渲染范围。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f15.md"
+    },
+    {
+      "key": "F16",
+      "id": "d868e8c5-6ae1-4fda-90b8-f9e4cbc354af",
+      "title": "调整图层与局部调整蒙版",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "两个像素层之间插入调整层，仅影响其下方；嵌套组与剪贴作用范围可验证。",
+        "蒙版黑/白/半透明区域与调整强度按统一顺序合成，开关不改变源图。",
+        "调整层拖动排序、复制、删除、撤销及保存导出保持正确。",
+        "透明背景下不凭空生成底色；锁定阻止参数和蒙版修改。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f16.md"
+    },
+    {
+      "key": "F17",
+      "id": "4a41be31-fad3-4251-9d3b-a323437c1739",
+      "title": "智能对象与替换内容",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "缩小后再放大仍从源图采样，对照破坏性缩放可验证；替换保留位置、变换、蒙版及效果。",
+        "编辑内部文字/形状回写后所有相关实例更新，独立复制实例语义明确。",
+        "父子文档保存关闭和撤销边界明确，项目离线重开恢复完整资源。",
+        "循环引用、源内容丢失和超限嵌套被拒绝，栅格化可撤销。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f17.md"
+    },
+    {
+      "key": "F18",
+      "id": "5d6da8e9-4f92-447e-b8b4-ec0c9d8e2ecd",
+      "title": "智能滤镜与可重排处理链",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "不同顺序输出不同且可预测，默认参数不改变原图，开关恢复链前结果。",
+        "更改源内容、蒙版、参数或顺序正确失效缓存，旧异步任务不能覆盖新结果。",
+        "保存重开、最终导出和撤销完整恢复链及参数，不把预览图当源图。",
+        "渲染可取消，超大半径被限制并说明原因。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f18.md"
+    },
+    {
+      "key": "F19",
+      "id": "35cf98fb-639a-49fd-873b-e5e26f0a1f7b",
+      "title": "污点修复、仿制与修补工具完整闭环",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "固定纹理、皮肤小斑点和边缘样例验证源点偏移及融合，不仅生成一条颜色笔画。",
+        "采样范围与隐藏层规则正确；输出新层保留原图，祖先锁定不改受保护内容。",
+        "一次笔画/修补一次撤销，取消中途请求不产生半成品层。",
+        "高缩放、旋转视图与非默认画布尺寸下采样坐标正确；断网服务分支给具体原因。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f19.md"
+    },
+    {
+      "key": "F20",
+      "id": "c594f3eb-b5f9-4ce0-9944-eb5b53faf4e6",
+      "title": "移除工具与内容识别填充",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "重复纹理、天空、跨边缘三类样例补洞边界可评估；采样保护区绝不被取样或覆盖。",
+        "新层只包含变更区域，原图及未选区域像素保持不变，可一键比较和撤销。",
+        "大选区、无有效采样、请求超时和取消有明确反馈，不写入空白成功结果。",
+        "项目重开及导出保留实际补洞资源和方法元数据，不自动重新调用服务。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f20.md"
+    },
+    {
+      "key": "F21",
+      "id": "06c7705f-79d1-42da-8caa-0359f99fc1a2",
+      "title": "减淡、加深与局部色调画笔",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 5,
+      "acceptanceCriteria": [
+        "灰阶样例验证三段范围和保护色调，连续笔触累积行为明确且不产生溢出。",
+        "独立层开关能完整恢复原图，笔触可撤销并保存重开。",
+        "图层/蒙版锁定、透明区、画布边缘均有正确行为，导出与预览一致。",
+        "拖笔过程中保持连续采样，取消手势不保留不完整笔触。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f21.md"
+    },
+    {
+      "key": "F22",
+      "id": "6bf0d14d-36db-491b-b99c-bbc19402af71",
+      "title": "路径锚点编辑与形状布尔运算",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "贝塞尔控制柄与闭合规则有几何样例，尖角/平滑切换不产生无效路径。",
+        "四种布尔操作覆盖重叠、孔洞、自交和不相交形状，填充规则固定。",
+        "缩放后描边是否随对象缩放有显式设置；SVG 与栅格导出对照一致。",
+        "原始组合可重新编辑，复制/撤销/项目重开保持独立 ID 和路径拓扑。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f22.md"
+    },
+    {
+      "key": "F23",
+      "id": "1b230fe9-afb5-4be5-be5c-889397983034",
+      "title": "真实参考图编辑与按模型显示参数",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "契约测试核实图片 multipart/base64、尺寸、能力限制和实际参数名；不支持的参数既不显示也不发送。",
+        "无图可文生图，有图可编辑或独立生成；意图冲突时可明确选择，不靠提示词猜测覆盖原图。",
+        "真实编辑结果进入候选并保留提示词/模型/参数/参考来源；原图不变，采用流程复用原任务。",
+        "取消、部分失败、未知计费结果不自动重复扣费请求；跨文档异步结果绑定原文档。",
+        "更新界面可打开的模型说明，说明质量/强度/步数的具体含义与成本，不虚构支持列表。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f23.md"
+    },
+    {
+      "key": "F24",
+      "id": "9bc057e9-6e10-4581-a2a5-44fd6e78ef4a",
+      "title": "选区生成填充与 AI 物体移除",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 7,
+      "acceptanceCriteria": [
+        "不规则半透明选区、旋转图层和不同画布尺寸下 mask/裁切/回贴位置正确。",
+        "选区外像素不变，边缘羽化无明显接缝；保留完整原始结果以便复查。",
+        "空提示移除和有提示替换分别验证；取消、失败、锁定目标不覆盖内容。",
+        "候选按批次比较、采用/撤销、保存重开保留源/蒙版/参数，不需重跑 API。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f24.md"
+    },
+    {
+      "key": "F25",
+      "id": "f3a699a2-6102-4617-8200-fb086bbd4008",
+      "title": "扩图与画布外生成",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "四边扩展及非对称扩展坐标正确，原图区域像素保留，扩展区域无透明洞。",
+        "改变比例、端点尺寸限制与分块时显示最终尺寸和调用数量。",
+        "取消或失败保留原画布；采用把画布变化与新内容作为同一撤销事务。",
+        "保存重开、导出和候选追溯一致，旧异步结果不会改变后来调整过的画布。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f25.md"
+    },
+    {
+      "key": "F26",
+      "id": "7e930f74-07f8-41ae-aee5-50b6303446fb",
+      "title": "多文档标签与状态隔离",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 6,
+      "acceptanceCriteria": [
+        "两个文档有不同尺寸/选区/历史，来回切换及撤销互不影响。",
+        "后台生成或保存完成回写正确文档，已关闭文档不会被悄悄重建或污染当前文档。",
+        "跨文档粘贴后资源和对象 ID 独立，关闭原文档不丢素材。",
+        "多标签恢复、关闭取消、内存预算下后台预览回收均有验证。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f26.md"
+    },
+    {
+      "key": "F27",
+      "id": "9d2d2685-1fcb-46c3-b64b-948695a20176",
+      "title": "多画板与同设计多尺寸版本",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 8,
+      "acceptanceCriteria": [
+        "画板之间选区/裁切/吸附正确，移动画板携带内容且不改变局部坐标。",
+        "复制为不同规格时用户能预览缩放或裁切结果，不静默丢层。",
+        "全部画板导出分别具备正确像素尺寸/名称，重名处理不覆盖。",
+        "画板增删、跨板移动、撤销和项目重开恢复一致，空画板可保留。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f27.md"
+    },
+    {
+      "key": "F28",
+      "id": "379fb04f-26a5-4cae-9de3-f2d4aa8f2f0d",
+      "title": "批量缩放、导出、水印与调整预设",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 7,
+      "acceptanceCriteria": [
+        "混合横竖图、透明 PNG、重复文件名批量输出尺寸/质量/水印位置正确且不覆盖源文件。",
+        "一个损坏文件失败不阻断其余文件，取消不再排新任务，已成功项保持完整。",
+        "失败重试不重复导出成功项，记录每项原因、输出路径和汇总。",
+        "配方保存重用结果一致，并发和内存有上限，主编辑画布不被批量任务修改。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f28.md"
+    },
+    {
+      "key": "F29",
+      "id": "cb50a00b-2792-40b1-8398-1a9c3533b8bd",
+      "title": "RAW 解码与基础显影",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 12,
+      "acceptanceCriteria": [
+        "使用有授权的至少三类不同 RAW 样本验证方向、白平衡、曝光和高光处理，记录解码版本与支持矩阵。",
+        "重开显影参数可编辑，原 RAW 字节不变；转入项目后离线可恢复。",
+        "不支持/损坏 RAW 明确拒绝，不把内嵌 JPEG 当完整 RAW 解码成功。",
+        "大文件解码可取消且不阻塞 UI，内存峰值有记录；导出经 ICC 管线转换。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f29.md"
+    },
+    {
+      "key": "F30",
+      "id": "3e2fb3da-b5ff-4961-8610-0fab97a8cb34",
+      "title": "16 位与 32 位浮点高精度处理",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 15,
+      "acceptanceCriteria": [
+        "读取真实 16bit 梯度与大于 1 的浮点数据，往返保留精度，处理链中不偷偷转 uint8。",
+        "曝光/曲线/蒙版/常用合成在高精度缓冲运行，验证渐变条带和高光未提前剪裁。",
+        "8/16/32 位转换可取消/撤销，导出格式不兼容时明确提示并保留源文档。",
+        "独立解码 16bit PNG/TIFF 与 32float EXR 验证数据类型和数值，项目重开不降精度。",
+        "按分块/离屏处理记录 4096px 高精度场景峰值，超预算时拒绝或降预览分辨率而不降源质量。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f30.md"
+    },
+    {
+      "key": "F31",
+      "id": "e91f3f81-16dd-423c-b482-0218e5a5d7b7",
+      "title": "ICC 色彩管理与配置文件转换",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 12,
+      "acceptanceCriteria": [
+        "同一色块以不同 profile 编码导入后按正确转换保持外观，指定与转换的数值差异有测试。",
+        "无 profile、坏 profile、超大 profile 和不支持类型有明确反馈及可回退策略。",
+        "预览只做一次显示转换，导出嵌入正确 ICC，独立工具检查标签和色值。",
+        "项目保存重开保持 profile 和渲染意图，设置变化可撤销，带透明像素不产生彩边。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f31.md"
+    },
+    {
+      "key": "F32",
+      "id": "27fab054-0c10-4bd6-bb31-16ad514b8a88",
+      "title": "CMYK 文档与印刷导出",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 15,
+      "acceptanceCriteria": [
+        "CMYK TIFF 经独立解码验证四通道和嵌入 profile，纯黑和总墨量样例符合所选印刷 profile。",
+        "RGB↔CMYK 通过 ICC 转换，超色域与可能有损反馈明确，转换可撤销且保留源。",
+        "CMYK 项目重开保持通道，预览、软打样接口与导出不出现二次转换。",
+        "不支持的滤镜/AI 接口需显式生成 RGB 副本，不静默更改文档模式。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f32.md"
+    },
+    {
+      "key": "F33",
+      "id": "f37f0db2-51ec-4f83-92ef-fe41a45914c2",
+      "title": "软打样、色域警告与印刷检查",
+      "status": "backlog",
+      "version": 3,
+      "estimate": 7,
+      "acceptanceCriteria": [
+        "已知 RGB→印刷 ICC 样例验证渲染意图、黑点补偿和纸白模拟差异。",
+        "色域警告与总墨量指标来自目标 profile/CMYK 数值，不以任意 RGB 阈值代替。",
+        "开关打样前后源像素和普通导出完全一致，当前打样状态可见且可通过键盘关闭。",
+        "缺失目标 profile、项目重开及跨文档切换不串设置，检查报告显示实际目标配置。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f33.md"
+    },
+    {
+      "key": "R",
+      "id": "92116dc7-a664-47f2-918e-8afa9d501a98",
+      "title": "升级图片处理右侧工作区与 AI 结果工作流",
+      "status": "in_review",
+      "version": 12,
+      "estimate": 18,
+      "acceptanceCriteria": [
+        "右侧固定提供“图层 / 属性 / AI 结果”三个标签，默认进入图层，切换标签不丢失 Composer、选区和当前选中图层状态。",
+        "图层支持重命名、复制、删除、显示/隐藏、锁定/解锁、上下及拖拽排序、分组折叠、缩略图和搜索筛选；锁定图层不会被误编辑，最后一个图层不可删除，所有操作支持撤销/重做。",
+        "属性支持选中对象的 X/Y、宽高、比例锁定、旋转、水平/垂直翻转和重置；数字输入、画布预览、导出结果保持一致，并对非法值给出明确反馈。",
+        "AI 结果与正式图层分离，支持缩略图、空/加载失败状态、模型和提示词等参数详情、放大预览、两到四格比较、继续编辑、新增图层、替换当前图层、收藏/标记和删除；替换保留原图且可撤销。",
+        "支持多选和批量隐藏、锁定、删除、分组，AI 结果支持本次生成/已采用/未采用筛选，常用图层操作有稳定快捷键和拖拽插入反馈。",
+        "基础调整提供亮度、对比度、饱和度、色温、清晰度、模糊、阴影和高光；调整非破坏、可重置、可撤销，并且不把模型专属参数伪装成统一质量或强度。",
+        "现有生成、编辑、选区范围、图层新增、模型来源、浮动/停靠 Composer、导出和历史功能无回归；测试覆盖空状态、锁定、非法输入、部分失败和真实结果缩略图接入。",
+        "提供用户可读的右侧工作区说明和模型/结果操作提示，避免关键状态只用图标表达。"
+      ],
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/existing-workspace-amendment.md"
+    }
+  ],
+  "remoteWrites": [],
+  "creationProtocol": "展示完整payload后一次确认；确认后逐项创建、记录ID、关联依赖并上传完整计划；不启动或验收任务。",
+  "remoteTaskIds": {
+    "A01": "3fe3accf-0bfd-40bb-873d-01e9c02f6626",
+    "A02": "e3ac5120-efde-4c7f-b053-a7a0826eaff5",
+    "A03": "beeba626-ccf0-4071-bb39-af5d4b042ab9",
+    "A04": "c0258b81-7048-4424-a77f-965dfff0ea7f",
+    "A05": "1787311c-549f-49d5-8f86-22577f8f2437",
+    "A06": "578528f7-2294-4915-99fb-fd85d77d32a6",
+    "A07": "564b5b94-30a1-4a80-9ad2-1dd1efd4d7e4",
+    "A08": "d6e7cfa7-99f5-4da0-9098-92702a68b1d8",
+    "A09": "9177717e-d54c-46e3-b83e-9b3675552713",
+    "A10": "ed8b6dd2-e2c9-49ab-8656-e65c6fc5ef4e",
+    "A11": "e1b99a91-2b3b-4c03-9ca8-9f77eb7a3c30",
+    "A12": "e955e655-c33d-4e20-aa62-c8a3a1f44b5b",
+    "A13": "7505abfa-075d-405d-bcdd-9ffe9de8eb1f",
+    "A14": "8d7c82b8-0211-4068-8b7c-7342f1b79425",
+    "A15": "f451dc4f-d6d7-4a21-9178-b692673289f2",
+    "A16": "2553bc91-6db9-43e0-8378-552c50d3dbea",
+    "A17": "220e882d-60db-4891-962b-555a43819d94",
+    "A18": "5446b035-c5b0-4fdf-8c7b-e11d1fe8451f",
+    "A19": "b2431637-e693-4cae-bb40-2909c03508f5",
+    "A20": "e5e34889-fad7-4d36-b81e-72c9eafe778e",
+    "A21": "ee15408c-900f-4045-8c5a-6be30dfb22da",
+    "A22": "e845dcb5-6e8b-45d0-b45d-a7129aeee830",
+    "A23": "1fc69f79-2bc3-418c-b07d-0f8b4b962ecb",
+    "A24": "d0905d23-8b35-4295-96f2-be9d7a6569b1",
+    "A25": "b58231aa-9702-4727-bcb3-fe7de39e2e31",
+    "A26": "c9c9a008-a96f-4cc6-9087-4046908f3346",
+    "A27": "fc3e6f3d-63e1-4b43-8ccc-445c79ba36a4",
+    "A28": "50dd5e0f-3913-4242-8884-f624335b860a",
+    "A29": "8d439639-69fc-4fd8-b370-6902efd2f01a",
+    "A30": "4326f70d-1119-4f4e-bb66-081095b1a341",
+    "A31": "65482a83-9916-4164-8f93-b314539f19f7",
+    "A32": "0bd0c9b8-75e6-4f3d-9e7a-168d48f167ae",
+    "A33": "a80140dc-841e-4a91-86d2-1fbe7a3937e5",
+    "A34": "f869d0b1-e563-4ac4-8269-adddd115221a",
+    "A35": "6bab7ff2-efdb-4bea-92c4-4736f6cc4f83",
+    "A37": "ada2179a-3971-4ede-88d7-727a58c846f3",
+    "A36": "9110cc9a-1498-4365-9768-23baddf97337"
+  }
+}

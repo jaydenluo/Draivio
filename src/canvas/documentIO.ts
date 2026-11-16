@@ -39,3 +39,17 @@ export function readImageFile(file: File): Promise<string> {
     reader.readAsDataURL(file)
   })
 }
+
+/** Decode natural pixel dimensions rather than CSS/display dimensions. */
+export function readImageMetadata(source: string): Promise<{ width: number; height: number }> {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => {
+      const width = image.naturalWidth, height = image.naturalHeight
+      if (![width, height].every((value) => Number.isInteger(value) && value > 0)) return reject(new Error('无法读取图片像素尺寸'))
+      resolve({ width, height })
+    }
+    image.onerror = () => reject(new Error('图片文件无法解码'))
+    image.src = source
+  })
+}

@@ -1,0 +1,138 @@
+{
+  "file": "/Users/szys/Downloads/draivio-canvas (17).png",
+  "scenario": "blocks-canvas",
+  "passed": true,
+  "requestedFormat": "png",
+  "decodedFormat": "PNG",
+  "decodedMime": "image/png",
+  "capturedMime": null,
+  "capturedMimeChecked": false,
+  "size": [
+    4096,
+    4096
+  ],
+  "bytes": 352931,
+  "probes": [
+    {
+      "label": "transparent corner",
+      "xy": [
+        144,
+        144
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "label": "red",
+      "xy": [
+        1040,
+        1040
+      ],
+      "expected": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "actual": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "green",
+      "xy": [
+        3088,
+        1040
+      ],
+      "expected": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "actual": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "blue",
+      "xy": [
+        1040,
+        3088
+      ],
+      "expected": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "actual": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "half alpha yellow",
+      "xy": [
+        3088,
+        3088
+      ],
+      "expected": [
+        255,
+        255,
+        0,
+        128
+      ],
+      "actual": [
+        255,
+        255,
+        0,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "label": "transparent center",
+      "xy": [
+        2064,
+        2064
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    }
+  ],
+  "errors": []
+}

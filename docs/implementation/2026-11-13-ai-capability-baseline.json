@@ -1,0 +1,2550 @@
+{
+  "schemaVersion": 1,
+  "taskId": "3fe3accf-0bfd-40bb-873d-01e9c02f6626",
+  "date": "2026-11-13",
+  "scope": "A01 read-only source/test capability audit; not implementation or final release acceptance",
+  "workspace": "dirty concurrent workspace; files may change after observation",
+  "statusVocabulary": {
+    "real": "Implemented local behavior; bounded to described behavior, not end-to-end release verification",
+    "simulated": "UI/alias/demo does not fulfill named capability",
+    "missing": "No production implementation/provider binding"
+  },
+  "evidenceLimits": [
+    "No real model/API/credential calls",
+    "No manual all-tool browser execution or exported pixel fixture artifacts in this audit",
+    "Vitest jsdom DOM/style assertions do not prove browser-decoded pixels",
+    "Pure Uint8ClampedArray pixel tests prove algorithms only; mocked Image/Canvas/fetch boundaries prove contracts only",
+    "Registry/icon/protocol/model preset/fixture success labels are not capability proof"
+  ],
+  "tools": [
+    {
+      "id": "select",
+      "label": "选择",
+      "group": "select-move",
+      "status": "simulated",
+      "behavior": "Canvas click only posts “已选择当前图层”; no object/layer hit test. Existing selection overlay can move a selection.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "set-notice",
+        "commit-selection (selection overlay only)"
+      ],
+      "render": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "selection (overlay only)",
+        "notice (transient)"
+      ],
+      "tests": [
+        "src/canvas/CanvasObjectTools.test.tsx",
+        "src/canvas/TransformOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F05",
+        "A04"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "move",
+      "label": "移动",
+      "group": "select-move",
+      "status": "real",
+      "behavior": "Drag previews and commits selected layer transform; no automatic hit selection.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-layer-transform"
+      ],
+      "render": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layers[].transform"
+      ],
+      "tests": [
+        "src/canvas/CanvasObjectTools.test.tsx",
+        "src/canvas/TransformOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F05",
+        "A04"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "selection",
+      "label": "选区",
+      "group": "selection",
+      "status": "real",
+      "behavior": "Rectangle selection drag alias; changes selection geometry, not image pixels.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "rectangle-select",
+      "label": "矩形选框",
+      "group": "selection",
+      "status": "real",
+      "behavior": "Rectangle geometry plus combination modes/feather; raster mask primitive tested.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "ellipse-select",
+      "label": "椭圆选框",
+      "group": "selection",
+      "status": "real",
+      "behavior": "Ellipse geometry plus combination modes/feather; browser export edge pixels unverified.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "lasso-select",
+      "label": "套索",
+      "group": "selection",
+      "status": "real",
+      "behavior": "Freehand path closes on pointer up and commits irregular selection.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "polygon-select",
+      "label": "多边形套索",
+      "group": "selection",
+      "status": "real",
+      "behavior": "Anchors close with Enter/double click; explicit conversion commits selection.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "bezier-select",
+      "label": "贝塞尔路径",
+      "group": "selection",
+      "status": "real",
+      "behavior": "Bezier anchors/handles and conversion to selection/mask; not a retained vector object.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "magic-wand",
+      "label": "魔棒",
+      "group": "selection",
+      "status": "real",
+      "behavior": "Rasterizes scene, four-connected tolerance flood, converts mask to geometry.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "subject-select",
+      "label": "主体选择",
+      "group": "selection",
+      "status": "missing",
+      "behavior": "Only injected selectSubject callback; no production configuration caller found.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection (only if service injected)",
+        "set-notice (production unconfigured)"
+      ],
+      "render": [
+        "src/canvas/SelectionOverlay.tsx",
+        "src/canvas/selectionGeometry.ts",
+        "src/canvas/selectionRaster.ts"
+      ],
+      "schema": [
+        "selection",
+        "selectionRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/selectionGeometry.test.ts",
+        "src/canvas/selectionRaster.test.ts",
+        "src/canvas/PathWorkflow.test.tsx",
+        "src/canvas/SelectionOverlay.test.tsx"
+      ],
+      "gaps": [
+        "F09",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "selection overlay excluded; persisted selection only affects applied mask/fill/brush",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "No real provider evidence; listed tests cover related offline primitives/UI only",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "brush",
+      "label": "画笔",
+      "group": "brush",
+      "status": "real",
+      "behavior": "Imported untransformed image uses paintBrushStroke -> PNG source; otherwise SVG stroke object.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-brush-stroke",
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/BrushScene.tsx",
+        "src/canvas/rasterBrush.ts"
+      ],
+      "schema": [
+        "brushStrokes",
+        "sceneOrder",
+        "layers[].source"
+      ],
+      "tests": [
+        "src/canvas/BrushEngine.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "pencil",
+      "label": "铅笔",
+      "group": "brush",
+      "status": "real",
+      "behavior": "Brush with hardness 100 and smoothing 0; same raster/vector branches.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-brush-stroke",
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/BrushScene.tsx",
+        "src/canvas/rasterBrush.ts"
+      ],
+      "schema": [
+        "brushStrokes",
+        "sceneOrder",
+        "layers[].source"
+      ],
+      "tests": [
+        "src/canvas/BrushEngine.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "gradient-brush",
+      "label": "渐变画笔",
+      "group": "brush",
+      "status": "simulated",
+      "behavior": "Brush group fallback creates ordinary paint stroke; no per-stroke gradient behavior.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-brush-stroke"
+      ],
+      "render": [
+        "src/canvas/BrushScene.tsx",
+        "src/canvas/rasterBrush.ts"
+      ],
+      "schema": [
+        "brushStrokes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/BrushEngine.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "brush-line",
+      "label": "直线画笔",
+      "group": "brush",
+      "status": "real",
+      "behavior": "Two-point straight stroke; raster branch or SVG BrushScene.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-brush-stroke",
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/BrushScene.tsx",
+        "src/canvas/rasterBrush.ts"
+      ],
+      "schema": [
+        "brushStrokes",
+        "sceneOrder",
+        "layers[].source"
+      ],
+      "tests": [
+        "src/canvas/BrushEngine.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "soft-brush",
+      "label": "柔边笔",
+      "group": "brush",
+      "status": "real",
+      "behavior": "Brush hardness forced 0; raster branch or SVG soft brush.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-brush-stroke",
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/BrushScene.tsx",
+        "src/canvas/rasterBrush.ts"
+      ],
+      "schema": [
+        "brushStrokes",
+        "sceneOrder",
+        "layers[].source"
+      ],
+      "tests": [
+        "src/canvas/BrushEngine.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "smudge",
+      "label": "涂抹",
+      "group": "brush",
+      "status": "real",
+      "behavior": "Local smudge pixel primitive carries sampled color; SVG->canvas boundary mocked in tests.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/BrushScene.tsx",
+        "src/canvas/rasterBrush.ts"
+      ],
+      "schema": [
+        "layers[].source"
+      ],
+      "tests": [
+        "src/canvas/BrushEngine.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "eraser",
+      "label": "橡皮",
+      "group": "erase-heal",
+      "status": "real",
+      "behavior": "Imported untransformed image reduces alpha; SVG eraser masks preceding layer content.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "rasterize-layer",
+        "commit-brush-stroke"
+      ],
+      "render": [
+        "src/canvas/rasterTools.ts",
+        "src/canvas/BrushScene.tsx"
+      ],
+      "schema": [
+        "layers[].source",
+        "brushStrokes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/rasterTools.test.ts",
+        "src/canvas/BrushScene.test.tsx"
+      ],
+      "gaps": [
+        "F19",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "background-eraser",
+      "label": "背景橡皮擦",
+      "group": "erase-heal",
+      "status": "real",
+      "behavior": "Erases connected seed-color region by tolerance; not semantic background removal.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/rasterTools.ts",
+        "src/canvas/BrushScene.tsx"
+      ],
+      "schema": [
+        "layers[].source"
+      ],
+      "tests": [
+        "src/canvas/rasterTools.test.ts",
+        "src/canvas/BrushScene.test.tsx"
+      ],
+      "gaps": [
+        "F19",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "healing",
+      "label": "修复画笔",
+      "group": "erase-heal",
+      "status": "missing",
+      "behavior": "Injected heal callback only; empty production service registry reports not configured.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "rasterize-layer (only if service injected)",
+        "set-notice (production unconfigured)"
+      ],
+      "render": [
+        "src/canvas/rasterTools.ts",
+        "src/canvas/BrushScene.tsx"
+      ],
+      "schema": [
+        "layers[].source",
+        "brushStrokes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/rasterTools.test.ts",
+        "src/canvas/BrushScene.test.tsx"
+      ],
+      "gaps": [
+        "F19",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "No real provider evidence; listed tests cover related offline primitives/UI only",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "clone-stamp",
+      "label": "仿制图章",
+      "group": "erase-heal",
+      "status": "real",
+      "behavior": "Alt-click source then fixed-offset sampling from source snapshot; pure pixel tests.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/rasterTools.ts",
+        "src/canvas/BrushScene.tsx"
+      ],
+      "schema": [
+        "layers[].source"
+      ],
+      "tests": [
+        "src/canvas/rasterTools.test.ts",
+        "src/canvas/BrushScene.test.tsx"
+      ],
+      "gaps": [
+        "F19",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "mask",
+      "label": "蒙版",
+      "group": "mask",
+      "status": "real",
+      "behavior": "Layer mask strokes preview red; apply-mask activates luminance mask in scene/export.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-mask",
+        "apply-mask (separate UI command)"
+      ],
+      "render": [
+        "src/canvas/MaskOverlay.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layerMasks"
+      ],
+      "tests": [
+        "src/canvas/MaskOverlay.test.tsx",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "mask-quick",
+      "label": "快速蒙版",
+      "group": "mask",
+      "status": "real",
+      "behavior": "Alias to mask brush, not a separately implemented quick-mask conversion workflow.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-mask",
+        "apply-mask (separate UI command)"
+      ],
+      "render": [
+        "src/canvas/MaskOverlay.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layerMasks"
+      ],
+      "tests": [
+        "src/canvas/MaskOverlay.test.tsx",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "mask-gradient",
+      "label": "渐变蒙版",
+      "group": "mask",
+      "status": "real",
+      "behavior": "Two-endpoint luminance gradient; preview then explicit apply.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-mask",
+        "apply-mask (separate UI command)"
+      ],
+      "render": [
+        "src/canvas/MaskOverlay.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layerMasks"
+      ],
+      "tests": [
+        "src/canvas/MaskOverlay.test.tsx",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "F10",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "mask-subject",
+      "label": "主体蒙版",
+      "group": "mask",
+      "status": "missing",
+      "behavior": "Same unconfigured selectSubject seam; only routes returned selection to mask.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "selection-to-mask (only if service injected)",
+        "set-notice (production unconfigured)"
+      ],
+      "render": [
+        "src/canvas/MaskOverlay.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layerMasks"
+      ],
+      "tests": [
+        "src/canvas/MaskOverlay.test.tsx",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "F09",
+        "A16"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "No real provider evidence; listed tests cover related offline primitives/UI only",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "crop",
+      "label": "裁剪",
+      "group": "crop-transform",
+      "status": "real",
+      "behavior": "Non-destructive cropRect changes visible window and SVG viewBox; original canvas dimensions retained.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-crop"
+      ],
+      "render": [
+        "src/canvas/TransformOverlay.tsx",
+        "src/canvas/PerspectiveOverlay.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "cropRect",
+        "selectionVisible"
+      ],
+      "tests": [
+        "src/canvas/transformGeometry.test.ts",
+        "src/canvas/TransformOverlay.test.tsx",
+        "src/canvas/rasterTools.test.ts"
+      ],
+      "gaps": [
+        "F04",
+        "A14"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "perspective-crop",
+      "label": "透视裁剪",
+      "group": "crop-transform",
+      "status": "real",
+      "behavior": "Projective bilinear/premultiplied-alpha warp to PNG; reducer currently records document-sized content metadata.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "rasterize-layer"
+      ],
+      "render": [
+        "src/canvas/TransformOverlay.tsx",
+        "src/canvas/PerspectiveOverlay.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layers[].source",
+        "layers[].contentWidth",
+        "layers[].contentHeight"
+      ],
+      "tests": [
+        "src/canvas/transformGeometry.test.ts",
+        "src/canvas/TransformOverlay.test.tsx",
+        "src/canvas/rasterTools.test.ts"
+      ],
+      "gaps": [
+        "F04",
+        "A14"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "transform",
+      "label": "变换",
+      "group": "crop-transform",
+      "status": "real",
+      "behavior": "Selected-layer rectangle/rotation/flips; draft separate until Enter/apply; Escape cancels.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-layer-transform"
+      ],
+      "render": [
+        "src/canvas/TransformOverlay.tsx",
+        "src/canvas/PerspectiveOverlay.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layers[].transform"
+      ],
+      "tests": [
+        "src/canvas/transformGeometry.test.ts",
+        "src/canvas/TransformOverlay.test.tsx",
+        "src/canvas/rasterTools.test.ts"
+      ],
+      "gaps": [
+        "F04",
+        "A14"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "text",
+      "label": "文字",
+      "group": "text-shape",
+      "status": "real",
+      "behavior": "Editable multi-line SVG text object; basic font/size/weight/alignment; no rich paragraph/style ranges.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "upsert-text"
+      ],
+      "render": [
+        "src/canvas/CanvasScene.tsx",
+        "src/canvas/TextObject.tsx"
+      ],
+      "schema": [
+        "canvasTexts",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/CanvasObjectTools.test.tsx",
+        "src/canvas/TextObject.test.tsx",
+        "src/canvas/CanvasScene.test.tsx"
+      ],
+      "gaps": [
+        "F14",
+        "F22",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "shape",
+      "label": "形状",
+      "group": "text-shape",
+      "status": "real",
+      "behavior": "Filled rectangle object.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "add-shape"
+      ],
+      "render": [
+        "src/canvas/CanvasScene.tsx",
+        "src/canvas/TextObject.tsx"
+      ],
+      "schema": [
+        "canvasShapes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/CanvasObjectTools.test.tsx",
+        "src/canvas/TextObject.test.tsx",
+        "src/canvas/CanvasScene.test.tsx"
+      ],
+      "gaps": [
+        "F14",
+        "F22",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "shape-ellipse",
+      "label": "圆形",
+      "group": "text-shape",
+      "status": "real",
+      "behavior": "Filled ellipse object.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "add-shape"
+      ],
+      "render": [
+        "src/canvas/CanvasScene.tsx",
+        "src/canvas/TextObject.tsx"
+      ],
+      "schema": [
+        "canvasShapes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/CanvasObjectTools.test.tsx",
+        "src/canvas/TextObject.test.tsx",
+        "src/canvas/CanvasScene.test.tsx"
+      ],
+      "gaps": [
+        "F14",
+        "F22",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "shape-line",
+      "label": "线条",
+      "group": "text-shape",
+      "status": "real",
+      "behavior": "Stroked line object.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "add-shape"
+      ],
+      "render": [
+        "src/canvas/CanvasScene.tsx",
+        "src/canvas/TextObject.tsx"
+      ],
+      "schema": [
+        "canvasShapes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/CanvasObjectTools.test.tsx",
+        "src/canvas/TextObject.test.tsx",
+        "src/canvas/CanvasScene.test.tsx"
+      ],
+      "gaps": [
+        "F14",
+        "F22",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "shape-arrow",
+      "label": "箭头",
+      "group": "text-shape",
+      "status": "real",
+      "behavior": "Line plus geometric arrowhead.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "add-shape"
+      ],
+      "render": [
+        "src/canvas/CanvasScene.tsx",
+        "src/canvas/TextObject.tsx"
+      ],
+      "schema": [
+        "canvasShapes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/CanvasObjectTools.test.tsx",
+        "src/canvas/TextObject.test.tsx",
+        "src/canvas/CanvasScene.test.tsx"
+      ],
+      "gaps": [
+        "F14",
+        "F22",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "pen",
+      "label": "钢笔",
+      "group": "text-shape",
+      "status": "simulated",
+      "behavior": "Reuses temporary Bezier selection path; converts to selection/mask, no persistent vector path/boolean shape.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "commit-selection",
+        "selection-to-mask"
+      ],
+      "render": [
+        "src/canvas/CanvasScene.tsx",
+        "src/canvas/TextObject.tsx"
+      ],
+      "schema": [
+        "selection",
+        "layerMasks"
+      ],
+      "tests": [
+        "src/canvas/pathGeometry.test.ts",
+        "src/canvas/PathWorkflow.test.tsx"
+      ],
+      "gaps": [
+        "F14",
+        "F22",
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "picker",
+      "label": "取色",
+      "group": "color-fill",
+      "status": "real",
+      "behavior": "Scene raster color sample; pure sample pixels pass, UI integration suite currently fails notice expectation.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "set-brush-color"
+      ],
+      "render": [
+        "src/canvas/rasterTools.ts",
+        "src/canvas/rasterBrush.ts",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "brushColor",
+        "recentColors (preferences; excluded from project)"
+      ],
+      "tests": [
+        "src/canvas/rasterTools.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "not in document undo snapshot",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "color preference itself not exported; subsequent painted objects use chosen color",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "pure primitive passed; ToolInteraction integration failed",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "fill",
+      "label": "填充",
+      "group": "color-fill",
+      "status": "real",
+      "behavior": "Whole selected region/layer color fill; not click-contiguous paint bucket; raster branch else SVG shape.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "rasterize-layer (untransformed imported image)",
+        "add-shape (other layers)"
+      ],
+      "render": [
+        "src/canvas/rasterTools.ts",
+        "src/canvas/rasterBrush.ts",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "layers[].source",
+        "canvasShapes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/rasterTools.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "gradient-fill",
+      "label": "渐变",
+      "group": "color-fill",
+      "status": "real",
+      "behavior": "SVG linear gradient shape with optional selection mask.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "add-shape"
+      ],
+      "render": [
+        "src/canvas/rasterTools.ts",
+        "src/canvas/rasterBrush.ts",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "schema": [
+        "canvasShapes",
+        "sceneOrder"
+      ],
+      "tests": [
+        "src/canvas/rasterTools.test.ts",
+        "src/canvas/rasterBrush.test.ts",
+        "src/canvas/CanvasObjectTools.test.tsx"
+      ],
+      "gaps": [
+        "A37"
+      ],
+      "history": "committed document actions use snapshot undo/redo (30 snapshots); preview/cancel separate",
+      "save": "project v2 retains document fields listed in schema; save/reopen not visually exercised per tool",
+      "export": "shared CanvasScene -> serializeEditorSvg; browser-decoded final pixels not executed for this tool",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "pan",
+      "label": "平移",
+      "group": "navigation",
+      "status": "real",
+      "behavior": "View offset only; Space shortcut supports temporary navigation; no document pixels/history.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "set-canvas-offset"
+      ],
+      "render": [
+        "src/canvas/CanvasViewport.tsx (CSS view transform)"
+      ],
+      "schema": [
+        "canvasOffset/zoom/canvasRotation (excluded from project)"
+      ],
+      "tests": [
+        "src/canvas/CanvasRotation.test.tsx",
+        "src/canvas/CanvasViewport.test.tsx"
+      ],
+      "gaps": [
+        "A35"
+      ],
+      "history": "not in document undo snapshot",
+      "save": "view preferences excluded from project",
+      "export": "view transform excluded from SVG",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "zoom",
+      "label": "缩放",
+      "group": "navigation",
+      "status": "real",
+      "behavior": "View zoom click/Alt-click, Ctrl wheel and pinch; no image resampling.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "set-zoom"
+      ],
+      "render": [
+        "src/canvas/CanvasViewport.tsx (CSS view transform)"
+      ],
+      "schema": [
+        "canvasOffset/zoom/canvasRotation (excluded from project)"
+      ],
+      "tests": [
+        "src/canvas/CanvasRotation.test.tsx",
+        "src/canvas/CanvasViewport.test.tsx"
+      ],
+      "gaps": [
+        "A35"
+      ],
+      "history": "not in document undo snapshot",
+      "save": "view preferences excluded from project",
+      "export": "view transform excluded from SVG",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    },
+    {
+      "id": "rotate",
+      "label": "旋转画布",
+      "group": "navigation",
+      "status": "real",
+      "behavior": "View rotation only, drag/click and explicit controls; export intentionally unrotated.",
+      "implementation": [
+        "src/canvas/CanvasViewport.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "set-canvas-rotation"
+      ],
+      "render": [
+        "src/canvas/CanvasViewport.tsx (CSS view transform)"
+      ],
+      "schema": [
+        "canvasOffset/zoom/canvasRotation (excluded from project)"
+      ],
+      "tests": [
+        "src/canvas/CanvasRotation.test.tsx",
+        "src/canvas/CanvasViewport.test.tsx"
+      ],
+      "gaps": [
+        "A35"
+      ],
+      "history": "not in document undo snapshot",
+      "save": "view preferences excluded from project",
+      "export": "view transform excluded from SVG",
+      "evidenceLevel": "source trace + existing offline tests; no manual/browser pixel acceptance",
+      "testStatus": "suite passed referenced test files",
+      "testCoverageNote": "Tests are associated coverage pointers, not a claim of dedicated end-to-end coverage for every listed ID; inspect assertions and evidenceLevel."
+    }
+  ],
+  "additionalCapabilities": [
+    {
+      "id": "adjustments",
+      "status": "simulated",
+      "realSubset": [
+        "brightness",
+        "contrast",
+        "saturation",
+        "approximate temperature (sepia+hue-rotate)",
+        "blur"
+      ],
+      "missingSubset": [
+        "sharpness",
+        "shadows",
+        "highlights"
+      ],
+      "implementation": [
+        "src/layers/PropertiesPanel.tsx",
+        "src/canvas/CanvasScene.tsx"
+      ],
+      "actions": [
+        "set-layer-adjustment",
+        "reset-layer-adjustments"
+      ],
+      "schema": [
+        "layers[].adjustments"
+      ],
+      "gaps": [
+        "R",
+        "F11",
+        "F12",
+        "F13",
+        "A13",
+        "A15"
+      ]
+    },
+    {
+      "id": "export",
+      "status": "real",
+      "behavior": "SVG serialization only; crop viewBox; overlays removed; remote hrefs not embedded by export",
+      "implementation": [
+        "src/components/TopBar.tsx",
+        "src/canvas/documentIO.ts"
+      ],
+      "tests": [
+        "src/canvas/documentIO.test.ts"
+      ],
+      "gaps": [
+        "F03"
+      ]
+    },
+    {
+      "id": "project",
+      "status": "real",
+      "behavior": "v2 JSON asset table; data/HTTP images materialized; legacy v1 import; undo stacks and view preferences excluded; native/file-picker writes, download-only fallback cannot confirm durable write",
+      "implementation": [
+        "src/document/projectFormat.ts",
+        "src/document/projectStorage.ts",
+        "src/document/ProjectFileControl.tsx"
+      ],
+      "tests": [
+        "src/document/projectFormat.test.ts",
+        "src/document/projectStorage.test.ts",
+        "src/document/ProjectFileControl.test.tsx"
+      ],
+      "gaps": [
+        "F01",
+        "F02"
+      ]
+    },
+    {
+      "id": "ai-generation",
+      "status": "real",
+      "behavior": "OpenAI-compatible/Volcengine text-to-image request path and ImageBatch; no real-service call made; outputs auto-adopt into layers",
+      "implementation": [
+        "src/creation/ImageGeneration.tsx",
+        "src/creation/openaiImages.ts",
+        "src/creation/imageBatch.ts",
+        "src/state/editor.tsx"
+      ],
+      "tests": [
+        "src/creation/ImageGeneration.test.tsx",
+        "src/creation/openaiImages.test.ts",
+        "src/creation/imageBatch.test.ts"
+      ],
+      "gaps": [
+        "R",
+        "F23",
+        "A17",
+        "A18"
+      ]
+    },
+    {
+      "id": "ai-editing",
+      "status": "missing",
+      "behavior": "Real source rejects edit mode; no reference image/mask editing request; cloud is 900ms demo placeholder only (source absent; current reducer status loading)",
+      "implementation": [
+        "src/creation/ImageGeneration.tsx",
+        "src/state/editor.tsx"
+      ],
+      "gaps": [
+        "F23",
+        "F24",
+        "F25",
+        "A17",
+        "A19"
+      ]
+    },
+    {
+      "id": "ai-command-planning",
+      "status": "missing",
+      "behavior": "No natural-language structured plan/validated tool execution registry found in inspected src; toolRegistry only display definitions",
+      "implementation": [
+        "src/tools/toolRegistry.ts",
+        "src/tools/toolTypes.ts"
+      ],
+      "gaps": [
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A07",
+        "A08",
+        "A09"
+      ]
+    },
+    {
+      "id": "history-selection",
+      "status": "simulated",
+      "behavior": "HistoryStrip buttons dispatch select-history; reducer changes selectedHistoryId only, not layers, source, selection or other document content. Compare tab merely slices last four metadata rows; ResultThumbnail draws tone CSS spans, not source images. Actual undo/redo is a separate real snapshot mechanism.",
+      "implementation": [
+        "src/components/HistoryStrip.tsx",
+        "src/history/ResultThumbnail.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "select-history",
+        "set-history-tab",
+        "set-history-collapsed",
+        "clear-history"
+      ],
+      "render": [
+        "src/components/HistoryStrip.tsx",
+        "src/history/ResultThumbnail.tsx"
+      ],
+      "schema": [
+        "history[].id/label/tone",
+        "selectedHistoryId (excluded from project)",
+        "historyTab/historyCollapsed (preferences; excluded from project)"
+      ],
+      "history": "select-history does not commit/restore a snapshot; clear-history edits the visible metadata list without commit",
+      "save": "project encoder retains history labels but excludes selectedHistoryId; restore-project does not restore history list in its explicit whitelist",
+      "export": "history selected ID does not change CanvasScene or exported SVG",
+      "tests": [
+        "src/canvas/ToolInteraction.test.tsx (collapse only)",
+        "src/state/documentHistory.test.ts (undo/redo, not thumbnail restore)"
+      ],
+      "testCoverageNote": "No original audit test proved clicking a history thumbnail restores document pixels; newly added concurrent tests are not evidence until run",
+      "gaps": [
+        "R",
+        "A29",
+        "A30"
+      ]
+    },
+    {
+      "id": "duplicate-layer",
+      "status": "simulated",
+      "behavior": "Observed duplicate-layer shallow-copies Layer fields and allocates layer-Date.now ID; source-only image is reused. brushStrokes/canvasTexts/canvasShapes/layerMasks/sceneOrder are separate tables and are not cloned or remapped. Group children/groupId references are copied unchanged. Nested adjustments/transform metadata initially shares references; selectedLayerIds remains previous selection. Thus this is not complete editable layer/group duplication.",
+      "implementation": [
+        "src/layers/LayersPanel.tsx",
+        "src/state/editor.tsx"
+      ],
+      "actions": [
+        "duplicate-layer"
+      ],
+      "render": [
+        "src/canvas/CanvasScene.tsx (collects side-table objects by layerId)",
+        "src/canvas/BrushScene.tsx"
+      ],
+      "schema": [
+        "layers[] (shallow copy)",
+        "brushStrokes[].layerId (not copied)",
+        "canvasTexts[].layerId (not copied)",
+        "canvasShapes[].layerId (not copied)",
+        "layerMasks[layerId] (not copied)",
+        "sceneOrder (not extended)",
+        "layers[].children/groupId (not remapped)",
+        "selectedLayerIds (not updated)"
+      ],
+      "history": "one commit snapshot makes shallow duplicate undoable; does not prove full clone content",
+      "save": "project v2 serializes resulting state, so missing copied objects/references remain missing or shared after save",
+      "export": "duplicate imported source may look correct; drawn/text/shape/mask-only copy loses content; group copy may refer to original children",
+      "tests": [
+        "src/state/layerWorkspace.test.ts"
+      ],
+      "testCoverageNote": "Original duplication test checks name, unlock, ordering and delete only. Concurrent R01 deep duplication tests were added after baseline run and are not counted as passing here.",
+      "gaps": [
+        "R",
+        "F05",
+        "A04",
+        "A37"
+      ]
+    }
+  ],
+  "architecture": {
+    "entry": "src/tools/toolRegistry.ts -> ToolRail/ToolOptionsBar -> CanvasViewport pointer/keyboard handlers",
+    "state": "src/state/editor.tsx reducer -> commit snapshot (30 entries) -> undo/redo",
+    "render": "CanvasScene -> BrushScene/MaskDefinitions/SVG shapes+text; SVG CSS filter adjustments",
+    "pixel": "rasterTools/rasterBrush/selectionRaster; rasterize-layer replaces source and clears layer masks/objects/transform",
+    "compositor": "src/engine/raster/composite.ts -> RasterSurface/rasterWorker wrappers and unit tests; no connection from viewport/export to these wrappers found; current scene/export uses SVG",
+    "project": "projectFormat v2 materializes sources into assets; restores editable fields; history undo stacks deliberately not persisted",
+    "export": "TopBar -> serializeEditorSvg -> Blob image/svg+xml; not raster compositor"
+  },
+  "knownGaps": [
+    {
+      "id": "K01",
+      "issue": "No complete per-tool manual pixel/history/save/export execution evidence; A01 procedural coverage remains partial",
+      "tasks": [
+        "A01",
+        "A32",
+        "A35"
+      ]
+    },
+    {
+      "id": "K02",
+      "issue": "Layer locks not checked in commit-brush-stroke/upsert-text/add-shape/commit-mask/rasterize-layer and pointer handler; ancestor lock not enforced there",
+      "tasks": [
+        "R",
+        "F05",
+        "A04",
+        "A05"
+      ]
+    },
+    {
+      "id": "K03",
+      "issue": "Async raster/cloud callbacks capture selected layer/state with no document ID/version guard; selection-to-mask binds current reducer selection target",
+      "tasks": [
+        "A03",
+        "A05",
+        "F26"
+      ]
+    },
+    {
+      "id": "K04",
+      "issue": "SVG layer extraction retains document background and layer CSS filters/opacity; rasterized result retains layer adjustments/opacity, risking double application; browser pixel test needed",
+      "tasks": [
+        "F03",
+        "F04",
+        "A04",
+        "A32"
+      ]
+    },
+    {
+      "id": "K05",
+      "issue": "Group rows/metadata do not establish hierarchical render/transform/lock semantics; CanvasScene renders flat reversed visible layers",
+      "tasks": [
+        "F05",
+        "F06"
+      ]
+    },
+    {
+      "id": "K06",
+      "issue": "Export may retain remote image hrefs and system-font dependencies; SVG download does not guarantee offline pixel parity",
+      "tasks": [
+        "F03",
+        "F14",
+        "F31"
+      ]
+    },
+    {
+      "id": "K07",
+      "issue": "Full suite fails picker notice integration; root cause not established or repaired by this audit",
+      "tasks": [
+        "A01",
+        "A35"
+      ]
+    },
+    {
+      "id": "K08",
+      "issue": "Exposed history thumbnails select metadata ID only; no document restore or real image comparison",
+      "tasks": [
+        "R",
+        "A29",
+        "A30"
+      ]
+    },
+    {
+      "id": "K09",
+      "issue": "Layer duplication omits side-table content/mask/order remapping and group subtree cloning; original tests assert metadata only",
+      "tasks": [
+        "R",
+        "F05",
+        "A04",
+        "A37"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "G01",
+      "phase": "first",
+      "kind": "automated",
+      "command": "npm test -- --run",
+      "expected": "0 failed tests",
+      "observed": "1 failed | 283 passed; ToolInteraction.test.tsx:30 cannot find 已取色 #dd806d",
+      "status": "failed"
+    },
+    {
+      "id": "G02",
+      "phase": "first",
+      "kind": "automated",
+      "command": "npm run build",
+      "expected": "TypeScript and Vite exit 0",
+      "observed": "exit 0; 96 modules",
+      "status": "passed"
+    },
+    {
+      "id": "G03",
+      "phase": "first",
+      "kind": "manual",
+      "command": "npm run dev",
+      "steps": [
+        "Import a local 64x64 RGBA color-card PNG; use 8px red brush, eraser and an ellipse selection on separate fresh copies.",
+        "Decode before/after exported SVG in an independent browser rasterizer; compare RGBA arrays. Assert outside selection unchanged, eraser alpha falls, source fixture retained.",
+        "Undo once: pixels equal pre-gesture; redo: pixels equal post-gesture. Save .draivio, reopen offline; repeat pixel equality and object/schema inspection."
+      ],
+      "expected": "Pixel/history/save/export equality evidence for brush and selection paths",
+      "status": "not_run",
+      "tasks": [
+        "F01",
+        "F03",
+        "F04",
+        "A32"
+      ]
+    },
+    {
+      "id": "G04",
+      "phase": "first",
+      "kind": "manual",
+      "command": "npm run dev",
+      "steps": [
+        "Import gray ramp and six-color card. Set each of eight property adjustments individually to 40 then reset.",
+        "Decode exported SVG and compare pixel arrays, then undo/redo and save/reopen. Identity at zero; document each actual response."
+      ],
+      "expected": "No successful claim for a slider with unchanged pixels; temperature must disclose approximate CSS effect",
+      "status": "blocked",
+      "blocker": "sharpness/shadows/highlights not consumed by CanvasScene; no final pixel evidence",
+      "tasks": [
+        "R",
+        "F11",
+        "F13",
+        "A13",
+        "A15"
+      ]
+    },
+    {
+      "id": "G05",
+      "phase": "first",
+      "kind": "manual",
+      "command": "npm run dev",
+      "steps": [
+        "Invoke default cloud generate/edit; verify it is clearly demo/unavailable and cannot be adopted as actual image.",
+        "Use locally provided image result in offline test; adopt/replace, verify original + undo, cancellation and failure do not alter artwork.",
+        "With separately authorized real provider, record request/response image, model/parameters/cost and reference/mask semantics; do not use fixtures as service evidence."
+      ],
+      "expected": "Candidates separate from formal layers; no source-less success; real edit capability only after actual image/reference request evidence",
+      "status": "blocked",
+      "blocker": "Default cloud demo; real source currently only text-to-image and auto-adopts; no real edit provider call",
+      "tasks": [
+        "R",
+        "F23",
+        "F24",
+        "A17",
+        "A19"
+      ]
+    },
+    {
+      "id": "G06",
+      "phase": "first",
+      "kind": "manual",
+      "command": "npm run dev",
+      "steps": [
+        "Import non-square transparent PNG; transform/flip/crop; save/reopen; download SVG.",
+        "Independently decode output; assert dimensions, transparency, visible stack, no overlays, source pixels/transform/masks match viewport.",
+        "Try advertised PNG/JPEG/WebP and selection/layer export; record unavailable until implemented."
+      ],
+      "expected": "Explicit SVG-only current release; final raster formats decode correctly when added",
+      "status": "blocked",
+      "blocker": "TopBar exports SVG only; no independent browser output QA",
+      "tasks": [
+        "F03",
+        "A35"
+      ]
+    },
+    {
+      "id": "G07",
+      "phase": "full",
+      "kind": "manual",
+      "command": "npm run dev",
+      "steps": [
+        "Exercise every inventory row with a fresh local fixture and document before/after pixels, history, project reopen and export.",
+        "Check layer and ancestor locks, transformed/non-default dimensions, cancellation, invalid inputs and stale document/version/target results.",
+        "For missing/simulated rows, assert clear unavailable/demo UI and no artwork mutation; rerun after linked implementation tasks."
+      ],
+      "expected": "Every exposed tool either verified as real with evidence or clearly unavailable; no misleading aliases",
+      "status": "not_run",
+      "tasks": [
+        "A03",
+        "A05",
+        "A16",
+        "A32",
+        "A35",
+        "A37"
+      ]
+    },
+    {
+      "id": "G08",
+      "phase": "full",
+      "kind": "roadmap",
+      "command": "Read each planFile in taskReferences and execute its verification/acceptance cases",
+      "steps": [
+        "For every F01–F33, R and A02–A37 task, record independent current-cycle per-criterion evidence.",
+        "Implement natural-language planning -> validated tool commands -> atomic preview/commit/rollback, persistent edit records and recipes, then execute fixed benchmark fixtures and authorized real-service evaluations separately.",
+        "Cover RAW/high bit depth/ICC/CMYK/soft proof, multi-document/artboard, batch recovery, large-image memory, accessibility and platform checks before full-goal release."
+      ],
+      "expected": "All required criteria reviewed; real service quality/cost separate from mocked contracts; no silent skips",
+      "status": "not_run",
+      "tasks": [
+        "F01",
+        "F02",
+        "F03",
+        "F04",
+        "F05",
+        "F06",
+        "F07",
+        "F08",
+        "F09",
+        "F10",
+        "F11",
+        "F12",
+        "F13",
+        "F14",
+        "F15",
+        "F16",
+        "F17",
+        "F18",
+        "F19",
+        "F20",
+        "F21",
+        "F22",
+        "F23",
+        "F24",
+        "F25",
+        "F26",
+        "F27",
+        "F28",
+        "F29",
+        "F30",
+        "F31",
+        "F32",
+        "F33",
+        "R",
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
+        "A06",
+        "A07",
+        "A08",
+        "A09",
+        "A10",
+        "A11",
+        "A12",
+        "A13",
+        "A14",
+        "A15",
+        "A16",
+        "A17",
+        "A18",
+        "A19",
+        "A20",
+        "A21",
+        "A22",
+        "A23",
+        "A24",
+        "A25",
+        "A26",
+        "A27",
+        "A28",
+        "A29",
+        "A30",
+        "A31",
+        "A32",
+        "A33",
+        "A34",
+        "A35",
+        "A37",
+        "A36"
+      ]
+    },
+    {
+      "id": "G09",
+      "phase": "first",
+      "kind": "manual-regression",
+      "command": "npm run dev",
+      "steps": [
+        "Create image A; paint and transform to B; click original/history thumbnail A and compare full document state plus independently decoded SVG against saved A.",
+        "Assert either exact restore with one defined reversible history transition or an explicitly labeled metadata-only selection; switching compare must show real image sources, not tone placeholders.",
+        "Undo/redo, clear, project save/reopen and failed/missing history entry must preserve documented semantics."
+      ],
+      "expected": "Do not claim history recovery or image comparison from selectedHistoryId/CSS highlight alone",
+      "status": "blocked",
+      "blocker": "select-history only changes selectedHistoryId; no snapshot/source mapping",
+      "tasks": [
+        "R",
+        "A29",
+        "A30"
+      ]
+    },
+    {
+      "id": "G10",
+      "phase": "first",
+      "kind": "manual-regression",
+      "command": "npm run dev",
+      "steps": [
+        "Create one layer containing imported source, brush stroke, editable text, shape, applied mask, transform and adjustments. Duplicate it; independently inspect object IDs/layer IDs/mask references/order and compare rendered pixels.",
+        "Edit each copied object and nested metadata; original remains byte-for-byte unchanged. Undo removes entire copy in one transaction; redo restores it. Save/reopen/export retains both independently editable copies.",
+        "Duplicate a nested group: fresh IDs for every descendant and object; remap children/groupId and preserve stack order; no copied group points to original descendants. selectedLayerId and selectedLayerIds agree."
+      ],
+      "expected": "Complete independent layer/subtree/content copy, not source/name-only duplication",
+      "status": "blocked",
+      "blocker": "Audited duplicate-layer only shallow-copies Layer; side tables and group links not cloned/remapped",
+      "tasks": [
+        "R",
+        "F05",
+        "A04",
+        "A37"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run",
+      "exitCode": 1,
+      "outcome": "failed",
+      "files": {
+        "passed": 69,
+        "failed": 1,
+        "total": 70
+      },
+      "tests": {
+        "passed": 283,
+        "failed": 1,
+        "total": 284
+      },
+      "failure": "src/canvas/ToolInteraction.test.tsx > canvas tools perform visible actions on the canvas; line 30; Unable to find 已取色 #dd806d",
+      "log": "/tmp/draivio-ai-baseline-tests.log"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "outcome": "passed",
+      "log": "/tmp/draivio-ai-baseline-build.log"
+    },
+    {
+      "command": "vibeplan check",
+      "outcome": "not_run",
+      "reason": "Parent agent owns Vibe workflow and remote state; delegated scope was npm checks only"
+    },
+    {
+      "command": "npm test -- --run src/canvas/ToolInteraction.test.tsx",
+      "exitCode": 0,
+      "outcome": "passed",
+      "files": {
+        "passed": 1,
+        "failed": 0,
+        "total": 1
+      },
+      "tests": {
+        "passed": 4,
+        "failed": 0,
+        "total": 4
+      },
+      "log": "/tmp/draivio-ai-baseline-picker-focused.log",
+      "scope": "Read-only reproduction attempt after original full suite; does not replace failing full-suite evidence"
+    }
+  ],
+  "taskReferences": {
+    "F01": {
+      "id": "8e0e4c40-174e-4351-b7ff-9f41dc44f297",
+      "title": "建立可恢复编辑状态的 Draivio 项目文件",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f01.md"
+    },
+    "F02": {
+      "id": "6ed0827b-7695-4b62-a4c9-a32e9da456f0",
+      "title": "自动保存、恢复记录与崩溃恢复",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f02.md"
+    },
+    "F03": {
+      "id": "86334889-4f25-4c1d-8f34-afdb937b29fd",
+      "title": "PNG、JPEG、WebP 与选区/图层导出",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f03.md"
+    },
+    "F04": {
+      "id": "206ef3a1-378e-4dcd-8e49-1c95096aa733",
+      "title": "画布尺寸、图像缩放与统一像素坐标",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f04.md"
+    },
+    "F05": {
+      "id": "fcb42afd-75ad-4118-9793-e0ed297b7935",
+      "title": "组整体变换与图层合并",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f05.md"
+    },
+    "F06": {
+      "id": "fa00ba86-4507-4ae0-91c9-1bc405e94ede",
+      "title": "剪贴蒙版与完整常用混合模式",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f06.md"
+    },
+    "F07": {
+      "id": "c60979b3-31a2-4ecb-97c8-ca2c982120a6",
+      "title": "对齐与等距分布",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f07.md"
+    },
+    "F08": {
+      "id": "3dcae1cb-edf1-4148-96a9-1b883b5b520a",
+      "title": "标尺、参考线、网格与智能吸附",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f08.md"
+    },
+    "F09": {
+      "id": "868741ae-597d-48af-a575-1201884a4e4b",
+      "title": "真实主体识别与背景移除",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f09.md"
+    },
+    "F10": {
+      "id": "e8e211d0-5b0e-4ec0-81d0-5d517fb8dab5",
+      "title": "选择并遮住与蒙版边缘精修",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f10.md"
+    },
+    "F11": {
+      "id": "c94960da-5e9a-45dc-b6d6-37a9d0c4281a",
+      "title": "直方图、曝光与准确白平衡",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f11.md"
+    },
+    "F12": {
+      "id": "5bf6994e-5c2d-46ab-a1b8-b439c6188ba2",
+      "title": "曲线与色阶",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f12.md"
+    },
+    "F13": {
+      "id": "46c5e27c-1f9c-4614-a45f-df13d499e74d",
+      "title": "HSL、色彩平衡与调整预设",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f13.md"
+    },
+    "F14": {
+      "id": "79956f5e-d48e-4ef3-90d9-575117f1a6d5",
+      "title": "文本框、段落排版与局部文字样式",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f14.md"
+    },
+    "F15": {
+      "id": "2f295f3e-dd37-4a5e-931e-f8a26b1ab663",
+      "title": "可重编辑的图层效果",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f15.md"
+    },
+    "F16": {
+      "id": "d868e8c5-6ae1-4fda-90b8-f9e4cbc354af",
+      "title": "调整图层与局部调整蒙版",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f16.md"
+    },
+    "F17": {
+      "id": "4a41be31-fad3-4251-9d3b-a323437c1739",
+      "title": "智能对象与替换内容",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f17.md"
+    },
+    "F18": {
+      "id": "5d6da8e9-4f92-447e-b8b4-ec0c9d8e2ecd",
+      "title": "智能滤镜与可重排处理链",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f18.md"
+    },
+    "F19": {
+      "id": "35cf98fb-639a-49fd-873b-e5e26f0a1f7b",
+      "title": "污点修复、仿制与修补工具完整闭环",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f19.md"
+    },
+    "F20": {
+      "id": "c594f3eb-b5f9-4ce0-9944-eb5b53faf4e6",
+      "title": "移除工具与内容识别填充",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f20.md"
+    },
+    "F21": {
+      "id": "06c7705f-79d1-42da-8caa-0359f99fc1a2",
+      "title": "减淡、加深与局部色调画笔",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f21.md"
+    },
+    "F22": {
+      "id": "6bf0d14d-36db-491b-b99c-bbc19402af71",
+      "title": "路径锚点编辑与形状布尔运算",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f22.md"
+    },
+    "F23": {
+      "id": "1b230fe9-afb5-4be5-be5c-889397983034",
+      "title": "真实参考图编辑与按模型显示参数",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f23.md"
+    },
+    "F24": {
+      "id": "9bc057e9-6e10-4581-a2a5-44fd6e78ef4a",
+      "title": "选区生成填充与 AI 物体移除",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f24.md"
+    },
+    "F25": {
+      "id": "f3a699a2-6102-4617-8200-fb086bbd4008",
+      "title": "扩图与画布外生成",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f25.md"
+    },
+    "F26": {
+      "id": "7e930f74-07f8-41ae-aee5-50b6303446fb",
+      "title": "多文档标签与状态隔离",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f26.md"
+    },
+    "F27": {
+      "id": "9d2d2685-1fcb-46c3-b64b-948695a20176",
+      "title": "多画板与同设计多尺寸版本",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f27.md"
+    },
+    "F28": {
+      "id": "379fb04f-26a5-4cae-9de3-f2d4aa8f2f0d",
+      "title": "批量缩放、导出、水印与调整预设",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f28.md"
+    },
+    "F29": {
+      "id": "cb50a00b-2792-40b1-8398-1a9c3533b8bd",
+      "title": "RAW 解码与基础显影",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f29.md"
+    },
+    "F30": {
+      "id": "3e2fb3da-b5ff-4961-8610-0fab97a8cb34",
+      "title": "16 位与 32 位浮点高精度处理",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f30.md"
+    },
+    "F31": {
+      "id": "e91f3f81-16dd-423c-b482-0218e5a5d7b7",
+      "title": "ICC 色彩管理与配置文件转换",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f31.md"
+    },
+    "F32": {
+      "id": "27fab054-0c10-4bd6-bb31-16ad514b8a88",
+      "title": "CMYK 文档与印刷导出",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f32.md"
+    },
+    "F33": {
+      "id": "f37f0db2-51ec-4f83-92ef-fe41a45914c2",
+      "title": "软打样、色域警告与印刷检查",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/f33.md"
+    },
+    "R": {
+      "id": "92116dc7-a664-47f2-918e-8afa9d501a98",
+      "title": "升级图片处理右侧工作区与 AI 结果工作流",
+      "planFile": "docs/superpowers/plans/2026-11-13-editor-capabilities/existing-workspace-amendment.md"
+    },
+    "A01": {
+      "id": "3fe3accf-0bfd-40bb-873d-01e9c02f6626",
+      "title": "编辑能力基线、缺口与 AI 工具覆盖矩阵",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a01.md"
+    },
+    "A02": {
+      "id": "e3ac5120-efde-4c7f-b053-a7a0826eaff5",
+      "title": "AI 工具协议、参数校验与注册表",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a02.md"
+    },
+    "A03": {
+      "id": "beeba626-ccf0-4071-bb39-af5d4b042ab9",
+      "title": "文档上下文、作用范围与稳定对象绑定",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a03.md"
+    },
+    "A04": {
+      "id": "c0258b81-7048-4424-a77f-965dfff0ea7f",
+      "title": "基础编辑工具的统一命令适配",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a04.md"
+    },
+    "A05": {
+      "id": "1787311c-549f-49d5-8f86-22577f8f2437",
+      "title": "AI 多步事务、预检、回滚与撤销",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a05.md"
+    },
+    "A06": {
+      "id": "578528f7-2294-4915-99fb-fd85d77d32a6",
+      "title": "推理模型与视觉模型的服务配置",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a06.md"
+    },
+    "A07": {
+      "id": "564b5b94-30a1-4a80-9ad2-1dd1efd4d7e4",
+      "title": "推理请求适配、结构化输出与视觉输入",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a07.md"
+    },
+    "A08": {
+      "id": "d6e7cfa7-99f5-4da0-9098-92702a68b1d8",
+      "title": "自然语言规划器与能力约束",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a08.md"
+    },
+    "A09": {
+      "id": "9177717e-d54c-46e3-b83e-9b3675552713",
+      "title": "计划执行器、依赖调度与运行状态",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a09.md"
+    },
+    "A10": {
+      "id": "ed8b6dd2-e2c9-49ab-8656-e65c6fc5ef4e",
+      "title": "紧凑的一句话编辑入口与操作反馈",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a10.md"
+    },
+    "A11": {
+      "id": "e1b99a91-2b3b-4c03-9ca8-9f77eb7a3c30",
+      "title": "临时预览、前后比较与参数微调",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a11.md"
+    },
+    "A12": {
+      "id": "e955e655-c33d-4e20-aa62-c8a3a1f44b5b",
+      "title": "常用模糊与风格滤镜算法",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a12.md"
+    },
+    "A13": {
+      "id": "7505abfa-075d-405d-bcdd-9ffe9de8eb1f",
+      "title": "锐化、降噪与细节增强",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a13.md"
+    },
+    "A14": {
+      "id": "8d7c82b8-0211-4068-8b7c-7342f1b79425",
+      "title": "透视、镜头畸变与局部形变工具",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a14.md"
+    },
+    "A15": {
+      "id": "f451dc4f-d6d7-4a21-9178-b692673289f2",
+      "title": "颜色调整、效果与局部蒙版的 AI 适配",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a15.md"
+    },
+    "A16": {
+      "id": "2553bc91-6db9-43e0-8378-552c50d3dbea",
+      "title": "语义目标定位、分割与蒙版工具",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a16.md"
+    },
+    "A17": {
+      "id": "220e882d-60db-4891-962b-555a43819d94",
+      "title": "生成编辑路由、能力协商与参数适配",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a17.md"
+    },
+    "A18": {
+      "id": "5446b035-c5b0-4fdf-8c7b-e11d1fe8451f",
+      "title": "生成任务队列、额度提示与可靠取消",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a18.md"
+    },
+    "A19": {
+      "id": "b2431637-e693-4cae-bb40-2909c03508f5",
+      "title": "局部生成合成、保护区域与采用",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a19.md"
+    },
+    "A20": {
+      "id": "e5e34889-fad7-4d36-b81e-72c9eafe778e",
+      "title": "AI 布光、背景匹配与合成协调",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a20.md"
+    },
+    "A21": {
+      "id": "ee15408c-900f-4045-8c5a-6be30dfb22da",
+      "title": "放大、去模糊与修复模型接入",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a21.md"
+    },
+    "A22": {
+      "id": "e845dcb5-6e8b-45d0-b45d-a7129aeee830",
+      "title": "识字、图片文字替换与可编辑排版",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a22.md"
+    },
+    "A23": {
+      "id": "1fc69f79-2bc3-418c-b07d-0f8b4b962ecb",
+      "title": "可编辑操作配方引擎与版本管理",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a23.md"
+    },
+    "A24": {
+      "id": "d0905d23-8b35-4295-96f2-be9d7a6569b1",
+      "title": "电影调色与风格预设配方",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a24.md"
+    },
+    "A25": {
+      "id": "b58231aa-9702-4727-bcb3-fe7de39e2e31",
+      "title": "人像自然精修配方",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a25.md"
+    },
+    "A26": {
+      "id": "c9c9a008-a96f-4cc6-9087-4046908f3346",
+      "title": "产品抠图、背景与自然投影配方",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a26.md"
+    },
+    "A27": {
+      "id": "fc3e6f3d-63e1-4b43-8ccc-445c79ba36a4",
+      "title": "双重曝光与创意合成配方",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a27.md"
+    },
+    "A28": {
+      "id": "50dd5e0f-3913-4242-8884-f624335b860a",
+      "title": "海报排版、多尺寸与文字保护配方",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a28.md"
+    },
+    "A29": {
+      "id": "8d439639-69fc-4fd8-b370-6902efd2f01a",
+      "title": "连续对话修改、操作记录与纠错",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a29.md"
+    },
+    "A30": {
+      "id": "4326f70d-1119-4f4e-bb66-081095b1a341",
+      "title": "AI 编辑记录持久化与离线恢复",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a30.md"
+    },
+    "A31": {
+      "id": "65482a83-9916-4164-8f93-b314539f19f7",
+      "title": "AI 配方批处理、预算与逐项结果",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a31.md"
+    },
+    "A32": {
+      "id": "0bd0c9b8-75e6-4f3d-9e7a-168d48f167ae",
+      "title": "AI 编辑评测集与质量回归体系",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a32.md"
+    },
+    "A33": {
+      "id": "a80140dc-841e-4a91-86d2-1fbe7a3937e5",
+      "title": "AI 工作流性能、内存与大图处理",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a33.md"
+    },
+    "A34": {
+      "id": "f869d0b1-e563-4ac4-8269-adddd115221a",
+      "title": "AI 工具调用边界、凭据与数据保护",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a34.md"
+    },
+    "A35": {
+      "id": "6bab7ff2-efdb-4bea-92c4-4736f6cc4f83",
+      "title": "跨平台、无障碍与完整工作流验收",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a35.md"
+    },
+    "A37": {
+      "id": "ada2179a-3971-4ede-88d7-727a58c846f3",
+      "title": "画笔、填充、修复、文字与路径的 AI 工具适配",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a37.md"
+    },
+    "A36": {
+      "id": "9110cc9a-1498-4365-9768-23baddf97337",
+      "title": "用户说明、能力声明与分阶段发布验收",
+      "planFile": "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/a36.md"
+    }
+  },
+  "remainingIssues": [
+    "A01 inventory and executable checklist ready for review; all-tool live execution acceptance not claimed",
+    "Resolve full-suite failure and execute missing browser pixel gates before claiming first release",
+    "Roadmap task acceptance and real-service evaluations remain separate work"
+  ],
+  "taskReferenceSources": [
+    "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/manifest.json",
+    "docs/superpowers/plans/2026-11-13-ai-editing-roadmap/write-status.json"
+  ],
+  "failureInvestigation": {
+    "test": "src/canvas/ToolInteraction.test.tsx:30",
+    "skill": "superpowers:systematic-debugging",
+    "observed": "Original full suite failed exact picker notice; focused reproduction passes 4/4 in 1.42s",
+    "trace": [
+      "CanvasViewport pointer picker calls mocked sampleCanvasColor",
+      "Promise completion dispatches set-brush-color",
+      "editorReducer assigns notice 已取色 + color",
+      "TopBar effect forwards state.notice with message.info key editor-notice",
+      "MessageHost subscribes and renders portal text"
+    ],
+    "rootCause": "Not proven: exact code path and string match in current source, focused failure not reproducible. No evidence justifies blaming pixel sampling or removing assertion.",
+    "hypotheses": [
+      "Default findByText 1s wait can be exceeded under original parallel-suite load",
+      "Concurrent edits may mean full-suite and focused runs observed different code snapshots"
+    ],
+    "recommendedFix": "First freeze/finish concurrent R01 changes and rerun full suite. If failure recurs, capture mock call and resolved value, reducer notice, and messageStore snapshot across boundary before choosing a targeted fix. If measured delay alone exceeds timeout, use an explicit condition/wait for resolved picker+message (bounded timeout) rather than changing pixel code or weakening assertion.",
+    "codeOrTestEdits": false
+  },
+  "liveAuditCheckpoint": {
+    "date": "2026-11-14",
+    "status": "blocked_native_input_not_acceptance",
+    "countedToolExecutions": 0,
+    "attemptedToolGestures": 3,
+    "attemptedToolIds": [
+      "brush",
+      "pencil",
+      "gradient-brush"
+    ],
+    "remainingToolIds": [
+      "select",
+      "move",
+      "selection",
+      "rectangle-select",
+      "ellipse-select",
+      "lasso-select",
+      "polygon-select",
+      "bezier-select",
+      "magic-wand",
+      "subject-select",
+      "brush",
+      "pencil",
+      "gradient-brush",
+      "brush-line",
+      "soft-brush",
+      "smudge",
+      "eraser",
+      "background-eraser",
+      "healing",
+      "clone-stamp",
+      "mask",
+      "mask-quick",
+      "mask-gradient",
+      "mask-subject",
+      "crop",
+      "perspective-crop",
+      "transform",
+      "text",
+      "shape",
+      "shape-ellipse",
+      "shape-line",
+      "shape-arrow",
+      "pen",
+      "picker",
+      "fill",
+      "gradient-fill",
+      "pan",
+      "zoom",
+      "rotate"
+    ],
+    "url": "http://127.0.0.1:5189/",
+    "title": "Draivio — AI 图片创作",
+    "blocker": {
+      "kind": "native_input_unavailable",
+      "error": "Computer Use server error -10005: noWindowsAvailable",
+      "recoveryAttempts": [
+        "Inventory showed Chrome running, browsers empty",
+        "Rebound Chrome getApp; correct5189 editor AX readable",
+        "Retried drag and click, both returned same error"
+      ],
+      "scope": "CUA action channel; not diagnosed as product error"
+    },
+    "file": "docs/implementation/2026-11-14-ai-live-tool-audit.json",
+    "staticSnapshot": {
+      "source": "/Users/szys/AI/Draivio/dist",
+      "snapshot": "/tmp/draivio-ai-audit-static-20261114",
+      "files": {
+        "index.html": "dc8494107bcdd24f2001f9eff482fdbc26b8a93edc116debee807fb7b59e0870",
+        "assets/index-B1FLZj3t.css": "526b0a10c66eb39e0d5f225aa1307a20a4ef0a39d4abb5f3f85749642e1cb9f0",
+        "assets/index-Db4xoRbE.js": "b6ad0fee554532c16f384afc8420d56b4cddc5d2b2589e5bb6d4cb713adb3b7e"
+      },
+      "scope": "Dated pre-final-fixes build copied from original checkout; not current repaired source or final release acceptance"
+    }
+  },
+  "laterSnapshotChecks": [
+    {
+      "command": "npm test -- --run",
+      "source": "parent-reported execution; audit read log tail only",
+      "outcome": "passed",
+      "reportedExitCode": 0,
+      "filesPassed": 76,
+      "testsPassed": 311,
+      "log": "/tmp/draivio-root-r01-full-tests.log",
+      "scope": "Later R01 snapshot, not original baseline; no browser pixel proof"
+    },
+    {
+      "command": "npm run build",
+      "source": "parent-reported execution; audit read log tail only",
+      "outcome": "passed",
+      "reportedExitCode": 0,
+      "modules": 102,
+      "log": "/tmp/draivio-root-r01-build.log",
+      "scope": "Later R01 snapshot; original baseline failure preserved"
+    }
+  ]
+}

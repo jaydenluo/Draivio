@@ -1,0 +1,83 @@
+[
+  {
+    "file": "cropped.png",
+    "size": [
+      32,
+      32
+    ],
+    "probes": [
+      {
+        "xy": [
+          16,
+          16
+        ],
+        "actual": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "expected": [
+          255,
+          0,
+          0,
+          255
+        ]
+      }
+    ],
+    "passed": true
+  },
+  {
+    "file": "cropped-selection.png",
+    "size": [
+      32,
+      32
+    ],
+    "probes": [
+      {
+        "xy": [
+          0,
+          0
+        ],
+        "actual": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "expected": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "xy": [
+          31,
+          31
+        ],
+        "actual": [
+          255,
+          0,
+          0,
+          255
+        ],
+        "expected": [
+          255,
+          0,
+          0,
+          255
+        ]
+      }
+    ],
+    "passed": true
+  },
+  {
+    "file": "cropped-scaled.svg",
+    "width": 64,
+    "height": 64,
+    "viewBox": "16 16 32 32",
+    "passed": true
+  }
+]

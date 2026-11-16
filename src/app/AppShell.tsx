@@ -4,9 +4,12 @@ import { HistoryStrip } from '../components/HistoryStrip'
 import { Inspector } from '../components/Inspector'
 import { ToolRail } from '../components/ToolRail'
 import { TopBar } from '../components/TopBar'
+import { MessageHost } from '../components/MessageHost'
 import { ToolOptionsBar } from '../components/ToolOptionsBar'
 import { useEditor } from '../state/editor'
 import { useToolShortcuts } from '../tools/useToolShortcuts'
+import { RecoveryControl } from '../document/RecoveryControl'
+import { DocumentTabs } from '../document/DocumentTabs'
 
 const MIN_INSPECTOR_WIDTH = 240
 const MAX_INSPECTOR_WIDTH = 520
@@ -16,7 +19,6 @@ export function AppShell() {
   useToolShortcuts()
   const [inspectorWidth, setInspectorWidth] = useState(320)
   const [resizing, setResizing] = useState(false)
-
   useEffect(() => {
     if (!resizing) return
     const handleMove = (event: PointerEvent) => {
@@ -43,5 +45,5 @@ export function AppShell() {
   }, [])
 
   const style = { '--inspector-width': `${inspectorWidth}px` } as CSSProperties
-  return <div className={`app-shell ${resizing ? 'is-resizing' : ''} ${state.historyCollapsed ? 'history-collapsed' : ''}`} style={style}><TopBar /><div className="workspace"><ToolRail /><div className="canvas-workspace"><ToolOptionsBar /><CanvasViewport /></div><Inspector inspectorWidth={inspectorWidth} onResizeStart={() => setResizing(true)} onResizeBy={(delta) => setInspectorWidth((value) => Math.min(MAX_INSPECTOR_WIDTH, Math.max(MIN_INSPECTOR_WIDTH, value + delta)))} /></div><HistoryStrip /></div>
+  return <div className={`app-shell ${resizing ? 'is-resizing' : ''} ${state.historyCollapsed ? 'history-collapsed' : ''}`} style={style}><MessageHost /><TopBar /><DocumentTabs /><div className="workspace"><ToolRail /><div className="canvas-workspace"><ToolOptionsBar /><CanvasViewport /></div><Inspector inspectorWidth={inspectorWidth} onResizeStart={() => setResizing(true)} onResizeBy={(delta) => setInspectorWidth((value) => Math.min(MAX_INSPECTOR_WIDTH, Math.max(MIN_INSPECTOR_WIDTH, value + delta)))} /></div><HistoryStrip /><RecoveryControl /></div>
 }

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "fingerprint": "01582efbea841fb772191d04a6f0793a8f40595a4f9ddebc31455bd788606665",
+  "server": "https://vibeplan.szxinjin.cn/api",
+  "projectId": "c3263908-e8c1-47ed-ad80-f822e5a73a8f",
+  "actorId": "7992bdcf-cb2d-4562-892e-1ba76dd36bd1",
+  "verified": true,
+  "entries": {
+    "goal": {
+      "mutationId": "d2be02aa-afd4-43d2-9867-620aa2a3ce31",
+      "state": "created",
+      "id": "3cd6bb5e-0c41-4aa4-aa7b-3ebcfb058748"
+    },
+    "editor": {
+      "mutationId": "d76b9581-485c-42f8-9470-c3a3438ce2da",
+      "state": "created",
+      "id": "04040894-9ac5-4809-b183-c6014d9d7e2d"
+    },
+    "imaging": {
+      "mutationId": "be920cd3-d64f-42d9-a588-a620dae7277a",
+      "state": "created",
+      "id": "a7c12509-2666-428b-b333-1f4274fc4e2d"
+    },
+    "platform": {
+      "mutationId": "2ef8a53e-c66c-4349-9549-3a58cf224e47",
+      "state": "created",
+      "id": "00e9279f-35e2-4e85-843e-a95e8d61181d"
+    },
+    "workflow": {
+      "mutationId": "b295d1c4-433f-48b5-81f2-36b45c966fcb",
+      "state": "created",
+      "id": "44a3ec80-c695-46a3-8808-a72f9001b4f7"
+    },
+    "quality": {
+      "mutationId": "f6ea14b6-f21a-470c-82ac-293bc2d31952",
+      "state": "created",
+      "id": "ff1d3a49-3bef-4b2a-8b3b-2aeec254dd53"
+    }
+  }
+}

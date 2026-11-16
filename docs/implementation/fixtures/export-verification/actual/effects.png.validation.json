@@ -1,0 +1,98 @@
+{
+  "file": "/Users/szys/.codex/worktrees/ai-editing-roadmap/Draivio/docs/implementation/fixtures/export-verification/actual/effects.png",
+  "scenario": "effects-canvas",
+  "passed": true,
+  "requestedFormat": "png",
+  "decodedFormat": "PNG",
+  "decodedMime": "image/png",
+  "capturedMime": null,
+  "capturedMimeChecked": false,
+  "size": [
+    128,
+    128
+  ],
+  "bytes": 1545,
+  "probes": [
+    {
+      "label": "brightness doubled; child .5 \u00d7 parent .5 alpha",
+      "xy": [
+        90,
+        88
+      ],
+      "expected": [
+        64,
+        128,
+        192,
+        64
+      ],
+      "actual": [
+        64,
+        128,
+        191,
+        64
+      ],
+      "passed": true
+    },
+    {
+      "label": "masked half after flip and rotation",
+      "xy": [
+        90,
+        104
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "label": "original square position cleared by transform",
+      "xy": [
+        32,
+        32
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "label": "transparent background",
+      "xy": [
+        120,
+        120
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    }
+  ],
+  "errors": []
+}

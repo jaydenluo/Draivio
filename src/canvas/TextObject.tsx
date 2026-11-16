@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { normalizeFontFamily } from '../text/systemFonts'
 
 export type CanvasTextObject = {
   id: string; layerId: string; x: number; y: number; text: string
@@ -17,7 +18,7 @@ export function TextObject({ object, onCommit, selected, onSelect }: { object: C
     setEditing(false)
     if (apply && draft !== object.text) onCommit({ ...object, text: draft })
   }
-  const style = { left: `${object.x}%`, top: `${object.y}%`, fontFamily: object.fontFamily, fontSize: object.fontSize, fontWeight: object.fontWeight, color: object.color, textAlign: object.align }
+  const style = { left: `${object.x}%`, top: `${object.y}%`, fontFamily: normalizeFontFamily(object.fontFamily), fontSize: object.fontSize, fontWeight: object.fontWeight, color: object.color, textAlign: object.align }
   return <div className={`canvas-text-object ${selected ? 'selected' : ''}`} style={style} onPointerDown={(event) => event.stopPropagation()} onClick={onSelect} onDoubleClick={() => { if (editing) return; finished.current = false; setDraft(object.text); setEditing(true) }}>
     {editing ? <textarea ref={input} aria-label="编辑画布文字" value={draft} onChange={(event) => setDraft(event.target.value)} onBlur={() => finish(true)} onKeyDown={(event) => {
       event.stopPropagation()

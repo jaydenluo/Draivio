@@ -1,0 +1,212 @@
+
+> draivio-desktop@0.1.0 test
+> vitest --run
+
+
+ RUN  v5.1.0 /Users/szys/.codex/worktrees/ai-editing-roadmap/Draivio
+
+stderr | src/creation/Inspector.test.tsx > submitting the AI composer shows loading and appends a result
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ src/layers/PropertiesPanel.history.test.tsx (5 tests) 1441ms
+   ✓ actual property scrubbing commits once, history thumbnail is real, and a click restores it 781ms
+   ✓ a long canvas transform gesture commits once and cancelled preview leaves history and document untouched 460ms
+ ✓ src/creation/ServiceSourceSettings.test.tsx (11 tests) 1752ms
+   ✓ saves multiple accounts and updates the model selector immediately 413ms
+stderr | src/creation/Inspector.test.tsx > keeps the submitted scope and intent when the user changes them during execution
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ src/canvas/ToolInteraction.test.tsx (4 tests) 1723ms
+   ✓ canvas tools perform visible actions on the canvas 1065ms
+   ✓ selection tool creates a rectangle from a drag gesture 331ms
+stderr | src/creation/Inspector.test.tsx > selects 3 results and creates the matching candidates and a history entry without formal layers
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stdout | src/document/projectScale.test.ts > round trips 100 layers with 20 real 2048px PNGs and records process memory
+{"label":"F01 100 layers / 20 real 2048x2048 gradient PNG","saveMs":124,"serializedBytes":2394201,"baselineRssBytes":206569472,"afterRssBytes":262176768,"peakRssBytes":272433152}
+
+ ✓ src/document/projectScale.test.ts (1 test) 2217ms
+   ✓ round trips 100 layers with 20 real 2048px PNGs and records process memory 2215ms
+ ✓ src/canvas/CanvasObjectTools.test.tsx (4 tests) 1943ms
+   ✓ continuous paint is a single undo operation and eraser masks the layer 840ms
+   ✓ mask brush, invert and apply affect the selected layer and can be undone 501ms
+   ✓ shapes are real canvas objects; text can be edited and undo restores its content 344ms
+ ✓ src/components/ButtonAudit.test.tsx (4 tests) 1953ms
+   ✓ top actions support undo, redo, export and account settings 937ms
+   ✓ history tabs, clear and import buttons update the history area 628ms
+stderr | src/creation/Inspector.test.tsx > selects 6 results and creates the matching candidates and a history entry without formal layers
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+stderr | src/creation/Inspector.test.tsx > selects 8 results and creates the matching candidates and a history entry without formal layers
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ ✓ src/creation/Inspector.test.tsx (8 tests) 2365ms
+   ✓ uses one AI composer for generation and editing 501ms
+   ✓ selecting a history thumbnail makes it active 334ms
+   ✓ selects 8 results and creates the matching candidates and a history entry without formal layers 312ms
+ ✓ src/canvas/SelectionOverlay.test.tsx (11 tests) 3166ms
+   ✓ draws an ellipse with physical Shift ratio and commits a whole gesture once 475ms
+   ✓ switching to selection tool allows moving the interior of a combined selection 444ms
+   ✓ selection actions and option fields update actual geometry and state 403ms
+   ✓ combines ellipse and rectangle geometry through every mode and keeps controls available 721ms
+ ✓ src/creation/ModelGuide.test.tsx (4 tests) 867ms
+   ✓ opens a sourced model guide and explains that strength is not universal 427ms
+ ✓ src/canvas/PathWorkflow.test.tsx (2 tests) 780ms
+   ✓ freehand lasso closes on release and creates an irregular selection 313ms
+   ✓ polygon can be closed with Enter and explicitly converted to a selection 465ms
+ ✓ src/tools/useToolShortcuts.test.tsx (5 tests) 1270ms
+   ✓ switches to each documented tool shortcut 442ms
+   ✓ ignores tool shortcuts while editing text or account fields 353ms
+ ✓ src/creation/ImageGeneration.test.tsx (10 tests) 4474ms
+   ✓ simulation provider completes visible candidates without creating formal layers 962ms
+   ✓ a new document can start simulation immediately while the old demo timer is discarded 957ms
+   ✓ same-ID restore discards old real callbacks and retry while allowing the new session to generate 965ms
+   ✓ same-ID restore cancels pending demo and permits immediate replacement batch 957ms
+ ✓ src/layers/LayersPanel.hierarchy.test.tsx (4 tests) 759ms
+   ✓ labels inherited locks and visibility, renders thumbnails through the scene and collapses all descendants 433ms
+ ✓ src/creation/OutputFormat.test.tsx (3 tests) 1297ms
+   ✓ replaces separate controls with nested ratio and resolution choices applied together 624ms
+   ✓ supports automatic resolution per ratio and fully automatic output across placements 418ms
+ ✓ src/creation/ComposerLayout.test.tsx (2 tests) 1236ms
+   ✓ moves the same composer between the canvas and the sidebar without losing work 707ms
+   ✓ minimizes and restores the composer in either placement while preserving its draft 528ms
+ ✓ src/creation/InspectorWorkspace.test.tsx (4 tests) 1370ms
+   ✓ switches the right workspace between layers, properties and AI results 705ms
+   ✓ renames, duplicates, locks and reorders a layer from the right panel 435ms
+ ✓ src/creation/ComposerPopover.test.tsx (2 tests) 751ms
+   ✓ anchors each composer menu to its own trigger and follows viewport changes 604ms
+ ✓ src/canvas/layerExtraction.test.tsx (10 tests) 733ms
+ ✓ src/components/ToolOptionsBar.test.tsx (4 tests) 767ms
+   ✓ shows selection controls and persists numeric options through editor state 449ms
+ ✓ src/canvas/CanvasViewport.test.tsx (1 test) 624ms
+   ✓ selecting a drawing tool updates its pressed state and selection overlay 623ms
+ ✓ src/canvas/CanvasAsyncHistory.test.tsx (14 tests) 989ms
+ ✓ src/render/ExportDialog.test.tsx (15 tests) 1101ms
+   ✓ blocks actual canvas/layer global shortcuts while retaining editable export fields 340ms
+ ✓ src/document/RecoveryControl.test.tsx (11 tests) 786ms
+   ✓ restores through dirty confirmation with a new identity and an unset save destination 351ms
+ ✓ src/components/ToolRail.test.tsx (11 tests) 716ms
+ ✓ src/creation/PromptHistory.test.tsx (2 tests) 498ms
+   ✓ composer groups forty prompt characters into one edit 309ms
+ ✓ src/layers/ResultsPanel.test.tsx (6 tests) 558ms
+ ✓ src/canvas/CanvasRotation.test.tsx (2 tests) 895ms
+   ✓ rotate tool exposes angle controls and changes the canvas by explicit buttons 691ms
+ ✓ src/canvas/selectionGeometry.test.ts (8 tests) 177ms
+ ✓ src/document/DocumentTabs.test.tsx (3 tests) 451ms
+ ✓ src/components/HistoryStrip.import.test.tsx (3 tests) 504ms
+ ✓ src/layers/PropertiesPanel.adjustments.test.tsx (2 tests) 338ms
+ ✓ src/document/ProjectFileControl.test.tsx (10 tests) 611ms
+ ✓ src/canvas/TransformOverlay.test.tsx (7 tests) 391ms
+stdout | docs/implementation/fixtures/adjustment-reference-benchmark.test.ts > records local reference timings without treating them as native performance evidence
+[{"size":128,"elapsedMs":214.59404099999983,"parameters":{"sharpness":70,"blur":100}},{"size":256,"elapsedMs":222.1005419999999,"parameters":{"sharpness":70,"blur":100}}]
+
+ ✓ docs/implementation/fixtures/adjustment-reference-benchmark.test.ts (1 test) 463ms
+   ✓ records local reference timings without treating them as native performance evidence 462ms
+ ✓ src/canvas/CanvasPixelTools.test.tsx (3 tests) 237ms
+ ✓ src/components/ResizableWorkspace.test.tsx (1 test) 302ms
+   ✓ resizes the inspector with the canvas divider 301ms
+ ✓ src/app/App.test.tsx (1 test) 228ms
+ ✓ src/components/RecentColorPalette.test.tsx (1 test) 192ms
+ ✓ src/document/ProjectClose.test.tsx (2 tests) 215ms
+ ✓ src/creation/ComposerPreferences.test.tsx (4 tests) 261ms
+ ✓ src/canvas/CanvasDocumentText.test.tsx (1 test) 212ms
+ ✓ src/components/NumericScrubber.test.tsx (4 tests) 188ms
+ ✓ src/canvas/exportScene.test.tsx (9 tests) 204ms
+ ✓ src/components/AppShell.test.tsx (1 test) 241ms
+ ✓ src/canvas/CanvasScene.test.tsx (6 tests) 154ms
+ ✓ src/components/ColorPicker.test.tsx (3 tests) 264ms
+stderr | src/components/MessageHost.test.tsx > keeps messages in the active dialog accessibility tree
+Cannot use a ref on a React element as a container to `createRoot` or `createPortal` if that element also sets "children" text content using React. It should be a leaf with no children. Otherwise it's ambiguous which children should be used.
+
+ ✓ src/components/MessageHost.test.tsx (3 tests) 129ms
+ ✓ src/canvas/PathOverlay.test.tsx (3 tests) 143ms
+ ✓ src/components/AlignmentControls.test.tsx (2 tests) 247ms
+ ✓ src/document/recoveryScheduler.test.ts (8 tests) 48ms
+ ✓ src/creation/ModelSourcePicker.test.tsx (4 tests) 168ms
+ ✓ src/canvas/TextObject.test.tsx (3 tests) 138ms
+ ✓ src/document/DocumentSizeControl.test.tsx (1 test) 226ms
+ ✓ src/render/exportImage.test.ts (29 tests) 165ms
+ ✓ src/tools/toolRegistry.test.ts (7 tests) 200ms
+ ✓ src/layers/PropertiesPanel.pixels.test.tsx (1 test) 91ms
+ ✓ src/lib/request.test.ts (4 tests) 13ms
+ ✓ src/document/recoveryStore.test.ts (5 tests) 82ms
+ ✓ docs/implementation/fixtures/adjustment-raster-artifacts.test.ts (1 test) 70ms
+ ✓ dev/providerRelay.test.ts (4 tests) 38ms
+ ✓ src/canvas/AdjustmentFilter.test.tsx (6 tests) 104ms
+ ✓ src/canvas/BrushScene.test.tsx (4 tests) 60ms
+ ✓ src/canvas/MaskOverlay.test.tsx (2 tests) 66ms
+ ✓ src/components/ToolIcon.test.tsx (1 test) 43ms
+ ✓ src/canvas/rasterTools.test.ts (17 tests) 54ms
+ ✓ src/document/alignment.test.ts (33 tests) 30ms
+ ✓ src/canvas/documentIO.test.ts (2 tests) 33ms
+ ✓ src/creation/imageBatch.test.ts (6 tests) 93ms
+ ✓ src/canvas/PerspectiveOverlay.test.tsx (1 test) 99ms
+ ✓ src/creation/AIResult.test.ts (8 tests) 13ms
+ ✓ src/document/documentGeometry.test.ts (15 tests) 77ms
+ ✓ src/state/documentHistory.test.ts (11 tests) 27ms
+ ✓ src/state/layerWorkspace.test.ts (16 tests) 24ms
+ ✓ src/imaging/layerAdjustments.test.ts (15 tests) 20ms
+ ✓ src/document/projectFormat.test.ts (17 tests) 29ms
+ ✓ src/ai/tools/registry.test.ts (23 tests) 19ms
+ ✓ docs/implementation/fixtures/alignment-verification/fixture.test.ts (4 tests) 10ms
+ ✓ src/creation/serviceConnections.test.ts (12 tests) 70ms
+ ✓ src/lib/projectImageRequest.test.ts (6 tests) 29ms
+ ✓ src/document/projectFixture.test.ts (1 test) 16ms
+ ✓ src/creation/openaiImages.test.ts (5 tests) 26ms
+ ✓ src/canvas/pathGeometry.test.ts (4 tests) 11ms
+ ✓ src/canvas/layerCoordinates.test.ts (8 tests) 9ms
+ ✓ src/engine/raster/composite.test.ts (5 tests) 7ms
+ ✓ src/canvas/rasterBrush.test.ts (3 tests) 6ms
+ ✓ src/creation/modelSources.test.ts (2 tests) 10ms
+ ✓ src/tools/capabilityMatrix.test.ts (3 tests) 10ms
+ ✓ src/creation/generationOptions.test.ts (2 tests) 4ms
+ ✓ src/state/layerHierarchy.test.ts (2 tests) 7ms
+ ✓ src/creation/outputFormats.test.ts (2 tests) 6ms
+ ✓ src/canvas/viewportFit.test.ts (3 tests) 5ms
+ ✓ docs/implementation/fixtures/export-verification/fixture.test.ts (2 tests) 6ms
+ ✓ src/document/documentWorkspace.test.ts (3 tests) 8ms
+ ✓ src/document/projectStorage.test.ts (2 tests) 10ms
+ ✓ src/canvas/transformGeometry.test.ts (8 tests) 8ms
+ ✓ src/text/systemFonts.test.ts (2 tests) 6ms
+ ✓ src/canvas/selectionRaster.test.ts (2 tests) 6ms
+ ✓ src/state/editor.test.tsx (1 test) 5ms
+ ✓ src/canvas/BrushEngine.test.ts (3 tests) 5ms
+ ✓ src/document/projectLifecycle.test.ts (1 test) 5ms
+ ✓ src/render/batchExport.test.ts (2 tests) 3ms
+ ✓ src/canvas/pointerPressure.test.ts (2 tests) 3ms
+ ✓ src/creation/imageProtocols.test.ts (2 tests) 3ms
+
+ Test Files  103 passed (103)
+      Tests  574 passed (574)
+   Start at  12:27:44
+   Duration  19.70s (environment 51%, tests 29%, setup 12%, import 5%, transform 4%)
+
+Environment  jsdom was created 103 times · 80.62s total, 51% of tracked time
+             create it once per worker with pool: 'vmThreads' (keeps per-file isolation) or isolate: false (shares it across files)
+             learn more: https://vitest.dev/guide/improving-performance#test-environments
+

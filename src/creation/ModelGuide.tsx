@@ -80,6 +80,8 @@ export function ModelGuide({ onClose }: { onClose: () => void }) {
           <div className="model-guide-grid">{guide.models.filter((model) => !model.verified).map((model) => <ModelCard key={model.id} model={model} />)}</div>
         </> : section === 'parameters' ? <>
           <article className="model-guide-strength"><span className="model-guide-eyebrow">先理解变化程度</span><h3>{guide.strength.title}</h3><p>{guide.strength.summary}</p><p>{guide.strength.example}</p><p>{guide.strength.difference}</p><p>{guide.strength.support}</p><p className="model-guide-note">{guide.strength.demo}</p></article>
+          <h3 className="model-guide-section-title">已核查的模型参数示例</h3>
+          <div className="model-guide-grid">{guide.parameterExamples.map((item) => <article className="model-guide-card" key={item.name}><h3>{item.name}</h3><p>{item.meaning}</p><div className="model-guide-sources"><a href={item.url} target="_blank" rel="noopener noreferrer">官方参数文档 ↗</a></div></article>)}</div>
           <div className="model-guide-parameter-list">{guide.parameters.map((item) => <article key={item.name}><h3>{item.name}</h3><p>{item.meaning}</p></article>)}</div>
         </> : <>
           <h3 className="model-guide-section-title">把目标说清楚，比盲目拉高参数更有效</h3>

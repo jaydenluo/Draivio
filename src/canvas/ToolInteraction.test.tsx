@@ -58,8 +58,8 @@ test('selection handles resize an existing rectangle', () => {
 test('history strip collapses and restores its results area', () => {
   render(<EditorProvider><AppShell /></EditorProvider>)
   fireEvent.click(screen.getByRole('button', { name: '折叠历史' }))
-  expect(screen.queryByRole('button', { name: '原图 · 现在' })).not.toBeInTheDocument()
+  expect(screen.queryByRole('button', { name: '初始文档' })).not.toBeInTheDocument()
   expect(screen.getByRole('button', { name: '展开历史' })).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: '展开历史' }))
-  expect(screen.getByRole('button', { name: '原图 · 现在' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: '初始文档' })).toBeInTheDocument()
 })

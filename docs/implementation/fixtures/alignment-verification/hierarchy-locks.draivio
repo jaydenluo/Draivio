@@ -1,0 +1,224 @@
+{
+  "format": "draivio",
+  "schemaVersion": 2,
+  "metadata": {
+    "id": "F07 transformed hierarchy and ancestor lock",
+    "name": "F07 transformed hierarchy and ancestor lock"
+  },
+  "assets": {},
+  "document": {
+    "documentWidth": 500,
+    "documentHeight": 400,
+    "documentBackground": "transparent",
+    "layers": [
+      {
+        "id": "rotated-parent",
+        "name": "rotated-parent",
+        "className": "layer-group",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常",
+        "transform": {
+          "kind": "transform",
+          "rect": {
+            "x": 20,
+            "y": 20,
+            "width": 55,
+            "height": 50
+          },
+          "rotation": 30,
+          "flipX": false,
+          "flipY": false
+        },
+        "children": [
+          "nested-child"
+        ]
+      },
+      {
+        "id": "nested-child",
+        "name": "nested-child",
+        "className": "layer-art",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常",
+        "transform": {
+          "kind": "transform",
+          "rect": {
+            "x": 10,
+            "y": 10,
+            "width": 20,
+            "height": 20
+          },
+          "rotation": -15,
+          "flipX": false,
+          "flipY": false
+        },
+        "groupId": "rotated-parent"
+      },
+      {
+        "id": "locked-ancestor",
+        "name": "locked-ancestor",
+        "className": "layer-group",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常",
+        "transform": {
+          "kind": "transform",
+          "rect": {
+            "x": 60,
+            "y": 10,
+            "width": 30,
+            "height": 30
+          },
+          "rotation": -20,
+          "flipX": false,
+          "flipY": false
+        },
+        "children": [
+          "locked-child"
+        ],
+        "locked": true
+      },
+      {
+        "id": "locked-child",
+        "name": "locked-child",
+        "className": "layer-art",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常",
+        "transform": {
+          "kind": "transform",
+          "rect": {
+            "x": 15,
+            "y": 15,
+            "width": 35,
+            "height": 30
+          },
+          "rotation": 10,
+          "flipX": false,
+          "flipY": false
+        },
+        "groupId": "locked-ancestor",
+        "locked": false
+      },
+      {
+        "id": "free-peer",
+        "name": "free-peer",
+        "className": "layer-art",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常",
+        "transform": {
+          "kind": "transform",
+          "rect": {
+            "x": 72,
+            "y": 65,
+            "width": 16,
+            "height": 18
+          },
+          "rotation": 15,
+          "flipX": false,
+          "flipY": false
+        }
+      }
+    ],
+    "selectedLayerId": "free-peer",
+    "selectedLayerIds": [
+      "rotated-parent",
+      "nested-child",
+      "locked-child",
+      "free-peer"
+    ],
+    "canvasTexts": [],
+    "canvasShapes": [
+      {
+        "id": "solid-nested-child",
+        "layerId": "nested-child",
+        "kind": "rectangle",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100
+        },
+        "color": "#ff8800",
+        "strokeWidth": 0
+      },
+      {
+        "id": "solid-locked-child",
+        "layerId": "locked-child",
+        "kind": "rectangle",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100
+        },
+        "color": "#8844ff",
+        "strokeWidth": 0
+      },
+      {
+        "id": "solid-free-peer",
+        "layerId": "free-peer",
+        "kind": "rectangle",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100
+        },
+        "color": "#00aacc",
+        "strokeWidth": 0
+      }
+    ],
+    "brushStrokes": [],
+    "layerMasks": {},
+    "aiResults": [],
+    "selection": {
+      "kind": "rectangle",
+      "mode": "new",
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 100,
+        "height": 100
+      },
+      "path": {
+        "type": "shape",
+        "kind": "rectangle",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 100,
+          "height": 100
+        }
+      },
+      "feather": 0,
+      "fixedRatio": null
+    },
+    "selectionRect": {
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100
+    },
+    "selectionVisible": false,
+    "cropRect": null,
+    "sceneOrder": [
+      "solid-nested-child",
+      "solid-locked-child",
+      "solid-free-peer"
+    ],
+    "prompt": "",
+    "composerMode": "edit",
+    "composerSourceId": "draivio-cloud",
+    "composerParameters": {
+      "model": "fixture",
+      "size": "500 × 400",
+      "ratio": "5:4",
+      "count": "1 张",
+      "strength": "48%"
+    },
+    "history": []
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "note": "One local CPU reference run; not browser/WebKit interactive rendering evidence.",
+  "samples": [
+    {
+      "size": 128,
+      "elapsedMs": 40.050457999999935,
+      "parameters": {
+        "sharpness": 70,
+        "blur": 100
+      }
+    },
+    {
+      "size": 256,
+      "elapsedMs": 103.95845900000006,
+      "parameters": {
+        "sharpness": 70,
+        "blur": 100
+      }
+    }
+  ]
+}

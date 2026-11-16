@@ -1,11 +1,13 @@
 import { useRef } from 'react'
 import { createSelection, moveSelection, type SelectionRect, type SelectionPoint } from './selectionGeometry'
 import { resizeTransformRect } from './transformGeometry'
+import { NumericScrubber } from '../components/NumericScrubber'
+import { snapRect, type SnapConfig } from '../document/snapping'
 
 export type TransformDraft = { kind: 'crop' | 'transform'; rect: SelectionRect; rotation: number; flipX: boolean; flipY: boolean }
-type Props = { draft: TransformDraft; onChange: (draft: TransformDraft) => void; onCommit: () => void; onCancel: () => void; toPoint: (x: number, y: number) => SelectionPoint; artboardRatio?: number }
+type Props = { draft: TransformDraft; onChange: (draft: TransformDraft) => void; onCommit: () => void; onCancel: () => void; toPoint: (x: number, y: number) => SelectionPoint; artboardRatio?: number; snapConfig?: SnapConfig; canvasSize?: { width: number; height: number } }
 
-export function TransformOverlay({ draft, onChange, onCommit, onCancel, toPoint, artboardRatio = .8 }: Props) {
+export function TransformOverlay({ draft, onChange, onCommit, onCancel, toPoint, artboardRatio = .8, snapConfig, canvasSize }: Props) {
   const drag = useRef<{ handle: string; start: SelectionPoint; draft: TransformDraft } | null>(null)
   const down = (handle: string) => (event: React.PointerEvent<HTMLButtonElement | HTMLDivElement>) => {
     event.preventDefault(); event.stopPropagation(); event.currentTarget.setPointerCapture?.(event.pointerId)
@@ -19,7 +21,8 @@ export function TransformOverlay({ draft, onChange, onCommit, onCancel, toPoint,
     const selection = createSelection('rectangle', start.draft.rect)
     const rect = start.handle === 'move' ? moveSelection(selection, delta.x, delta.y).rect
       : resizeTransformRect(start.draft.rect, start.handle, delta, start.draft.rotation, event.shiftKey, artboardRatio)
-    onChange({ ...draft, rect })
+    const snapped = snapConfig && canvasSize ? snapRect({ rect, canvas: canvasSize, config: snapConfig, altKey: event.altKey }).rect : rect
+    onChange({ ...draft, rect: snapped })
   }
   const up = () => { drag.current = null }
   const rect = draft.rect
@@ -29,7 +32,7 @@ export function TransformOverlay({ draft, onChange, onCommit, onCancel, toPoint,
       {['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].map((handle) => <button type="button" key={handle} className={`selection-handle handle-${handle}`} aria-label={`变换控制点${handle}`} onPointerDown={down(handle)} onPointerMove={move} onPointerUp={up} onPointerCancel={up} />)}
     </div>
     <div className="transform-actions" role="toolbar" aria-label="变换操作">
-      <label>旋转<input type="number" aria-label="变换旋转角度" value={draft.rotation} min={-180} max={180} onChange={(event) => { if (Number.isFinite(event.currentTarget.valueAsNumber)) onChange({ ...draft, rotation: Math.max(-180, Math.min(180, event.currentTarget.valueAsNumber)) }) }} /></label>
+      <NumericScrubber className="transform-number-field" label="旋转" ariaLabel="变换旋转角度" value={draft.rotation} min={-180} max={180} unit="°" onChange={(rotation) => onChange({ ...draft, rotation })} />
       <button type="button" aria-label="水平翻转" onClick={() => onChange({ ...draft, flipX: !draft.flipX })}>↔</button>
       <button type="button" aria-label="垂直翻转" onClick={() => onChange({ ...draft, flipY: !draft.flipY })}>↕</button>
       <button type="button" aria-label="确认变换" onClick={onCommit}>确认 ↵</button>

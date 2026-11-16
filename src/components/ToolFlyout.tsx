@@ -1,9 +1,10 @@
 import { useLayoutEffect, useRef, useState } from 'react'
 import type { ToolGroupDefinition, ToolId } from '../tools/toolTypes'
+import { ToolIcon } from './ToolIcon'
 
-type ToolFlyoutProps = { group: ToolGroupDefinition; selectedToolId: ToolId; anchor: HTMLElement | null; onSelect: (toolId: ToolId) => void; onClose: () => void }
+type ToolFlyoutProps = { group: ToolGroupDefinition; selectedToolId: ToolId; anchor: HTMLElement | null; onSelect: (toolId: ToolId) => void; onClose: () => void; recentColors?: string[]; onColorSelect?: (color: string) => void }
 
-export function ToolFlyout({ group, selectedToolId, anchor, onSelect, onClose }: ToolFlyoutProps) {
+export function ToolFlyout({ group, selectedToolId, anchor, onSelect, onClose, recentColors = [], onColorSelect }: ToolFlyoutProps) {
   const flyoutRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([])
   const [placement, setPlacement] = useState<'right' | 'left'>('right')
@@ -38,7 +39,8 @@ export function ToolFlyout({ group, selectedToolId, anchor, onSelect, onClose }:
   return <div ref={flyoutRef} className={`tool-flyout tool-flyout-${placement}`} role="menu" aria-label={`${group.label}工具`} style={{ top: position.top, left: position.left }} onPointerDown={(event) => event.stopPropagation()} onKeyDown={handleKeyDown}>
     <div className="tool-flyout-heading">{group.label}</div>
     {group.tools.map((definition, index) => <button key={definition.id} ref={(node) => { itemRefs.current[index] = node }} type="button" role="menuitem" className={`tool-flyout-item ${definition.id === selectedToolId ? 'active' : ''}`} aria-label={`${definition.label}${definition.shortcut ? ` (${definition.shortcut})` : ''}`} aria-pressed={definition.id === selectedToolId} onClick={() => { onSelect(definition.id); onClose() }}>
-      <span className="tool-flyout-glyph" aria-hidden="true">{definition.glyph ?? '·'}</span><span>{definition.label}</span>{definition.shortcut ? <kbd>{definition.shortcut}</kbd> : null}
+      <ToolIcon toolId={definition.id} /><span>{definition.label}</span>{definition.shortcut ? <kbd>{definition.shortcut}</kbd> : null}
     </button>)}
+    {group.id === 'color-fill' ? <div className="recent-color-palette" role="group" aria-label="最近取色"><span>最近取色</span>{recentColors.length ? <div className="recent-color-swatches">{recentColors.map((color) => <button key={color} type="button" aria-label={`最近颜色 ${color}`} title={color} style={{ backgroundColor: color }} onClick={() => { onColorSelect?.(color); onClose() }} />)}</div> : <small>取色后会保留最近 20 个颜色</small>}</div> : null}
   </div>
 }

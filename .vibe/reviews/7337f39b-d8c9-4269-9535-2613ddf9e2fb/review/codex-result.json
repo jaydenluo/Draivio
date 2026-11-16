@@ -1,0 +1,27 @@
+{
+  "changedFiles": [],
+  "criteria": [
+    {
+      "id": "c6be8bf4-d9fa-4e58-9972-1395a84a5591",
+      "passed": true,
+      "reason": "实际源码具备完整的编辑结果链路：documentHistory.ts 快照包含画布尺寸、图层、选区、蒙版、文字和变换；projectFormat.ts 持久化对应数据；CanvasScene.tsx 与 exportScene.tsx 将结果纳入导出。已检查混合历史恢复、项目往返和选区导出的测试断言，所提供实际检查显示相关测试通过。历史撤销栈本身不随项目保存。"
+    },
+    {
+      "id": "11029c87-4e81-4eb1-b266-8ebe82c59247",
+      "passed": false,
+      "reason": "仍存在状态保护缺口。DocumentWorkspaceProvider.tsx:25 每次状态更新都按 revision 重算 dirty：初始文档改名后切换工具，会将名称产生的 dirty 清除，DocumentTabs.tsx:25 随后允许直接关闭。另 ProjectFileControl.tsx:74-76 恢复时更换 state.documentId，但工作区标签仍保留旧 ID，updateMeta(newId) 无法匹配；切换标签后恢复副本的名称和保存元数据无法可靠保留。现有测试未覆盖这些工作区集成路径。"
+    },
+    {
+      "id": "09da4a0b-eafb-4fb2-a57d-58a350283461",
+      "passed": false,
+      "reason": "批量导出的浏览器完整验收不可核实。ExportDialog.test.tsx:77 起将编码固定模拟为 PNG Blob，并模拟 anchor.click，只检查调用次数；不能证明所选格式真实编码和完整下载。ExportDialog.tsx:134-137 的串行等待仅是点击后延时120ms，没有下载完成确认。本地存在单文件导出样例，但未找到可核实的一次批量操作完整输出材料；提供的实际检查也没有浏览器批量下载结果。"
+    }
+  ],
+  "outcome": "failed",
+  "remainingIssues": [
+    "名称 dirty 可被普通编辑器状态更新清除，关闭保护不完整。",
+    "恢复副本文档 ID 与工作区标签 ID 不一致，元数据同步失效。",
+    "缺少批量导出全部所选格式的真实浏览器下载及文件验证证据。"
+  ],
+  "summary": "独立只读审查：1项通过、2项失败。已检查实际源码、测试断言和本地材料，并结合提供的实际检查；未修改文件或云端状态，未重跑测试或构建，未将实现自述作为验收证据。"
+}

@@ -1,0 +1,175 @@
+{
+  "format": "draivio",
+  "schemaVersion": 2,
+  "metadata": {
+    "id": "F03 independent effects",
+    "name": "F03 independent effects"
+  },
+  "assets": {},
+  "document": {
+    "documentWidth": 128,
+    "documentHeight": 128,
+    "documentBackground": "transparent",
+    "layers": [
+      {
+        "id": "text",
+        "name": "text",
+        "className": "layer-art",
+        "visible": true,
+        "opacity": 100,
+        "blendMode": "正常"
+      },
+      {
+        "id": "half-opacity-group",
+        "name": "half-opacity-group",
+        "className": "layer-group",
+        "visible": true,
+        "opacity": 50,
+        "blendMode": "正常",
+        "children": [
+          "effect"
+        ]
+      },
+      {
+        "id": "effect",
+        "name": "effect",
+        "className": "layer-art",
+        "visible": true,
+        "opacity": 50,
+        "blendMode": "正常",
+        "groupId": "half-opacity-group",
+        "transform": {
+          "kind": "transform",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 100,
+            "height": 100
+          },
+          "rotation": 90,
+          "flipX": true,
+          "flipY": false
+        },
+        "adjustments": {
+          "brightness": 100,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        }
+      }
+    ],
+    "selectedLayerId": "effect",
+    "selectedLayerIds": [
+      "effect"
+    ],
+    "canvasTexts": [
+      {
+        "id": "label",
+        "layerId": "text",
+        "x": 5,
+        "y": 5,
+        "text": "F03",
+        "fontFamily": "sans-serif",
+        "fontSize": 16,
+        "fontWeight": "400",
+        "align": "left",
+        "color": "#ff00ff"
+      }
+    ],
+    "canvasShapes": [
+      {
+        "id": "effect-square",
+        "layerId": "effect",
+        "kind": "rectangle",
+        "rect": {
+          "x": 12.5,
+          "y": 12.5,
+          "width": 25,
+          "height": 25
+        },
+        "color": "#204060",
+        "strokeWidth": 0
+      }
+    ],
+    "brushStrokes": [],
+    "layerMasks": {
+      "effect": {
+        "selection": {
+          "kind": "rectangle",
+          "mode": "new",
+          "rect": {
+            "x": 25,
+            "y": 0,
+            "width": 75,
+            "height": 100
+          },
+          "path": {
+            "type": "shape",
+            "kind": "rectangle",
+            "rect": {
+              "x": 25,
+              "y": 0,
+              "width": 75,
+              "height": 100
+            }
+          },
+          "feather": 0,
+          "fixedRatio": null
+        },
+        "strokes": [],
+        "inverted": false,
+        "applied": true
+      }
+    },
+    "aiResults": [],
+    "selection": {
+      "kind": "ellipse",
+      "mode": "new",
+      "rect": {
+        "x": 12.5,
+        "y": 12.5,
+        "width": 75,
+        "height": 75
+      },
+      "path": {
+        "type": "shape",
+        "kind": "ellipse",
+        "rect": {
+          "x": 12.5,
+          "y": 12.5,
+          "width": 75,
+          "height": 75
+        }
+      },
+      "feather": 0,
+      "fixedRatio": null
+    },
+    "selectionRect": {
+      "x": 12.5,
+      "y": 12.5,
+      "width": 75,
+      "height": 75
+    },
+    "selectionVisible": true,
+    "cropRect": null,
+    "sceneOrder": [
+      "effect-square",
+      "label"
+    ],
+    "prompt": "",
+    "composerMode": "edit",
+    "composerSourceId": "draivio-cloud",
+    "composerParameters": {
+      "model": "fixture",
+      "size": "128 × 128",
+      "ratio": "1:1",
+      "count": "1 张",
+      "strength": "48%"
+    },
+    "history": []
+  }
+}

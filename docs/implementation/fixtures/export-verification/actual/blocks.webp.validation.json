@@ -1,0 +1,138 @@
+{
+  "file": "/Users/szys/.codex/worktrees/ai-editing-roadmap/Draivio/docs/implementation/fixtures/export-verification/actual/blocks.webp",
+  "scenario": "blocks-canvas",
+  "passed": true,
+  "requestedFormat": "webp",
+  "decodedFormat": "WEBP",
+  "decodedMime": "image/webp",
+  "capturedMime": null,
+  "capturedMimeChecked": false,
+  "size": [
+    256,
+    256
+  ],
+  "bytes": 1410,
+  "probes": [
+    {
+      "label": "transparent corner",
+      "xy": [
+        9,
+        9
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    },
+    {
+      "label": "red",
+      "xy": [
+        65,
+        65
+      ],
+      "expected": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "actual": [
+        255,
+        1,
+        0,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "green",
+      "xy": [
+        193,
+        65
+      ],
+      "expected": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "actual": [
+        0,
+        255,
+        1,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "blue",
+      "xy": [
+        65,
+        193
+      ],
+      "expected": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "actual": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "passed": true
+    },
+    {
+      "label": "half alpha yellow",
+      "xy": [
+        193,
+        193
+      ],
+      "expected": [
+        255,
+        255,
+        0,
+        128
+      ],
+      "actual": [
+        255,
+        255,
+        0,
+        128
+      ],
+      "passed": true
+    },
+    {
+      "label": "transparent center",
+      "xy": [
+        129,
+        129
+      ],
+      "expected": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "actual": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "passed": true
+    }
+  ],
+  "errors": []
+}

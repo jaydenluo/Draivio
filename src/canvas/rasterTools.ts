@@ -132,28 +132,18 @@ export async function rasterizeSvg(svg: SVGElement): Promise<HTMLCanvasElement> 
   } finally { URL.revokeObjectURL(url) }
 }
 
-function readPixels(canvas: HTMLCanvasElement): ImageData {
+export function readCanvasPixels(canvas: HTMLCanvasElement): ImageData {
   try { return context2d(canvas).getImageData(0, 0, canvas.width, canvas.height) }
   catch (cause) { throw new Error('无法读取画布像素；图像可能含有不允许读取的跨域内容', { cause }) }
 }
 
-export async function sampleCanvasColor(svg: SVGElement, xPct: number, yPct: number): Promise<string> {
-  validatePoint({ x: xPct, y: yPct })
-  return samplePixelColor(readPixels(await rasterizeSvg(svg)), xPct, yPct)
-}
-
-export async function contiguousMagicSelection(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<Selection> {
-  const image = readPixels(await rasterizeSvg(svg))
-  return maskToSelection(floodPixels(image, point, tolerance), image.width, image.height)
-}
-
-export async function eraseBackground(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<string> {
+export async function rasterizeSvgPixels(svg: SVGElement): Promise<PixelImage> {
   const canvas = await rasterizeSvg(svg)
-  const image = readPixels(canvas)
-  return writePng(canvas, eraseFloodPixels(image, point, tolerance))
+  const pixels = readCanvasPixels(canvas)
+  return { width: pixels.width, height: pixels.height, data: new Uint8ClampedArray(pixels.data) }
 }
 
-function writePng(canvas: HTMLCanvasElement, image: PixelImage): string {
+export function encodePng(canvas: HTMLCanvasElement, image: PixelImage): string {
   const context = context2d(canvas)
   const output = context.createImageData(image.width, image.height)
   output.data.set(image.data)
@@ -161,6 +151,29 @@ function writePng(canvas: HTMLCanvasElement, image: PixelImage): string {
   const url = canvas.toDataURL('image/png')
   if (!url.startsWith('data:image/png')) throw new Error('无法将处理结果编码为 PNG 图像')
   return url
+}
+
+export function imageToPng(image: PixelImage): string {
+  validateImage(image)
+  const canvas = document.createElement('canvas')
+  canvas.width = image.width; canvas.height = image.height
+  return encodePng(canvas, image)
+}
+
+export async function sampleCanvasColor(svg: SVGElement, xPct: number, yPct: number): Promise<string> {
+  validatePoint({ x: xPct, y: yPct })
+  return samplePixelColor(readCanvasPixels(await rasterizeSvg(svg)), xPct, yPct)
+}
+
+export async function contiguousMagicSelection(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<Selection> {
+  const image = readCanvasPixels(await rasterizeSvg(svg))
+  return maskToSelection(floodPixels(image, point, tolerance), image.width, image.height)
+}
+
+export async function eraseBackground(svg: SVGElement, point: SelectionPoint, tolerance: number): Promise<string> {
+  const canvas = await rasterizeSvg(svg)
+  const image = readCanvasPixels(canvas)
+  return encodePng(canvas, eraseFloodPixels(image, point, tolerance))
 }
 
 /** Projectively maps TL/TR/BR/BL source corners onto a rectangular output.
@@ -283,10 +296,10 @@ export function clonePixels(image: PixelImage, points: SelectionPoint[], source:
 
 export async function smudgeImage(svg: SVGElement, points: SelectionPoint[], size: number, strength: number): Promise<string> {
   const canvas = await rasterizeSvg(svg)
-  return writePng(canvas, smudgePixels(readPixels(canvas), points, size, strength))
+  return encodePng(canvas, smudgePixels(readCanvasPixels(canvas), points, size, strength))
 }
 
 export async function cloneImage(svg: SVGElement, points: SelectionPoint[], source: SelectionPoint, size: number): Promise<string> {
   const canvas = await rasterizeSvg(svg)
-  return writePng(canvas, clonePixels(readPixels(canvas), points, source, size))
+  return encodePng(canvas, clonePixels(readCanvasPixels(canvas), points, source, size))
 }
