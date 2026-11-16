@@ -1,0 +1,123 @@
+{
+  "outcome": "focused_passed_waiting_full_frozen_run",
+  "rootCause": "Resvg defaults to scanning all installed system fonts for every constructor, including image-only 4x4/12x12 fixtures. Native font enumeration amplified system contention in the previous full run; no pixel assertion failure reproduced. Original exclusive run passed all22, showing environment-sensitive overhead; single-variable identical-image rendering isolates the unrelated font scan cost.",
+  "changedFiles": [
+    "src/render/layerEffects.pixels.test.tsx",
+    "src/render/materializeSmartFilters.test.tsx",
+    "src/ai/maskedEdit/testIO.ts"
+  ],
+  "implementation": "Only test render options changed: font.loadSystemFonts=false for known image/shape-only fixtures; layerEffects/testMaskedIO retain true when SVG contains text. Production code, all pixel assertions and original 15s/20s/global30s limits unchanged.",
+  "tests": [
+    {
+      "command": "npx vitest run src/render/layerEffects.pixels.test.tsx src/render/materializeSmartFilters.test.tsx src/ai/maskedEdit/workflow.test.ts --maxWorkers=1 --testTimeout=30000 --reporter=verbose (original)",
+      "exitCode": 0,
+      "result": "3files22tests passed;29.71s;/tmp/render-timeout-baseline.log"
+    },
+    {
+      "command": "same exact3file command after no-text render options",
+      "exitCode": 0,
+      "result": "3files22tests passed;4.72s;/tmp/render-timeout-fixed.log"
+    },
+    {
+      "command": "npx vitest run src/render/layerEffects.pixels.test.tsx src/render/materializeSmartFilters.test.tsx src/ai/maskedEdit/workflow.test.ts src/ai/maskedEdit/provider.test.tsx --maxWorkers=1 --testTimeout=30000 --reporter=verbose",
+      "exitCode": 0,
+      "result": "4files25tests passed;6.50s;/tmp/render-timeout-final.log"
+    },
+    {
+      "command": "node controlled12render no-text diagnostic; only loadSystemFonts varied",
+      "exitCode": 0,
+      "result": {
+        "fixture": "12x12 actual SVG, 12 repeated render constructions; only font.loadSystemFonts varied",
+        "measurements": [
+          {
+            "loadSystemFonts": true,
+            "times": [
+              282.283917,
+              146.61766600000004,
+              157.27391599999999,
+              141.05270800000005,
+              143.05375000000004,
+              135.29883299999995,
+              132.7203340000001,
+              139.97791699999993,
+              150.48120799999992,
+              137.75983399999996,
+              134.417917,
+              137.12083399999983
+            ],
+            "total": 1838.0588339999997,
+            "pixelsIdentical": true
+          },
+          {
+            "loadSystemFonts": false,
+            "times": [
+              0.028332999999975073,
+              0.010291999999935797,
+              0.011333000000149696,
+              0.007417000000032203,
+              0.006499999999959982,
+              0.006083999999873413,
+              0.0062499999999090505,
+              0.006292000000030384,
+              0.011916999999812106,
+              0.007417000000032203,
+              0.007583000000067841,
+              0.0059170000001813605
+            ],
+            "total": 0.11533499999995911,
+            "pixelsIdentical": true
+          }
+        ]
+      }
+    },
+    {
+      "command": "node original true vs conditional text render parity",
+      "exitCode": 0,
+      "result": {
+        "fixture": "actual sans-serif A text",
+        "originalFontScanning": true,
+        "currentFontScanning": true,
+        "pixelsEqual": true,
+        "nonemptyAlpha": true
+      }
+    },
+    {
+      "command": "git diff --check -- src/render/layerEffects.pixels.test.tsx src/render/materializeSmartFilters.test.tsx src/ai/maskedEdit/testIO.ts",
+      "exitCode": 0,
+      "result": "passed"
+    }
+  ],
+  "sameLoadTimings": [
+    {
+      "test": "covers five effects on transparent image edges, text, shape and isolated group pixels",
+      "originalMs": 7768,
+      "firstFixedMs": 2855,
+      "finalMs": 1974
+    },
+    {
+      "test": "all common kinds share awaited actual CPU pixels between preview/export; outside mask unchanged",
+      "originalMs": 4277,
+      "firstFixedMs": 55,
+      "finalMs": 51
+    },
+    {
+      "test": "adopt replace matches actual PNG preview for transparent=true multiply backdrop and survives hide/undo/project",
+      "originalMs": 1794,
+      "firstFixedMs": 9,
+      "finalMs": 9
+    },
+    {
+      "test": "adopt replace matches actual PNG preview for transparent=false multiply backdrop and survives hide/undo/project",
+      "originalMs": 1975,
+      "firstFixedMs": 10,
+      "finalMs": 16
+    }
+  ],
+  "remainingIssues": [
+    "Root/coordinator must run complete final frozen suite; focused pass is not full integration acceptance.",
+    "Previous full run contention source beyond repeated system font enumeration was not exhaustively attributed. No machine-wide process changes made."
+  ],
+  "codeFreeze": true,
+  "cloudAcceptancePerformed": false,
+  "commit": null
+}

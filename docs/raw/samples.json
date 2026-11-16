@@ -1,0 +1,35 @@
+[
+  {
+    "id": 2102,
+    "make": "Canon",
+    "model": "EOS 40D",
+    "mode": "sRAW2 (sRAW) (3:2)",
+    "url": "https://raw.pixls.us/getfile.php/2102/nice/Canon - EOS 40D - sRAW2 (sRAW) (3:2).CR2",
+    "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "ba644e7dd2abe74eca260e67f0206ff113bf0f62e710f8130611e964d6be5bf1",
+    "path": "/tmp/draivio-raw-samples/2102.CR2",
+    "bytes": 5805950
+  },
+  {
+    "id": 5227,
+    "make": "Nikon",
+    "model": "D2H",
+    "mode": "12bit 12bit compressed (Lossy (type 1)) (3:2)",
+    "url": "https://raw.pixls.us/getfile.php/5227/nice/Nikon - D2H - 12bit 12bit compressed (Lossy (type 1)) (3:2).NEF",
+    "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "155edb938f884ea7372ce98d4ff5f965c3e413b43b95bc9923da6e92082cf914",
+    "path": "/tmp/draivio-raw-samples/5227.NEF",
+    "bytes": 3236017
+  },
+  {
+    "id": 1582,
+    "make": "Sony",
+    "model": "ILCE-7S",
+    "mode": "14bit 14bit compressed (3:2)",
+    "url": "https://raw.pixls.us/getfile.php/1582/nice/Sony - ILCE-7S - 14bit 14bit compressed (3:2).ARW",
+    "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "sha256": "a35ebb2fbec929daa5beb20d1ce5c15a8aac7b1a7a231455387f3df8a7442e07",
+    "path": "/tmp/draivio-raw-samples/1582.ARW",
+    "bytes": 6160384
+  }
+]

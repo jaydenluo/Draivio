@@ -18,6 +18,7 @@ export async function fetchCloudBilling():Promise<{overview:CloudAccountOverview
  const method=object(checked<Record<string,unknown>>(methods));const gateway=method.defaultGateway;return {overview:{balance:body.balance as number|string,products:rawProducts.map(product),creditsPerYuan:rate},methods:{wechat:method.wechat===true,alipay:method.alipay===true,defaultGateway:gateway==='WECHAT'||gateway==='ALIPAY'?gateway:null}}
 }
 export async function createCloudPayment(input:{productId?:string;amountYuan?:number;gateway:PaymentGateway}):Promise<Checkout>{
+ if(input.gateway!=='WECHAT'&&input.gateway!=='ALIPAY')throw new Error('PAYMENT_ORDER_INVALID')
  if((input.productId===undefined)===(input.amountYuan===undefined))throw new Error('PAYMENT_ORDER_INVALID')
  const response=await cloudAccount.request('/api/account/payment-orders',{method:'POST',body:input})
  const body=object(checked<Record<string,unknown>>(response));if(typeof body.orderId!=='string'||typeof body.gateway!=='string'||typeof body.codeUrl!=='string'||!['WECHAT','ALIPAY'].includes(body.gateway))throw new Error('INVALID_PAYMENT_CHECKOUT')

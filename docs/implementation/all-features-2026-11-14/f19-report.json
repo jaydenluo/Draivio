@@ -1,0 +1,13 @@
+{
+  "summary":"完成污点修复、仿制与修补工具闭环：本地 RGBA heal/patch、采样范围、多层筛选、独立 repair layer、版本与撤销守卫，以及待确认/确认/取消交互。云服务保持可选，未伪造真实调用。",
+  "outcome":"success",
+  "changedFiles":["src/retouch/cloneHeal.ts","src/retouch/cloneHeal.test.ts","src/canvas/CanvasViewport.tsx","src/canvas/documentTypes.ts","src/canvas/documentIO.ts","src/state/editor.tsx","src/state/layerWorkspace.test.ts","src/components/ToolOptionsBar.tsx","src/components/ToolOptionsBar.test.tsx","docs/implementation/all-features-2026-11-14/f19-worker-result.md"],
+  "tests":[{"command":"npm test -- --run src/retouch/cloneHeal.test.ts src/state/layerWorkspace.test.ts src/components/ToolOptionsBar.test.tsx","result":"3 files / 22 tests passed","outcome":"passed","exitCode":0},{"command":"npm run build","result":"passed; existing large bundle warning","outcome":"passed","exitCode":0},{"command":"vibeplan check","result":"passed","outcome":"passed","exitCode":0}],
+  "commit":null,"evidence":[],"risks":["云端 healing 服务为可选外部能力，未进行真实付费调用；未配置时明确使用本地算法。"],"remainingIssues":[],
+  "criterionResults":[
+    {"acceptanceItemId":"497a539b-7f34-4d27-b0a6-7e7108259d6f","result":"固定 RGBA 样例验证 heal、feathered patch、边界裁剪及源像素保留；22 项专项测试通过","evidence":[]},
+    {"acceptanceItemId":"5f38b093-246f-4b4b-91af-6d607b253f98","result":"采样范围 current/below/visible 接入多层筛选；异步文档版本与撤销守卫覆盖","evidence":[]},
+    {"acceptanceItemId":"312db790-2849-44d3-9fb5-0246de8f8000","result":"修复结果写入独立 repair layer，确认才 dispatch；取消不污染文档并可撤销","evidence":[]},
+    {"acceptanceItemId":"02d3be34-0c27-402e-8cd1-b45bef9b998e","result":"ToolOptionsBar 提供大小/硬度/不透明度/采样范围及服务状态反馈；build/check通过","evidence":[]}
+  ]
+}

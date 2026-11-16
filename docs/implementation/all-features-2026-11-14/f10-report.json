@@ -1,0 +1,68 @@
+{
+  "summary": "完成选择并遮住与蒙版边缘精修闭环：非破坏参数、真实 alpha 栅格化低清预览/高清提交、取消与文档 revision 守卫、单次历史提交、项目序列化和导出去杂边像素后处理。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/masks/refineMask.ts",
+    "src/masks/refineMask.test.ts",
+    "src/masks/refineAsync.ts",
+    "src/masks/refineAsync.test.ts",
+    "src/canvas/documentTypes.ts",
+    "src/document/projectValidation.ts",
+    "src/components/SelectionRefinePanel.tsx",
+    "src/components/SelectionRefinePanel.test.tsx",
+    "src/components/AppShell.test.tsx",
+    "src/app/AppShell.tsx",
+    "src/canvas/CanvasScene.tsx",
+    "src/canvas/MaskOverlay.tsx",
+    "src/render/exportImage.ts",
+    "src/render/exportImage.test.ts",
+    "src/render/ExportDialog.tsx",
+    "src/components/TopBar.tsx",
+    "src/state/editor.tsx"
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run src/masks/refineMask.test.ts src/masks/refineAsync.test.ts src/document/projectFormat.test.ts src/state/documentHistory.test.ts src/components/SelectionRefinePanel.test.tsx src/components/AppShell.test.tsx src/render/exportImage.test.ts",
+      "result": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "Vite reports an existing large JavaScript chunk warning (~736KB)."
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "83dffe6f-edbe-4b08-94c0-10faddc9dea4",
+      "result": "refineMask/refineAsync fixed alpha fixtures cover hard edges, semi-transparent alpha, shift/feather/density and decontamination; exportImage postProcess test verifies RGBA correction runs after SVG rasterization.",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "e383ad45-834b-4250-854f-cc3424ba3cd5",
+      "result": "AppShell applies one dispatch after async result; cancellation and stale revision tests leave state unchanged; existing documentHistory and projectFormat tests pass.",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "e0b872fd-ca95-424f-b0e0-4b096e306026",
+      "result": "MaskDefinitions/CanvasScene share smooth-shift-feather-density SVG semantics; projectFormat roundtrip test passes; export path consumes refinement color correction.",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "f110fe70-aa14-4496-92fe-dd593a8787bf",
+      "result": "refineAsync performs <=256 preview then full-resolution computation, checks cancellation and documentId/revision before commit; alpha is clamped and export post-processing preserves buffer length; build passes.",
+      "evidence": []
+    }
+  ]
+}

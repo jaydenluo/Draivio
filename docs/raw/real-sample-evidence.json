@@ -1,0 +1,157 @@
+[
+  {
+    "sample": {
+      "id": 2102,
+      "make": "Canon",
+      "model": "EOS 40D",
+      "mode": "sRAW2 (sRAW) (3:2)",
+      "url": "https://raw.pixls.us/getfile.php/2102/nice/Canon - EOS 40D - sRAW2 (sRAW) (3:2).CR2",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sha256": "ba644e7dd2abe74eca260e67f0206ff113bf0f62e710f8130611e964d6be5bf1",
+      "path": "/tmp/draivio-raw-samples/2102.CR2",
+      "bytes": 5805950
+    },
+    "backend": "rawpy 0.28.0 / LibRaw (0, 22, 2)",
+    "width": 1944,
+    "height": 1296,
+    "orientation": 1,
+    "cameraWhiteBalance": [
+      1918.0,
+      1171.0,
+      2241.0,
+      1171.0
+    ],
+    "changedSamplesPerParameter": {
+      "exposure": 7558115,
+      "whiteBalance": 7556412,
+      "highlightRecoveryAt4EV": 7556614
+    },
+    "pixelSha256": {
+      "baseline": "d9d3fdc428ff46ca73bee3753d528704b48cd17e3c0b53a3518c21d7a572f18d",
+      "exposure": "4da1246f0eb0877980c91be0d37b5db009083b5349e48ba2d7f386a40f386f7e",
+      "whiteBalance": "e8cdc9537cf64924fd4dabb800c9ab4e912f79791ed0a5e528a47e8c45e31cdc",
+      "brightClip": "d2a4baee6b6fcf8ce90d9743f72deaac5de6ccbc9770424c43df2115d8311c7b",
+      "highlightReconstruct": "99ab46c5113100f283708e96bbe75aba4081313449ec6bb98875bb3e6441807f"
+    },
+    "peakRssBytes": 140673024,
+    "originalHashUnchanged": true,
+    "iccExportFixture": {
+      "description": "two exact pixels extracted at center and quarter from real decoded original",
+      "rgba16": [
+        2416,
+        1723,
+        1206,
+        65535,
+        23265,
+        18383,
+        14246,
+        65535
+      ]
+    }
+  },
+  {
+    "sample": {
+      "id": 5227,
+      "make": "Nikon",
+      "model": "D2H",
+      "mode": "12bit 12bit compressed (Lossy (type 1)) (3:2)",
+      "url": "https://raw.pixls.us/getfile.php/5227/nice/Nikon - D2H - 12bit 12bit compressed (Lossy (type 1)) (3:2).NEF",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sha256": "155edb938f884ea7372ce98d4ff5f965c3e413b43b95bc9923da6e92082cf914",
+      "path": "/tmp/draivio-raw-samples/5227.NEF",
+      "bytes": 3236017
+    },
+    "backend": "rawpy 0.28.0 / LibRaw (0, 22, 2)",
+    "width": 1241,
+    "height": 824,
+    "orientation": 1,
+    "cameraWhiteBalance": [
+      563.0,
+      256.0,
+      373.0,
+      256.0
+    ],
+    "changedSamplesPerParameter": {
+      "exposure": 2992544,
+      "whiteBalance": 3032027,
+      "highlightRecoveryAt4EV": 1293969
+    },
+    "pixelSha256": {
+      "baseline": "e50ffe2c06aa809aab8b5e08c181a0ee0e259e4998c7096fe8b7b5fa7212279c",
+      "exposure": "d16d4b65744a9a97a8e0b3877f0748bb6683f7fd8c040ae16d8cef4d4493a912",
+      "whiteBalance": "f330a342809fa3d4b542cfc79c259d7f579d9a38035acf267047f673cf824c11",
+      "brightClip": "32b3e3a411f2d124c8f47c77f2fada40d5567e7799fcf54649cf09191bced50a",
+      "highlightReconstruct": "6c8a8bc59fe53304724d95cecbfe7177c15769241a9237eb807c04b20a916b8d"
+    },
+    "peakRssBytes": 90963968,
+    "originalHashUnchanged": true,
+    "iccExportFixture": {
+      "description": "two exact pixels extracted at center and quarter from real decoded original",
+      "rgba16": [
+        8145,
+        8210,
+        9408,
+        65535,
+        59719,
+        60647,
+        61668,
+        65535
+      ]
+    },
+    "orientationTag6Contract": {
+      "fixture": "explicit modified TIFF orientation tag; not original camera evidence",
+      "pixelMatch": "exact 90-degree clockwise rotation",
+      "mutatedSha256": "9bfccede1478e4417479cf3cc159094508032d2346379ec8eab7dc60db06cae3"
+    }
+  },
+  {
+    "sample": {
+      "id": 1582,
+      "make": "Sony",
+      "model": "ILCE-7S",
+      "mode": "14bit 14bit compressed (3:2)",
+      "url": "https://raw.pixls.us/getfile.php/1582/nice/Sony - ILCE-7S - 14bit 14bit compressed (3:2).ARW",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "sha256": "a35ebb2fbec929daa5beb20d1ce5c15a8aac7b1a7a231455387f3df8a7442e07",
+      "path": "/tmp/draivio-raw-samples/1582.ARW",
+      "bytes": 6160384
+    },
+    "backend": "rawpy 0.28.0 / LibRaw (0, 22, 2)",
+    "width": 1392,
+    "height": 936,
+    "orientation": 1,
+    "cameraWhiteBalance": [
+      2932.0,
+      1024.0,
+      1372.0,
+      1024.0
+    ],
+    "changedSamplesPerParameter": {
+      "exposure": 3906120,
+      "whiteBalance": 3901183,
+      "highlightRecoveryAt4EV": 3721103
+    },
+    "pixelSha256": {
+      "baseline": "86c0c52f6f4bc4fc13c6ad379b449bca0b4279a7502357af7e919d4b8166e6d9",
+      "exposure": "c50d52a9907a07fba833e90a1f8780f4daea48c39512a0aeb551510b53639c85",
+      "whiteBalance": "b1fb4b7071bb70b2148403bc2584fac4db2ce256a2113939f53da6be6978383e",
+      "brightClip": "db686f4bb29a0600d5c3df8196d0b7c1f15fd9363f45807a7bcd6fc84c22286e",
+      "highlightReconstruct": "4de484e801237531258f64377d4324f6a36b3c28c18bf51e634121be82a890a2"
+    },
+    "peakRssBytes": 105545728,
+    "originalHashUnchanged": true,
+    "iccExportFixture": {
+      "description": "two exact pixels extracted at center and quarter from real decoded original",
+      "rgba16": [
+        16714,
+        15225,
+        8148,
+        65535,
+        35858,
+        37446,
+        36476,
+        65535
+      ]
+    }
+  }
+]

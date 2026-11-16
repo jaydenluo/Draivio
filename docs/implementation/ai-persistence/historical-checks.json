@@ -1,0 +1,26 @@
+[
+  {
+    "command": "npm test -- --run --maxWorkers=2 src/ai/persistence src/document/recoveryStore.test.ts src/document/projectFormat.test.ts src/document/DocumentTabs.test.tsx src/ai/conversation src/ai/recipes src/ai/ui/EditRunSummary.test.tsx src/color/softProof.test.ts",
+    "result": "14 files/90 tests passed",
+    "outcome": "passed",
+    "exitCode": 0
+  },
+  {
+    "command": "vibeplan check",
+    "result": "Checks passed; no queued events",
+    "outcome": "passed",
+    "exitCode": 0
+  },
+  {
+    "command": "npm test -- --run",
+    "result": "Default concurrency resource contention and pixel suite timeouts; interrupted at parent request; not passed",
+    "outcome": "failed",
+    "exitCode": 130
+  },
+  {
+    "command": "npm run build",
+    "result": "Latest worker build failed due parallel OCR artboard test fixture missing layerIds; A30 literal type corrected. Parent must run fresh build after freeze.",
+    "outcome": "failed",
+    "exitCode": 1
+  }
+]

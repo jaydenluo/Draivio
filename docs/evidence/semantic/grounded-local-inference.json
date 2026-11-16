@@ -1,0 +1,131 @@
+{
+  "load": {
+    "missingBuffers": [],
+    "unexpectedKeys": [
+      "label_enc.weight",
+      "bert.embeddings.position_ids"
+    ],
+    "bertParameterCount": 199,
+    "randomParameters": []
+  },
+  "image": {
+    "path": "/tmp/semantic-clothing.png",
+    "source": "official MobileSAM repo MobileSAMv2/ultralytics/assets/zidane.jpg, uncomposited existing photograph resized640x360",
+    "sha256": "a63e0c14a9e7ca7a95c9a15244291d11c1c05f4633509ec40d3ed2a8302a60c1",
+    "license": "No public-domain/CC0 claim. Existing upstream repository photograph used only for local verification; photo/overlays/masks not copied into repository."
+  },
+  "queries": [
+    {
+      "query": "衣服",
+      "seconds": 4.64230489730835,
+      "candidates": [
+        {
+          "id": "instance-1",
+          "confidence": 0.7657977342605591,
+          "box": [
+            60.33256530761719,
+            149.89682006835938,
+            487.34368896484375,
+            359.234130859375
+          ],
+          "maskArea": 35691.0
+        },
+        {
+          "id": "instance-2",
+          "confidence": 0.7544479370117188,
+          "box": [
+            374.16387939453125,
+            113.99714660644531,
+            568.401611328125,
+            359.12738037109375
+          ],
+          "maskArea": 31050.0
+        }
+      ]
+    },
+    {
+      "query": "shirt",
+      "seconds": 5.212333917617798,
+      "candidates": [
+        {
+          "id": "instance-1",
+          "confidence": 0.44976845383644104,
+          "box": [
+            374.70745849609375,
+            111.78288269042969,
+            567.276123046875,
+            359.4447021484375
+          ],
+          "maskArea": 31022.0
+        },
+        {
+          "id": "instance-2",
+          "confidence": 0.3630322515964508,
+          "box": [
+            172.4391632080078,
+            158.9337921142578,
+            296.313720703125,
+            359.55682373046875
+          ],
+          "maskArea": 8897.0
+        },
+        {
+          "id": "instance-3",
+          "confidence": 0.32280609011650085,
+          "box": [
+            60.822601318359375,
+            148.8601531982422,
+            554.204345703125,
+            359.52374267578125
+          ],
+          "maskArea": 40088.0
+        }
+      ]
+    },
+    {
+      "query": "elephant",
+      "seconds": 2.7985219955444336,
+      "error": "模型未发现指定物体，未生成蒙版"
+    }
+  ],
+  "subject": {
+    "width": 640,
+    "height": 360,
+    "range": [
+      0,
+      255
+    ],
+    "rawSaliencySameForBackgroundRequest": true,
+    "complementAtClient": true
+  },
+  "runtime": "isolated /tmp/draivio-semantic-grounded-venv Python3.11, torch2.15 CPU2threads, no paid calls",
+  "artifacts": {
+    "dino_source": "/tmp/draivio-groundingdino-src",
+    "sam_source": "/tmp/draivio-mobilesam-src",
+    "dino": {
+      "path": "/tmp/draivio-semantic-models/groundingdino_swint_ogc.pth",
+      "sha256": "3b3ca2563c77c69f651d7bd133e97139c186df06231157a64c507099c52bc799"
+    },
+    "sam": {
+      "path": "/tmp/draivio-mobilesam-src/weights/mobile_sam.pt",
+      "sha256": "6dbb90523a35330fedd7f1d3dfc66f995213d81b29a5ca8108dbcdd4e37d6c2f"
+    },
+    "vocab": {
+      "path": "/tmp/draivio-semantic-models/bert-base-uncased-vocab.txt",
+      "sha256": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3"
+    },
+    "box_threshold": 0.3
+  },
+  "sources": {
+    "GroundingDINO": {
+      "url": "https://github.com/IDEA-Research/GroundingDINO",
+      "commit": "856dde20aee659246248e20734ef9ba5214f5e44",
+      "license": "Apache-2.0"
+    },
+    "MobileSAM": {
+      "url": "https://github.com/ChaoningZhang/MobileSAM",
+      "commit": "f706ad9c4eb7f219c00d9050e46328518ffb65d2",
+      "license": "Apache-2.0 model/source, not a license certification for all embedded third-party image assets"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "runtime": "macOS host Vitest/jsdom with actual production React UI/planner/executor/reducer/project codec and Resvg output",
+  "beforeHash": "9fc16c2655560a16ebc4a58bd7230d7d892f70c7ccdcb8072cdc795bdb724a27",
+  "afterHash": "267d0f2b9372cb84ddfb8088e3394117eee033155f8eba8afbd1ef32f29b38f9",
+  "reopenedHash": "267d0f2b9372cb84ddfb8088e3394117eee033155f8eba8afbd1ef32f29b38f9",
+  "fetchRequests": 0,
+  "steps": [
+    "select layer",
+    "CtrlEnter plan",
+    "two-step execution",
+    "dx retune20",
+    "before/after",
+    "adopt1undo",
+    "undo focus",
+    "redo",
+    "encode project",
+    "new doc",
+    "offline reopen",
+    "pixel export"
+  ]
+}

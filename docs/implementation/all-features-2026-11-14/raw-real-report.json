@@ -1,0 +1,99 @@
+{
+  "summary": "RAW真实本地实现：rawpy0.28/LibRaw0.22.2解码三类CC0样本并逐参数验证曝光/相机WB/高光重建，方向6标签变体像素精确匹配。打开/重开显影、原字节/参数/16bit离线恢复、撤销和过期守卫、IPC独立进程取消/超时/RSS预算及ICC导出已接通；修复数字字节数组序列化Promise风暴。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/raw/rawPipeline.ts",
+    "src/raw/rawPipeline.test.ts",
+    "src/raw/rawState.test.ts",
+    "src/raw/RawControls.tsx",
+    "src/raw/RawControls.test.tsx",
+    "src/raw/rawExport.ts",
+    "src/raw/rawExport.test.ts",
+    "src/raw/rawRealProject.test.ts",
+    "scripts/raw/decode.py",
+    "scripts/raw/verify_samples.py",
+    "scripts/raw/requirements.txt",
+    "src-tauri/src/raw_decode.rs",
+    "src-tauri/src/lib.rs",
+    "src/components/TopBar.tsx",
+    "src/state/editor.tsx",
+    "src/document/projectFormat.ts",
+    "src/document/projectFormat.test.ts",
+    "src/document/projectValidation.ts",
+    "docs/raw/README.md",
+    "docs/raw/samples.json",
+    "docs/raw/real-sample-evidence.json",
+    "docs/raw/licenses/rawpy-MIT.txt",
+    "docs/raw/licenses/LibRaw-LGPL.txt",
+    "docs/raw/licenses/LibRaw-CDDL.txt"
+  ],
+  "tests": [
+    {
+      "command": "OMP_NUM_THREADS=1 /tmp/draivio-raw311/bin/python scripts/raw/verify_samples.py",
+      "result": "CR2/NEF/ARW各自曝光/WB/高光像素均变化；SHA256匹配；NEF方向6标签变体精确顺时针90°旋转；原字节不变",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "DRAIVIO_RAW_PROJECT_FIXTURE=/tmp/raw-real-project.json npx vitest run src/raw/rawRealProject.test.ts --maxWorkers=1",
+      "result": "1 real NEF production apply/encode/decode/offline/reopen/undo passed, 4.21s",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "DRAIVIO_RAW_PYTHON=/tmp/draivio-raw311/bin/python DRAIVIO_RAW_SAMPLE=/tmp/draivio-raw-samples/5227.NEF cargo test --manifest-path src-tauri/Cargo.toml --lib raw_decode",
+      "result": "5 passed including native real decode and in-flight process cancellation",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/raw src/document/projectFormat.test.ts src/render/exportImage.test.ts --maxWorkers=2",
+      "result": "46 passed / 1 skipped (external real fixture test separately run and passed with env), 6.72s",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed with existing bundle/dynamic import warnings",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "可选本地Python3.11+/rawpy/Pillow；缺依赖明确报错，无网络上传。",
+    "显影固定半尺寸16bit sRGB，最多16MiB原始/6000万sensor pixels/32MiB输出；其他模型格式未承诺实测支持。",
+    "真实项目初次并行测试因逐字节Promise风暴导致内存压力/超时，已修复并以4.21s真实项目专项通过；独立复审仍待进行。",
+    "方向6证据为显式修改TIFF orientation tag变体，三个原始相机样本方向均正常；不冒充真实旋转相机原样本。"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "eaeb3f6b-cab0-4179-955c-4ad37dd9ccb4",
+      "result": "PASS evidence: docs/raw/samples.json记录逐样本CC0与SHA256，real-sample-evidence.json包含rawpy0.28/LibRaw0.22.2和每格式逐EV/WB/highlight像素hash差异、原字节不变、orientation6明确tag变体精确旋转。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "7970e939-c089-4942-93cb-ac980c56ad5a",
+      "result": "PASS evidence: RawControls重开编辑/确认测试，rawState生产事务单次undo/redo与多板归属；rawRealProject以真实NEF bytes+16bitasset经apply->encode->decode验证离线原字节checksum、可重开参数与undo。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "61aed43b-ee97-4bfc-aa42-18763c8c7f7e",
+      "result": "PASS evidence: native malformed/JPEG与unknown检测明确拒绝；LibRaw sensor postprocess不会调用extract_thumb或JPEG fallback；缺依赖报错。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "ea2dce32-09d5-4d7a-8912-221c609660ae",
+      "result": "PASS evidence: Tauri spawn_blocking+独立子进程，实际处理中断测试通过；90秒超时和1.5GiB RSS边界；三格式峰值RSS实测；真实RAW提取像素经生产exportRawPreview->ICC->PNG，独立Resvg解码像素和iCCP验证。",
+      "evidence": []
+    }
+  ]
+}

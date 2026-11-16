@@ -1,0 +1,72 @@
+{
+  "summary": "F19最终修复：独立repair层、真实多scope与嵌套frontier合成、透明coverage局部替换、祖先opacity一次、Abort/UI取消、文档坐标、对齐/patch scope UI、锁/undo/项目往返/导出。独立v8复审12 files/81 tests、build/check全通过。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/retouch/cloneHeal.ts",
+    "src/retouch/cloneHeal.test.ts",
+    "src/canvas/rasterTools.ts",
+    "src/canvas/rasterTools.test.ts",
+    "src/canvas/CanvasViewport.tsx",
+    "src/canvas/CanvasViewport.test.tsx",
+    "src/canvas/retouchScope.ts",
+    "src/canvas/retouchScope.test.ts",
+    "src/state/editor.tsx",
+    "src/state/layerWorkspace.test.ts",
+    "src/document/projectFormat.test.ts",
+    "src/components/ToolOptionsBar.tsx",
+    "src/components/ToolOptionsBar.test.tsx",
+    "src/canvas/CanvasScene.tsx",
+    "src/canvas/retouchComposite.test.tsx",
+    "src/state/layerHierarchy.ts",
+    "src/document/projectValidation.ts"
+  ],
+  "tests": [
+    {
+      "command": "npm test -- --run src/retouch/cloneHeal.test.ts src/canvas/rasterTools.test.ts src/canvas/CanvasViewport.test.tsx src/canvas/retouchScope.test.ts src/canvas/retouchComposite.test.tsx src/canvas/CanvasScene.test.tsx src/canvas/layerCoordinates.test.ts src/state/layerWorkspace.test.ts src/state/layerHierarchy.test.ts src/document/projectFormat.test.ts src/components/ToolOptionsBar.test.tsx",
+      "result": "独立v8复审12 files / 81 tests passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed; existing large bundle warning",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "真实付费云端修复服务未调用；远程接口为可选，失败明确提示。",
+    "UI像素回归使用Resvg替代浏览器SVG解码边界，PNG输出在测试捕获RGBA；浏览器rasterTools管线另有专项测试。"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "497a539b-7f34-4d27-b0a6-7e7108259d6f",
+      "result": "固定RGBA纹理、边缘和alpha样例验证heal/patch/clone；opacity/hardness真实影响输出。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "5f38b093-246f-4b4b-91af-6d607b253f98",
+      "result": "真实CanvasScene→Resvg合成验证coverage局部替换：修复位置alpha128保持128，未触及半透明与上层蓝保持不变；隐藏/undo恢复、项目重开像素一致、嵌套祖先transform、祖先锁、复制sourceIds防旧引用回归。；rootPlacement跨组visible真实合成验证opaque green保持alpha255；current父组50%预样式采样后最终alpha128且无残红；documentSpace兼容嵌套变换，schema持久化，dup重映射。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "312db790-2849-44d3-9fb5-0246de8f8000",
+      "result": "UI真实in-flight healing Escape取消使AbortSignal中止，layers/history/undoStack不变；确认修复仅新增一层和一个undo快照。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "02d3be34-0c27-402e-8cd1-b45bef9b998e",
+      "result": "120x80文档、200%缩放、90度视图、变换图层Alt采样→真实Resvg RGBA→clone输出落点对照；服务失败具体错误，不伪造调用。",
+      "evidence": []
+    }
+  ]
+}

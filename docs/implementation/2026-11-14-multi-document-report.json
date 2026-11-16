@@ -1,0 +1,82 @@
+{
+  "summary": "用户本轮多标签主体已实现并验证：新建/打开/切换、状态和后台任务隔离、安全关闭、本地恢复。原 F26 范围未全部完成；task:start 被三个未验收依赖阻止，保留依赖和人工验收。",
+  "outcome": "blocked",
+  "changedFiles": [
+    "src/document/documentWorkspace.ts",
+    "src/document/documentWorkspace.test.ts",
+    "src/document/DocumentWorkspaceProvider.tsx",
+    "src/document/DocumentTabs.tsx",
+    "src/document/DocumentTabs.test.tsx",
+    "src/document/documentTabs.css",
+    "src/document/workspaceRecovery.ts",
+    "src/document/ProjectFileControl.tsx",
+    "src/document/DocumentSizeControl.tsx",
+    "src/state/editor.tsx",
+    "src/app/AppShell.tsx",
+    "src/canvas/CanvasViewport.tsx",
+    "src/styles/theme.css",
+    "README.md",
+    "docs/implementation/2026-11-14-multi-document-plan.md",
+    "docs/superpowers/plans/2026-11-13-editor-capabilities/f26.md",
+    "docs/implementation/screenshots/2026-11-14-document-tabs.jpg"
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run",
+      "result": "83 文件 351 测试通过，覆盖多文档隔离、后台演示生成/保存、恢复和关闭保护。",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "TypeScript 与 Vite 通过；主 JS 697KB，有分包提醒。",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "git diff --check",
+      "result": "通过。",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "通过。",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "evidence": [],
+  "risks": [
+    "浏览器实测两个标签、不同缩放和图层、关闭取消、一个活动画布；未进行双平台原生安装包验证。",
+    "恢复受本地存储配额限制，失败会提醒；恢复不保留撤销栈及文件 token。",
+    "未调用真实付费生成服务；后台路由测试为演示响应。"
+  ],
+  "remainingIssues": [
+    "上游自动保存/恢复、右侧工作区、项目文件三个依赖未验收，服务端拒绝启动 F26；维护为 ready，不绕过状态机。",
+    "跨文档粘贴资源 ID 重映射与共享资产内存预算尚未实现。",
+    "原生多文件选择一次一个，重复打开可进入多个标签；浏览器 fallback 和拖入支持批量。"
+  ],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "2ee4e3ac-0cba-41e2-b655-b5f4adefd7f2",
+      "result": "本轮自动化通过：两文档不同尺寸、选区、缩放、撤销隔离；浏览器 A/B 切换视图保持。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "cb13808c-cd86-4a71-99a4-91dad05d87a4",
+      "result": "本轮自动化通过：后台保存和演示生成归属原 session，关闭后迟到 dispatch 被忽略。尚无真实服务调用证据。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "49e54a1d-d599-4d16-af92-207ae066f650",
+      "result": "未完成：跨文档素材粘贴和 ID 重映射留待 F26 后续实施。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "0ee16640-7042-414e-8bea-e8cc5b494d3a",
+      "result": "部分通过：多标签恢复、取消关闭及单活动画布已验证；共享资源仓库及显式内存预算未实现。",
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "outcome": "ready_for_independent_review",
+  "scope": "Platform cycle4 repairFeedback criterion b65a587a-d300-4fb8-ad56-940e2fb88cab; retouch selection authorization only",
+  "rootCause": "contentRevision intentionally excludes current selection. validateRetouch checked only request selection presence; retouchResultAction clipped with caller selection. A larger/altered selection or stale selection after current selection changed could expand authorization without changing revision or undo length.",
+  "productionCallChain": [
+    "toolCoverage.ts aiManualToolCoverage.retouch.execute -> applyRetouchResult -> retouchResultAction -> validateRetouch -> clipRetouchResult -> repairDeltaPixels -> imageToPng -> reducer add-repair-layer",
+    "No other production calls to validateRetouch/retouchResultAction found. Shared adapter now enforces boundary for all callers."
+  ],
+  "changedFiles": [
+    "src/ai/tools/retouchTools.ts",
+    "src/ai/tools/retouchTools.test.ts"
+  ],
+  "fix": [
+    "Strictly compare complete request selection snapshot to current visible state selection (or null for no selection), including path/alpha/feather and visibility changes. Reject mismatches before pixel encoding/publication.",
+    "Use state.selection as publication clipping source instead of request.selection. No schema/criteria/other source changes."
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run src/ai/tools/retouchTools.test.ts --maxWorkers=1 (before fix)",
+      "exitCode": 1,
+      "result": "4 new regressions failed,5 passed; /tmp/retouch-selection-red.log; larger selection/same-bounds changed path/feather and stale changed selection accepted by old code"
+    },
+    {
+      "command": "npx vitest run src/ai/tools/retouchTools.test.ts src/ai/tools/toolCoverage.test.ts src/retouch/cloneHeal.test.ts --maxWorkers=1",
+      "exitCode": 0,
+      "result": "3files25tests passed; /tmp/retouch-selection-final.log; full unchanged-scope clone allowed, invalid scopes rejected; actual retouchResultAction delta encoder input outside current selection all transparent; cleared-selection result rejected before encoder"
+    },
+    {
+      "command": "npx tsc -b",
+      "exitCode": 0,
+      "result": "passed; /tmp/retouch-selection-tsc.log"
+    },
+    {
+      "command": "git diff --check -- src/ai/tools/retouchTools.ts src/ai/tools/retouchTools.test.ts",
+      "exitCode": 0,
+      "result": "passed"
+    }
+  ],
+  "remainingIssues": [],
+  "limits": [
+    "Strict snapshot equality conservatively rejects semantically equivalent but differently serialized caller selection; caller should use a clone of current state selection.",
+    "No full suite, cloud report or acceptance mutation performed by this worker."
+  ],
+  "codeFreeze": true,
+  "commit": null
+}

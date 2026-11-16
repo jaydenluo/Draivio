@@ -1,0 +1,41 @@
+{
+  "outcome": "passed",
+  "role": "read-only review of integration_freeze fixture repairs; picker catalog enhancement implemented by this worker",
+  "reviewedFiles": [
+    "src/creation/Inspector.test.tsx",
+    "src/creation/ComposerLayout.test.tsx",
+    "src/creation/ComposerPreferences.test.tsx",
+    "src/creation/AIComposer.remote.test.tsx"
+  ],
+  "findings": [],
+  "evidence": [
+    "Inspector selects explicitly configured custom provider and tests actual async candidate receipts; original mode/scope/history/adoption assertions preserved. No default official mock success restored.",
+    "ComposerLayout uses an explicit custom catalog option; composer input/placement/model/mode retention assertions preserved.",
+    "ComposerPreferences uses custom local fixture for selection persistence and execution UI availability; quantity/storage-failure/input keyboard assertions preserved.",
+    "AIComposer.remote uses actual localStorage service setup consumed by getRuntimeConnections instead of spying a different binding; fetch remains mocked, reference image/request payload/private-preview/late-cancel/stale-state assertions preserved."
+  ],
+  "tests": [
+    {
+      "source": "/tmp/integration-inspector-final.log",
+      "result": "1file8tests passed; log independently inspected"
+    },
+    {
+      "source": "/tmp/integration-layout-final.log",
+      "result": "1file3tests passed; log independently inspected"
+    },
+    {
+      "command": "npx vitest run src/creation/ModelSourcePicker.test.tsx src/creation/ComposerPreferences.test.tsx src/creation/AIComposer.remote.test.tsx --maxWorkers=1",
+      "exitCode": 0,
+      "result": "3files16tests passed; /tmp/catalog-fixture-final-tests.log; newly added authenticated catalog / logout UI fixture included"
+    }
+  ],
+  "pickerChangedFile": "src/creation/ModelSourcePicker.test.tsx",
+  "pickerCoverage": [
+    "Existing signed-out custom order/source switching/current-source model selection/disabled and empty source behavior retained",
+    "Mock account snapshot uses fixture-official-code/display name; official before custom; callback receives public code; subscribe-driven logout removes official models immediately",
+    "No real account login, email or model requests"
+  ],
+  "productionChanges": false,
+  "thresholdChanges": false,
+  "freeze": true
+}

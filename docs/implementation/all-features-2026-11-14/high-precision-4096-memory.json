@@ -1,0 +1,33 @@
+{
+  "dimensions": [
+    4096,
+    4096
+  ],
+  "format": "rgba32f",
+  "operation": "linear exposure +1EV",
+  "estimated": {
+    "sourceBytes": 268435456,
+    "outputBytes": 268435456,
+    "estimatedPeakBytes": 536870912,
+    "maxBytes": 536870912
+  },
+  "memoryBefore": {
+    "rss": 121225216,
+    "heapTotal": 38322176,
+    "heapUsed": 26988024,
+    "external": 20930833,
+    "arrayBuffers": 130727
+  },
+  "observedPeak": {
+    "rss": 672858112,
+    "heapTotal": 55623680,
+    "heapUsed": 32950016,
+    "external": 557780544,
+    "arrayBuffers": 536980398
+  },
+  "durationMs": 2055.538958,
+  "sourceHighlight": 2.5,
+  "resultHighlight": 5,
+  "sourceUnchanged": true,
+  "limits": "Node CPU source+output processing measurement only. Does not include codec/base64 transport, project serialization or native GPU memory."
+}

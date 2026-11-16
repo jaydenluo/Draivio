@@ -1,0 +1,50 @@
+{
+  "taskId": "6bab7ff2-efdb-4bea-92c4-4736f6cc4f83",
+  "scope": "Authorized keyboard/modal accessibility repair and current evaluation documentation calibration",
+  "reviewType": "implementation evidence; requires separate root review",
+  "outcome": "success_for_scoped_repair",
+  "changedFiles": [
+    "src/models/ModelManagerDialog.tsx",
+    "src/models/ModelManagerDialog.accessibility.test.tsx",
+    "docs/evaluation/README.md"
+  ],
+  "summary": "Model manager now reuses SettingsDialog modal focus stack, keyboard containment, Escape close and opener focus restoration while retaining existing draggable title and model-dialog styling. Type choices use ordinary aria-pressed buttons with existing selected colors, avoiding incomplete tab semantics. Download progress has a model-specific accessible name. Evaluation guide now leads with159cases/63composites/17tools and distinguishes historical150-case metrics/baselines and current prediction-import requirements.",
+  "tests": [
+    {
+      "command": "npx vitest run src/models/ModelManagerDialog.accessibility.test.tsx --maxWorkers=1 --configLoader runner --no-cache --no-fsModuleCache (before fix)",
+      "result": "Expected red:2 failed; initial focus remains on opener and U2Net progressbar has no accessible name. /tmp/model-modal-red.log",
+      "outcome": "failed",
+      "exitCode": 1
+    },
+    {
+      "command": "npx vitest run src/models/ModelManagerDialog.accessibility.test.tsx src/ui/DialogWindows.test.tsx --maxWorkers=1 --configLoader runner --no-cache --no-fsModuleCache",
+      "result": "2files9tests passed, including keyboard focus/Tab wrap/Escape restoration, type activation, named progress and existing drag/close. /tmp/model-modal-green.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx vitest run src/models/ModelManagerDialog.accessibility.test.tsx src/ui/DialogWindows.test.tsx src/components/ButtonAudit.test.tsx src/account/CloudAccountDialog.test.tsx --maxWorkers=1 --configLoader runner --no-cache --no-fsModuleCache",
+      "result": "4files16tests passed. /tmp/model-modal-final-tests.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx tsc -b --pretty false",
+      "result": "Passed. /tmp/model-modal-tsc.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "Vibe Plan checks passed. /tmp/model-modal-vibecheck.log",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "remainingIssues": [
+    "Independent review required; implementation author did not approve or change cloud acceptance.",
+    "Real screen reader, Windows, trackpad and live model/human evaluation evidence remain unchanged and blocked.",
+    "No full build/performance/render suite was run during this scoped repair; final frozen integration belongs to integration_freeze.",
+    "Cache-safe command was tested with current normal tool permissions; formal task:review read-only sandbox still must execute it independently."
+  ]
+}

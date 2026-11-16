@@ -1,0 +1,3492 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-11-15T09:34:03.336Z",
+  "environment": {
+    "node": "v22.23.1",
+    "renderer": "2.6.2",
+    "sourceSha256": {
+      "src/ai/planning/planner.ts": "11738d657db1a8ba4a30e2f7940de8058326a39e4fef4d70d49c9d38be3ae0ee",
+      "src/ai/planning/prompts.ts": "01cb2fed4169254566a408e73889803c7fbdaad584f035c472880658ad2d80b9",
+      "src/ai/tools/editorTools.ts": "8cefdc53a9fdedd06befec6158d682b59c8f69458d138717a6514a697c2ec18c",
+      "src/ai/execution/executor.ts": "0ae187d04b69e21f9c455b6393f797689f6b47e611a7157342b95e8aa53bca34",
+      "src/ai/execution/transaction.ts": "41b17c7a4a4c4b94989e1fae3ae1609624e3e4814e1a4dbd377be04d323a5b0b",
+      "src/state/editor.tsx": "e0b1297cd776025664ee6b1f7b00733b6c6b87bb704e94ba1a97ec11942cc4c2",
+      "src/canvas/CanvasScene.tsx": "c58d731675a9c3b5136255910d301f89069959f45f8490569f928ae461d75254"
+    }
+  },
+  "corpusVersion": "zh-layer-1.0.0",
+  "corpusSha256": "9a19c83788617c1618376610d71668eab50763f3b60f7de4fcebd481c6835de6",
+  "metadata": {
+    "mode": "offline-deterministic-planner",
+    "model": null,
+    "modelRevision": null,
+    "requestConfig": null,
+    "cost": {
+      "amount": 0,
+      "currency": "USD",
+      "inputTokens": 0,
+      "outputTokens": 0
+    },
+    "gitRevision": "c30a9ba8e06832f75e321146f95c3a6b6bcd939f",
+    "note": "Actual local parser predictions; no model calls. Execution uses oracle commands independently."
+  },
+  "metrics": {
+    "planning": {
+      "passed": 120,
+      "total": 150,
+      "rate": 0.8,
+      "realModelEvidence": false
+    },
+    "execution": {
+      "passed": 150,
+      "total": 150
+    },
+    "pixels": {
+      "passed": 150,
+      "total": 150,
+      "scope": "16 protected canvas pixels plus protected layer state; not full image quality"
+    },
+    "visual": {
+      "status": "not_run",
+      "reviewedCases": 0,
+      "requiredCases": 30
+    }
+  },
+  "durationMs": 576,
+  "failures": [
+    {
+      "caseId": "zh-007",
+      "instruction": "将图层“主体”混合模式设为正片叠底",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-013",
+      "instruction": "将图层“主体”和图层“标题”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"title\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-014",
+      "instruction": "把所有六个可编辑图层按画布左对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-015",
+      "instruction": "把图层“主体”、“标题”、“徽标”水平等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"title\",\"logo\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-022",
+      "instruction": "将图层“标题”混合模式设为滤色",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-028",
+      "instruction": "将图层“标题”和图层“徽标”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"title\",\"logo\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-029",
+      "instruction": "把所有六个可编辑图层按画布右对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-030",
+      "instruction": "把图层“标题”、“徽标”、“装饰”垂直等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"title\",\"logo\",\"decoration\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-037",
+      "instruction": "将图层“徽标”混合模式设为叠加",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-043",
+      "instruction": "将图层“徽标”和图层“装饰”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"logo\",\"decoration\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-044",
+      "instruction": "把所有六个可编辑图层按画布顶部对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-045",
+      "instruction": "把图层“徽标”、“装饰”、“说明”水平等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"logo\",\"decoration\",\"caption\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-052",
+      "instruction": "将图层“装饰”混合模式设为柔光",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-058",
+      "instruction": "将图层“装饰”和图层“说明”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"decoration\",\"caption\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-059",
+      "instruction": "把所有六个可编辑图层按画布底部对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-060",
+      "instruction": "把图层“装饰”、“说明”、“角标”垂直等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"decoration\",\"caption\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-067",
+      "instruction": "将图层“说明”混合模式设为差值",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-073",
+      "instruction": "将图层“说明”和图层“角标”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"caption\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-074",
+      "instruction": "把所有六个可编辑图层按画布水平居中",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-075",
+      "instruction": "把图层“主体”、“装饰”、“角标”水平等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"decoration\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-082",
+      "instruction": "将图层“角标”混合模式设为正常",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-088",
+      "instruction": "将图层“角标”和图层“主体”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"badge\",\"subject\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-089",
+      "instruction": "把所有六个可编辑图层按画布垂直居中",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-090",
+      "instruction": "把图层“主体”、“说明”、“角标”垂直等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"caption\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-127",
+      "instruction": "将图层“主体”混合模式设为滤色，然后将图层“主体”不透明度设置为20%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-128",
+      "instruction": "将图层“标题”混合模式设为滤色，然后将图层“标题”不透明度设置为30%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-129",
+      "instruction": "将图层“徽标”混合模式设为滤色，然后将图层“徽标”不透明度设置为40%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-130",
+      "instruction": "将图层“装饰”混合模式设为滤色，然后将图层“装饰”不透明度设置为50%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-131",
+      "instruction": "将图层“说明”混合模式设为滤色，然后将图层“说明”不透明度设置为60%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-132",
+      "instruction": "将图层“角标”混合模式设为滤色，然后将图层“角标”不透明度设置为70%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    }
+  ],
+  "records": [
+    {
+      "caseId": "zh-001",
+      "instruction": "将图层“主体”向右移动5像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-002",
+      "instruction": "将图层“主体”缩放为0.25倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-003",
+      "instruction": "将图层“主体”旋转-90度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-004",
+      "instruction": "将图层“主体”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-005",
+      "instruction": "将图层“主体”不透明度设置为0%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-006",
+      "instruction": "隐藏图层“主体”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-007",
+      "instruction": "将图层“主体”混合模式设为正片叠底",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-008",
+      "instruction": "将图层“主体”重命名为“主体终稿”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-009",
+      "instruction": "复制图层“主体”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-010",
+      "instruction": "删除图层“主体”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-011",
+      "instruction": "锁定图层“主体”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-012",
+      "instruction": "将图层“主体”下移一层",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-013",
+      "instruction": "将图层“主体”和图层“标题”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"title\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-014",
+      "instruction": "把所有六个可编辑图层按画布左对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-015",
+      "instruction": "把图层“主体”、“标题”、“徽标”水平等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"title\",\"logo\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-016",
+      "instruction": "将图层“标题”向右移动12像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-017",
+      "instruction": "将图层“标题”缩放为0.5倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-018",
+      "instruction": "将图层“标题”旋转-30度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-019",
+      "instruction": "将图层“标题”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-020",
+      "instruction": "将图层“标题”不透明度设置为10%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-021",
+      "instruction": "隐藏图层“标题”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-022",
+      "instruction": "将图层“标题”混合模式设为滤色",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-023",
+      "instruction": "将图层“标题”重命名为“标题终稿”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-024",
+      "instruction": "复制图层“标题”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-025",
+      "instruction": "删除图层“标题”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-026",
+      "instruction": "锁定图层“标题”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-027",
+      "instruction": "将图层“标题”上移一层",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-028",
+      "instruction": "将图层“标题”和图层“徽标”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"title\",\"logo\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-029",
+      "instruction": "把所有六个可编辑图层按画布右对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-030",
+      "instruction": "把图层“标题”、“徽标”、“装饰”垂直等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"title\",\"logo\",\"decoration\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-031",
+      "instruction": "将图层“徽标”向右移动24像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-032",
+      "instruction": "将图层“徽标”缩放为0.75倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-033",
+      "instruction": "将图层“徽标”旋转15度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-034",
+      "instruction": "将图层“徽标”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-035",
+      "instruction": "将图层“徽标”不透明度设置为33%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-036",
+      "instruction": "隐藏图层“徽标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-037",
+      "instruction": "将图层“徽标”混合模式设为叠加",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-038",
+      "instruction": "将图层“徽标”重命名为“徽标终稿”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-039",
+      "instruction": "复制图层“徽标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-040",
+      "instruction": "删除图层“徽标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-041",
+      "instruction": "锁定图层“徽标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-042",
+      "instruction": "将图层“徽标”上移一层",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-043",
+      "instruction": "将图层“徽标”和图层“装饰”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"logo\",\"decoration\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-044",
+      "instruction": "把所有六个可编辑图层按画布顶部对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-045",
+      "instruction": "把图层“徽标”、“装饰”、“说明”水平等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"logo\",\"decoration\",\"caption\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-046",
+      "instruction": "将图层“装饰”向右移动40像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-047",
+      "instruction": "将图层“装饰”缩放为1.25倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-048",
+      "instruction": "将图层“装饰”旋转45度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-049",
+      "instruction": "将图层“装饰”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-050",
+      "instruction": "将图层“装饰”不透明度设置为50%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-051",
+      "instruction": "隐藏图层“装饰”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-052",
+      "instruction": "将图层“装饰”混合模式设为柔光",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-053",
+      "instruction": "将图层“装饰”重命名为“装饰终稿”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-054",
+      "instruction": "复制图层“装饰”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-055",
+      "instruction": "删除图层“装饰”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-056",
+      "instruction": "锁定图层“装饰”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-057",
+      "instruction": "将图层“装饰”上移一层",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-058",
+      "instruction": "将图层“装饰”和图层“说明”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"decoration\",\"caption\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-059",
+      "instruction": "把所有六个可编辑图层按画布底部对齐",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-060",
+      "instruction": "把图层“装饰”、“说明”、“角标”垂直等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"decoration\",\"caption\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-061",
+      "instruction": "将图层“说明”向右移动64像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-062",
+      "instruction": "将图层“说明”缩放为1.5倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-063",
+      "instruction": "将图层“说明”旋转90度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-064",
+      "instruction": "将图层“说明”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-065",
+      "instruction": "将图层“说明”不透明度设置为80%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-066",
+      "instruction": "隐藏图层“说明”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-067",
+      "instruction": "将图层“说明”混合模式设为差值",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-068",
+      "instruction": "将图层“说明”重命名为“说明终稿”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-069",
+      "instruction": "复制图层“说明”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-070",
+      "instruction": "删除图层“说明”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-071",
+      "instruction": "锁定图层“说明”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-072",
+      "instruction": "将图层“说明”上移一层",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-073",
+      "instruction": "将图层“说明”和图层“角标”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"caption\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-074",
+      "instruction": "把所有六个可编辑图层按画布水平居中",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-075",
+      "instruction": "把图层“主体”、“装饰”、“角标”水平等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"decoration\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-076",
+      "instruction": "将图层“角标”向右移动80像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-077",
+      "instruction": "将图层“角标”缩放为2倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-078",
+      "instruction": "将图层“角标”旋转180度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-079",
+      "instruction": "将图层“角标”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-080",
+      "instruction": "将图层“角标”不透明度设置为100%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-081",
+      "instruction": "隐藏图层“角标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-082",
+      "instruction": "将图层“角标”混合模式设为正常",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-083",
+      "instruction": "将图层“角标”重命名为“角标终稿”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-084",
+      "instruction": "复制图层“角标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-085",
+      "instruction": "删除图层“角标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-086",
+      "instruction": "锁定图层“角标”",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-087",
+      "instruction": "将图层“角标”上移一层",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-088",
+      "instruction": "将图层“角标”和图层“主体”分组",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"badge\",\"subject\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-089",
+      "instruction": "把所有六个可编辑图层按画布垂直居中",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 1, got 0",
+          "step 1: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-090",
+      "instruction": "把图层“主体”、“说明”、“角标”垂直等距分布",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step 1.layerIds: expected [\"subject\",\"caption\",\"badge\"], got [\"subject\",\"title\",\"logo\",\"decoration\",\"caption\",\"badge\"]"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-091",
+      "instruction": "将图层“主体”向右移动8像素，然后将图层“主体”旋转15度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-092",
+      "instruction": "将图层“标题”向右移动11像素，然后将图层“标题”旋转25度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-093",
+      "instruction": "将图层“徽标”向右移动14像素，然后将图层“徽标”旋转35度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-094",
+      "instruction": "将图层“装饰”向右移动17像素，然后将图层“装饰”旋转45度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-095",
+      "instruction": "将图层“说明”向右移动20像素，然后将图层“说明”旋转55度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-096",
+      "instruction": "将图层“角标”向右移动23像素，然后将图层“角标”旋转65度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-097",
+      "instruction": "将图层“主体”向上移动8像素，然后将图层“主体”不透明度设置为20%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-098",
+      "instruction": "将图层“标题”向上移动11像素，然后将图层“标题”不透明度设置为30%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-099",
+      "instruction": "将图层“徽标”向上移动14像素，然后将图层“徽标”不透明度设置为40%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-100",
+      "instruction": "将图层“装饰”向上移动17像素，然后将图层“装饰”不透明度设置为50%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-101",
+      "instruction": "将图层“说明”向上移动20像素，然后将图层“说明”不透明度设置为60%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-102",
+      "instruction": "将图层“角标”向上移动23像素，然后将图层“角标”不透明度设置为70%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-103",
+      "instruction": "将图层“主体”缩放为0.5倍，然后将图层“主体”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-104",
+      "instruction": "将图层“标题”缩放为0.7倍，然后将图层“标题”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-105",
+      "instruction": "将图层“徽标”缩放为0.9倍，然后将图层“徽标”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-106",
+      "instruction": "将图层“装饰”缩放为1.1倍，然后将图层“装饰”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-107",
+      "instruction": "将图层“说明”缩放为1.3倍，然后将图层“说明”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-108",
+      "instruction": "将图层“角标”缩放为1.5倍，然后将图层“角标”水平翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-109",
+      "instruction": "将图层“主体”旋转15度，然后将图层“主体”不透明度设置为20%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-110",
+      "instruction": "将图层“标题”旋转25度，然后将图层“标题”不透明度设置为30%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-111",
+      "instruction": "将图层“徽标”旋转35度，然后将图层“徽标”不透明度设置为40%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-112",
+      "instruction": "将图层“装饰”旋转45度，然后将图层“装饰”不透明度设置为50%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-113",
+      "instruction": "将图层“说明”旋转55度，然后将图层“说明”不透明度设置为60%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-114",
+      "instruction": "将图层“角标”旋转65度，然后将图层“角标”不透明度设置为70%",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-115",
+      "instruction": "将图层“主体”重命名为“主体定稿”，然后将图层“主体”向左移动8像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-116",
+      "instruction": "将图层“标题”重命名为“标题定稿”，然后将图层“标题”向左移动11像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-117",
+      "instruction": "将图层“徽标”重命名为“徽标定稿”，然后将图层“徽标”向左移动14像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-118",
+      "instruction": "将图层“装饰”重命名为“装饰定稿”，然后将图层“装饰”向左移动17像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-119",
+      "instruction": "将图层“说明”重命名为“说明定稿”，然后将图层“说明”向左移动20像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-120",
+      "instruction": "将图层“角标”重命名为“角标定稿”，然后将图层“角标”向左移动23像素",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-121",
+      "instruction": "将图层“主体”隐藏，然后将图层“主体”锁定",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-122",
+      "instruction": "将图层“标题”隐藏，然后将图层“标题”锁定",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-123",
+      "instruction": "将图层“徽标”隐藏，然后将图层“徽标”锁定",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-124",
+      "instruction": "将图层“装饰”隐藏，然后将图层“装饰”锁定",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-125",
+      "instruction": "将图层“说明”隐藏，然后将图层“说明”锁定",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-126",
+      "instruction": "将图层“角标”隐藏，然后将图层“角标”锁定",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-127",
+      "instruction": "将图层“主体”混合模式设为滤色，然后将图层“主体”不透明度设置为20%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-128",
+      "instruction": "将图层“标题”混合模式设为滤色，然后将图层“标题”不透明度设置为30%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-129",
+      "instruction": "将图层“徽标”混合模式设为滤色，然后将图层“徽标”不透明度设置为40%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-130",
+      "instruction": "将图层“装饰”混合模式设为滤色，然后将图层“装饰”不透明度设置为50%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-131",
+      "instruction": "将图层“说明”混合模式设为滤色，然后将图层“说明”不透明度设置为60%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-132",
+      "instruction": "将图层“角标”混合模式设为滤色，然后将图层“角标”不透明度设置为70%",
+      "planning": {
+        "passed": false,
+        "failures": [
+          "step count: expected 2, got 1",
+          "step 1: expected blend, got opacity",
+          "step 1.blendMode: expected \"滤色\", got undefined",
+          "step 1: unexpected argument value",
+          "step 2: missing"
+        ]
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-133",
+      "instruction": "将图层“主体”缩放为0.5倍，然后将图层“主体”旋转15度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-134",
+      "instruction": "将图层“标题”缩放为0.7倍，然后将图层“标题”旋转25度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-135",
+      "instruction": "将图层“徽标”缩放为0.9倍，然后将图层“徽标”旋转35度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-136",
+      "instruction": "将图层“装饰”缩放为1.1倍，然后将图层“装饰”旋转45度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-137",
+      "instruction": "将图层“说明”缩放为1.3倍，然后将图层“说明”旋转55度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-138",
+      "instruction": "将图层“角标”缩放为1.5倍，然后将图层“角标”旋转65度",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-139",
+      "instruction": "将图层“主体”向下移动8像素，然后将图层“主体”缩放为0.5倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-140",
+      "instruction": "将图层“标题”向下移动11像素，然后将图层“标题”缩放为0.7倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-141",
+      "instruction": "将图层“徽标”向下移动14像素，然后将图层“徽标”缩放为0.9倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-142",
+      "instruction": "将图层“装饰”向下移动17像素，然后将图层“装饰”缩放为1.1倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-143",
+      "instruction": "将图层“说明”向下移动20像素，然后将图层“说明”缩放为1.3倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-144",
+      "instruction": "将图层“角标”向下移动23像素，然后将图层“角标”缩放为1.5倍",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-145",
+      "instruction": "将图层“主体”重命名为“主体镜像版”，然后将图层“主体”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-146",
+      "instruction": "将图层“标题”重命名为“标题镜像版”，然后将图层“标题”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-147",
+      "instruction": "将图层“徽标”重命名为“徽标镜像版”，然后将图层“徽标”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-148",
+      "instruction": "将图层“装饰”重命名为“装饰镜像版”，然后将图层“装饰”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-149",
+      "instruction": "将图层“说明”重命名为“说明镜像版”，然后将图层“说明”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    },
+    {
+      "caseId": "zh-150",
+      "instruction": "将图层“角标”重命名为“角标镜像版”，然后将图层“角标”垂直翻转",
+      "planning": {
+        "passed": true,
+        "failures": []
+      },
+      "execution": {
+        "passed": true,
+        "status": "committed",
+        "failures": []
+      },
+      "pixels": {
+        "passed": true,
+        "changedProtectedPixels": 0,
+        "protectedPixels": 16
+      }
+    }
+  ]
+}

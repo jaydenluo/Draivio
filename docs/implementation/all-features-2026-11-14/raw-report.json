@@ -1,0 +1,27 @@
+{
+  "summary": "审计确认当前构建没有 libraw/rawloader/dcraw 或其他经过验证的 RAW codec，也没有授权的三类真实 RAW 样本，因此无法声称完成真实解码验收。已实现严格格式/损坏/JPEG 冒充拒绝、显影参数校验、非破坏曝光/WB/高光处理、可取消处理、稳定缓存键，以及原始字节/元数据/参数的 JSON-safe 项目保存恢复边界。",
+  "outcome": "blocked",
+  "changedFiles": [
+    "src/raw/rawPipeline.ts",
+    "src/raw/rawPipeline.test.ts",
+    "src/state/editor.tsx",
+    "src/document/projectValidation.ts",
+    "src/document/projectFormat.ts",
+    "src/document/projectFormat.test.ts"
+  ],
+  "tests": [
+    {"command": "npx vitest run src/raw/rawPipeline.test.ts src/document/projectFormat.test.ts", "result": "22 passed", "outcome": "passed", "exitCode": 0},
+    {"command": "npx tsc -b", "result": "passed", "outcome": "passed", "exitCode": 0},
+    {"command": "vibeplan check", "result": "Vibe Plan checks passed", "outcome": "passed", "exitCode": 0}
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": ["未接入真实 RAW codec，不能验证去马赛克、相机白平衡、方向和高光恢复的真实样本像素结果。"],
+  "remainingIssues": ["需要选择并审计许可明确的 RAW codec，提供至少三类授权 RAW 样本，并在真实解码路径上补充取消、内存峰值和 ICC 导出证据。"],
+  "criterionResults": [
+    {"acceptanceItemId": "eaeb3f6b-cab0-4179-955c-4ad37dd9ccb4", "result": "blocked", "evidence": "无真实 codec 和三类授权样本；RAW_SUPPORT_MATRIX 明确所有格式 decode=false。"},
+    {"acceptanceItemId": "7970e939-c089-4942-93cb-ac980c56ad5a", "result": "partial", "evidence": "rawPipeline 与 projectFormat 测试验证原始 bytes、metadata、settings 离线 round-trip；真实 RAW 解码未接入。"},
+    {"acceptanceItemId": "61aed43b-ee97-4bfc-aa42-18763c8c7f7e", "result": "passed", "evidence": "rawPipeline.test.ts 覆盖 JPEG 冒充、unknown/corrupt 拒绝；decodeRaw 明确不会把内嵌 JPEG 当 RAW。"},
+    {"acceptanceItemId": "ea2dce32-09d5-4d7a-8912-221c609660ae", "result": "blocked", "evidence": "纯处理 AbortSignal 取消测试通过；真实大文件 codec、内存峰值与 ICC 导出未验证。"}
+  ]
+}

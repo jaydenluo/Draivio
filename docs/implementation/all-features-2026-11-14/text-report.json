@@ -1,0 +1,71 @@
+{
+  "summary": "文本框、段落排版与局部文字样式完成并通过 fresh 独立复核：grapheme/emoji/组合字符安全分段、IME composition、局部 runs 随编辑移动、point/paragraph 框体与字号缩放区分、overflow 提示、字体 fallback、行距字距、F15 图层效果以及项目/撤销语义均已接入。",
+  "outcome": "success",
+  "changedFiles": [
+    "src/text/paragraphLayout.ts",
+    "src/text/paragraphLayout.test.ts",
+    "src/canvas/TextObject.tsx",
+    "src/canvas/TextObject.test.tsx",
+    "src/canvas/TextObject.layout.test.tsx",
+    "src/canvas/CanvasTextTool.test.tsx",
+    "src/canvas/CanvasTextTransform.test.tsx",
+    "src/state/editor.tsx",
+    "src/layers/PropertiesPanel.tsx",
+    "src/layers/PropertiesPanel.text.test.tsx",
+    "src/canvas/CanvasScene.tsx"
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run src/text/paragraphLayout.test.ts src/canvas/TextObject.test.tsx src/canvas/TextObject.layout.test.tsx src/canvas/CanvasTextTool.test.tsx src/canvas/CanvasTextTransform.test.tsx src/layers/PropertiesPanel.text.test.tsx --maxWorkers=1 --testTimeout=30000",
+      "result": "6 files / 46 tests passed; exit 0",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npx tsc -b",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "passed; existing chunk/dynamic-import warnings only",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "passed",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [],
+  "risks": [
+    "TextStyleRun.shadow 字段在局部 tspans 中不单独渲染；文字图层级 F15 effects 仍会对整层提供真实描边/阴影。"
+  ],
+  "remainingIssues": [],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "9dbf43db-9324-4d72-80e4-cbcbfc7f1df4",
+      "result": "PASS：Intl.Segmenter/grapheme fallback、emoji/组合字符、IME composition guard，editor upsert-text 用前后缀 diff 调整 runs 范围并保留换行。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "92c46974-7df7-4398-b145-3934a31e4f91",
+      "result": "PASS：point 与 paragraph resizeTextObject 分离；paragraph width/height 与字号独立；overflow data/title 提示且原文不截断。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "5c7c2853-826e-4467-a2c8-d2b5a6413a5c",
+      "result": "PASS：fontChoices/normalizeFontFamily 提供缺失字体 fallback 提示；字体修改走 commit/undo，项目 SVG 重开保留字体字段。",
+      "evidence": []
+    },
+    {
+      "acceptanceItemId": "068fc074-a100-451d-b5a7-3c1a7c78d817",
+      "result": "PASS：lineHeight/letterSpacing/runs 与 layer effects 接入 CanvasScene/导出；Esc取消、Enter快捷键跳过IME composition。",
+      "evidence": []
+    }
+  ]
+}

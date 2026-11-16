@@ -1,0 +1,107 @@
+{
+  "summary": "Cycle2 adds real inner-range deadline checks every2048pixels,8ms budget,262144pixel outercap and exact pixel resume. Controlled pre-fix regression red→green; independent-math pixel contracts pass. Final coordinated exclusive one benchmark and sequential14performance tests pass original thresholds with all samples retained. Prior failures and phase diagnostic retained. Old68.904ms event exact cause unknown; diagnostic did not reproduce and is not substituted for acceptance. Ready separate read-only review; no cloud approval.",
+  "outcome": "success",
+  "changedFiles": [
+    "src/engine/raster/composite.ts",
+    "src/engine/raster/composite.deadline.test.ts",
+    "src/ai/imaging/processingScheduler.ts",
+    "src/ai/imaging/processingScheduler.md",
+    "docs/evidence/performance/cycle2-phase-diagnostic.json",
+    "docs/evidence/performance/benchmark.json",
+    "docs/evidence/performance/cycle2-before-deadline-failed.json",
+    "docs/evidence/performance/adoption-lifecycle.json",
+    "docs/evidence/performance/worker-benchmark.json",
+    "docs/evidence/performance/cycle2-phase-diagnostic.jsonl"
+  ],
+  "tests": [
+    {
+      "command": "npx vitest run --maxWorkers=1 src/engine/raster/composite.deadline.test.ts src/engine/raster/composite.test.ts src/ai/imaging/processingScheduler.pixels.test.ts src/ai/imaging/processingLifecycle.test.ts src/ai/imaging/rasterPreview.test.ts src/engine/raster/RasterSurface.async.test.ts",
+      "result": "Post-fix6files12tests passed; /tmp/performance-cycle2-contracts.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "node scripts/benchmark-raster.mjs",
+      "result": "Exclusive final one run; all5cold+20warm retained. Coldp9554.323/warm p9581.285/maxTask10.811ms; peak33554432B/RSS116260864B/cancel0.816ms. /tmp/performance-cycle2-exclusive-benchmark.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "PERFORMANCE_EVIDENCE_DIR=/tmp/performance-cycle2-exclusive npx vitest run --maxWorkers=1 src/ai/imaging/processingScheduler.test.ts src/ai/imaging/processingScheduler.regression.test.ts src/ai/imaging/processingWorker.integration.test.ts src/ai/imaging/processingLifecycle.test.ts",
+      "result": "Exclusive sequential4files14tests passed8.86s. Actual Worker p95137.772ms/main dispatch max4.708ms. 20lifecycle cycles0retained buffers,524288Bpixelpeak/187514880BRSS. /tmp/performance-cycle2-exclusive-focused.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build",
+      "result": "Passed /tmp/performance-cycle2-build.log",
+      "outcome": "passed",
+      "exitCode": 0
+    },
+    {
+      "command": "vibeplan check",
+      "result": "Passed /tmp/performance-cycle2-check.log",
+      "outcome": "passed",
+      "exitCode": 0
+    }
+  ],
+  "commit": null,
+  "evidence": [
+    {
+      "label": "Current docs/evidence/performance benchmark/worker/lifecycle; before-deadline failure and complete diagnostic JSONL preserved. Final command logs /tmp/performance-cycle2-exclusive-*",
+      "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+    }
+  ],
+  "criterionResults": [
+    {
+      "acceptanceItemId": "f8731914-c092-4166-8b38-97954b1d0b76",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "Current exclusive cold/warm all samples plus actual freshWorker samples meet original300ms/50ms thresholds. New controlled deadline test proves stop/resume within a previously uninterruptible range.",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "261818eb-1da0-4dc0-bf97-acf8700ddb6b",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "Focused regressions verify8192 rejection before output allocation with explicit pixel budget; actual cooperative and Worker cancellation preserve caller sources and publish no partial output.",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    },
+    {
+      "acceptanceItemId": "c3cf48ca-5360-46a9-a3c5-90478e81b578",
+      "result": "passed",
+      "evidence": [
+        {
+          "label": "20actual PNG results adopted via production reducer/undo; all owned pixel buffers zeroed and evicted; final retained0B,peak524288B,sampledRSS187514880B;20 encoded history/result sources intentionally retained and separately disclosed.",
+          "url": "https://vibeplan.szxinjin.cn/projects/c3263908-e8c1-47ed-ad80-f822e5a73a8f"
+        }
+      ]
+    }
+  ],
+  "risks": [
+    "Cooperative deadlines cannot prevent OS preemption or GC; historical failing wall timings remain disclosed. Old68.904ms precise cause unproven.",
+    "Benchmarks measure decoded2048² single normal opaque compositor; no model/network/wholeappGPU latency claim. Worker uses real OS threads with browser transport bridge, not cross-platform browser certification.",
+    "Encoded PNG results/undo retain20sources intentionally;0owned pixel buffers is not proof of immediate whole-process/GPU garbage collection."
+  ],
+  "remainingIssues": [],
+  "historicalTests": [
+    {
+      "command": "npx vitest run --maxWorkers=1 src/engine/raster/composite.deadline.test.ts",
+      "result": "Pre-fix controlled deadline regression failed because range had no stop/resume contract; /tmp/performance-deadline-red.log",
+      "outcome": "failed",
+      "exitCode": 1
+    },
+    {
+      "command": "npx vitest run --maxWorkers=1 src/engine/raster/composite.deadline.test.ts src/engine/raster/composite.test.ts src/ai/imaging/processingScheduler.regression.test.ts src/ai/imaging/processingScheduler.pixels.test.ts src/ai/imaging/processingScheduler.test.ts src/ai/imaging/processingWorker.integration.test.ts src/ai/imaging/processingLifecycle.test.ts src/ai/imaging/rasterPreview.test.ts src/engine/raster/RasterSurface.async.test.ts",
+      "result": "Initial mixed run23passed/2failed:2048x5 timeout5000ms; Worker first dispatch124.247ms. Preserved /tmp/performance-cycle2-focused.log",
+      "outcome": "failed",
+      "exitCode": 1
+    }
+  ]
+}

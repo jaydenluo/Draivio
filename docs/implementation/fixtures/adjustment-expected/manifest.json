@@ -1,0 +1,150 @@
+{
+  "width": 64,
+  "height": 64,
+  "colorSpace": "encoded sRGB",
+  "cases": {
+    "neutral": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "neutral.rgba"
+    },
+    "brightness35": {
+      "parameters": {
+        "brightness": 35,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "brightness35.rgba"
+    },
+    "contrast35": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 35,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "contrast35.rgba"
+    },
+    "saturation35": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 35,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "saturation35.rgba"
+    },
+    "temperature35": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 35,
+        "sharpness": 0,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "temperature35.rgba"
+    },
+    "sharpness35": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 35,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "sharpness35.rgba"
+    },
+    "blur35": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 35,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "blur35.rgba"
+    },
+    "shadows35": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 0,
+        "shadows": 35,
+        "highlights": 0
+      },
+      "rgba": "shadows35.rgba"
+    },
+    "highlights35": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 35
+      },
+      "rgba": "highlights35.rgba"
+    },
+    "blur100": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 0,
+        "blur": 100,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "blur100.rgba"
+    },
+    "clarity70": {
+      "parameters": {
+        "brightness": 0,
+        "contrast": 0,
+        "saturation": 0,
+        "temperature": 0,
+        "sharpness": 70,
+        "blur": 0,
+        "shadows": 0,
+        "highlights": 0
+      },
+      "rgba": "clarity70.rgba"
+    }
+  }
+}

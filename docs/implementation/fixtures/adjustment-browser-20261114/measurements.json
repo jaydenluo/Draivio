@@ -1,0 +1,563 @@
+{
+  "browser": "Codex IAB",
+  "url": "http://127.0.0.1:5194/",
+  "build": "/tmp/draivio-acceptance-20261114-0110",
+  "dimensions": [
+    64,
+    64
+  ],
+  "exportBackground": "#ffffff default; CPU reference still transparent; alpha metrics incomparable until composite reference",
+  "verdict": "FAIL clarity opaque max57 mean16.23; color transfer max1 and blur max3 require honest tolerance/alpha analysis",
+  "cases": [
+    {
+      "case": "neutral",
+      "path": "/Users/szys/Downloads/draivio-canvas (1).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (1).png",
+        "case": "neutral",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 23.5546875,
+          "count": 16384,
+          "nonzero": 4032
+        },
+        "visible_rgb": {
+          "max": 201,
+          "mean": 15.121457489878543,
+          "count": 11856,
+          "nonzero": 2592
+        },
+        "opaque_rgb": {
+          "max": 0,
+          "mean": 0.0,
+          "count": 9264,
+          "nonzero": 0
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/neutral.png"
+    },
+    {
+      "case": "brightness35",
+      "path": "/Users/szys/Downloads/draivio-canvas (2).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (2).png",
+        "case": "brightness35",
+        "parameters": {
+          "brightness": 35,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 19.9169921875,
+          "count": 16384,
+          "nonzero": 6128
+        },
+        "visible_rgb": {
+          "max": 183,
+          "mean": 11.40620782726046,
+          "count": 11856,
+          "nonzero": 4832
+        },
+        "opaque_rgb": {
+          "max": 1,
+          "mean": 0.33506044905008636,
+          "count": 9264,
+          "nonzero": 3104
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/brightness35.png"
+    },
+    {
+      "case": "contrast35",
+      "path": "/Users/szys/Downloads/draivio-canvas (3).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (3).png",
+        "case": "contrast35",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 35,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 24.125,
+          "count": 16384,
+          "nonzero": 6816
+        },
+        "visible_rgb": {
+          "max": 227,
+          "mean": 15.7638326585695,
+          "count": 11856,
+          "nonzero": 5376
+        },
+        "opaque_rgb": {
+          "max": 1,
+          "mean": 0.3005181347150259,
+          "count": 9264,
+          "nonzero": 2784
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/contrast35.png"
+    },
+    {
+      "case": "saturation35",
+      "path": "/Users/szys/Downloads/draivio-canvas (4).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (4).png",
+        "case": "saturation35",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 35,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 23.6396484375,
+          "count": 16384,
+          "nonzero": 5248
+        },
+        "visible_rgb": {
+          "max": 225,
+          "mean": 15.226720647773279,
+          "count": 11856,
+          "nonzero": 3808
+        },
+        "opaque_rgb": {
+          "max": 1,
+          "mean": 0.13471502590673576,
+          "count": 9264,
+          "nonzero": 1248
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/saturation35.png"
+    },
+    {
+      "case": "temperature35",
+      "path": "/Users/szys/Downloads/draivio-canvas (5).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (5).png",
+        "case": "temperature35",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 35,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 23.0263671875,
+          "count": 16384,
+          "nonzero": 7248
+        },
+        "visible_rgb": {
+          "max": 207,
+          "mean": 14.634278002699055,
+          "count": 11856,
+          "nonzero": 5808
+        },
+        "opaque_rgb": {
+          "max": 1,
+          "mean": 0.35060449050086356,
+          "count": 9264,
+          "nonzero": 3248
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/temperature35.png"
+    },
+    {
+      "case": "sharpness35",
+      "path": "/Users/szys/Downloads/draivio-canvas (6).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (6).png",
+        "case": "sharpness35",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 35,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 28.32708740234375,
+          "count": 16384,
+          "nonzero": 12294
+        },
+        "visible_rgb": {
+          "max": 215,
+          "mean": 21.800691632928476,
+          "count": 11856,
+          "nonzero": 10854
+        },
+        "opaque_rgb": {
+          "max": 35,
+          "mean": 8.462219343696027,
+          "count": 9264,
+          "nonzero": 8283
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/sharpness35.png"
+    },
+    {
+      "case": "blur35",
+      "path": "/Users/szys/Downloads/draivio-canvas (7).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (7).png",
+        "case": "blur35",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 35,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 23.8148193359375,
+          "count": 16384,
+          "nonzero": 6873
+        },
+        "visible_rgb": {
+          "max": 210,
+          "mean": 15.394146423751687,
+          "count": 11856,
+          "nonzero": 5433
+        },
+        "opaque_rgb": {
+          "max": 2,
+          "mean": 0.31001727115716754,
+          "count": 9264,
+          "nonzero": 2854
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/blur35.png"
+    },
+    {
+      "case": "shadows35",
+      "path": "/Users/szys/Downloads/draivio-canvas (8).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (8).png",
+        "case": "shadows35",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 35,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 22.9736328125,
+          "count": 16384,
+          "nonzero": 5520
+        },
+        "visible_rgb": {
+          "max": 185,
+          "mean": 14.537112010796221,
+          "count": 11856,
+          "nonzero": 4080
+        },
+        "opaque_rgb": {
+          "max": 1,
+          "mean": 0.16234887737478412,
+          "count": 9264,
+          "nonzero": 1504
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/shadows35.png"
+    },
+    {
+      "case": "highlights35",
+      "path": "/Users/szys/Downloads/draivio-canvas (9).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (9).png",
+        "case": "highlights35",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 35
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 23.27001953125,
+          "count": 16384,
+          "nonzero": 7448
+        },
+        "visible_rgb": {
+          "max": 201,
+          "mean": 14.898110661268555,
+          "count": 11856,
+          "nonzero": 6008
+        },
+        "opaque_rgb": {
+          "max": 1,
+          "mean": 0.3687392055267703,
+          "count": 9264,
+          "nonzero": 3416
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/highlights35.png"
+    },
+    {
+      "case": "blur100",
+      "path": "/Users/szys/Downloads/draivio-canvas (10).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (10).png",
+        "case": "blur100",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 0,
+          "blur": 100,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 23.93560791015625,
+          "count": 16384,
+          "nonzero": 6557
+        },
+        "visible_rgb": {
+          "max": 205,
+          "mean": 15.453694331983806,
+          "count": 11856,
+          "nonzero": 5117
+        },
+        "opaque_rgb": {
+          "max": 3,
+          "mean": 0.27979274611398963,
+          "count": 9264,
+          "nonzero": 2531
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/blur100.png"
+    },
+    {
+      "case": "clarity70",
+      "path": "/Users/szys/Downloads/draivio-canvas (11).png",
+      "exitCode": 0,
+      "error": "",
+      "metrics": {
+        "actual": "/Users/szys/Downloads/draivio-canvas (11).png",
+        "case": "clarity70",
+        "parameters": {
+          "brightness": 0,
+          "contrast": 0,
+          "saturation": 0,
+          "temperature": 0,
+          "sharpness": 70,
+          "blur": 0,
+          "shadows": 0,
+          "highlights": 0
+        },
+        "dimensions": [
+          64,
+          64
+        ],
+        "all_rgba": {
+          "max": 255,
+          "mean": 32.9295654296875,
+          "count": 16384,
+          "nonzero": 12521
+        },
+        "visible_rgb": {
+          "max": 229,
+          "mean": 28.244601889338732,
+          "count": 11856,
+          "nonzero": 11081
+        },
+        "opaque_rgb": {
+          "max": 57,
+          "mean": 16.22679188255613,
+          "count": 9264,
+          "nonzero": 8510
+        },
+        "alpha": {
+          "max": 255,
+          "mean": 35.859375,
+          "count": 4096,
+          "nonzero": 1008
+        },
+        "note": "Measured deltas only; no automatic acceptance tolerance. Fully transparent RGB excluded from visible_rgb."
+      },
+      "artifact": "docs/implementation/fixtures/adjustment-browser-20261114/clarity70.png"
+    }
+  ]
+}

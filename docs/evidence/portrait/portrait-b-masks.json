@@ -1,0 +1,149 @@
+{
+  "confirmed": true,
+  "person": {
+    "kind": "path",
+    "mode": "new",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100
+    },
+    "path": {
+      "type": "path",
+      "d": "M15 9L74 9L89 42L76 64L40 70L18 52Z",
+      "points": [
+        {
+          "x": 15,
+          "y": 9
+        },
+        {
+          "x": 74,
+          "y": 9
+        },
+        {
+          "x": 89,
+          "y": 42
+        },
+        {
+          "x": 76,
+          "y": 64
+        },
+        {
+          "x": 40,
+          "y": 70
+        },
+        {
+          "x": 18,
+          "y": 52
+        }
+      ]
+    },
+    "feather": 0,
+    "fixedRatio": null
+  },
+  "skin": {
+    "kind": "path",
+    "mode": "new",
+    "rect": {
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100
+    },
+    "path": {
+      "type": "path",
+      "d": "M34 16L68 13L80 28L85 43L72 58L43 60L28 40Z",
+      "points": [
+        {
+          "x": 34,
+          "y": 16
+        },
+        {
+          "x": 68,
+          "y": 13
+        },
+        {
+          "x": 80,
+          "y": 28
+        },
+        {
+          "x": 85,
+          "y": 43
+        },
+        {
+          "x": 72,
+          "y": 58
+        },
+        {
+          "x": 43,
+          "y": 60
+        },
+        {
+          "x": 28,
+          "y": 40
+        }
+      ]
+    },
+    "feather": 0,
+    "fixedRatio": null
+  },
+  "eyes": {
+    "kind": "ellipse",
+    "mode": "add",
+    "rect": {
+      "x": 46,
+      "y": 33,
+      "width": 39,
+      "height": 4
+    },
+    "path": {
+      "type": "boolean",
+      "mode": "add",
+      "left": {
+        "type": "shape",
+        "kind": "ellipse",
+        "rect": {
+          "x": 46,
+          "y": 33,
+          "width": 12,
+          "height": 4
+        }
+      },
+      "right": {
+        "type": "shape",
+        "kind": "ellipse",
+        "rect": {
+          "x": 73,
+          "y": 33,
+          "width": 12,
+          "height": 4
+        }
+      }
+    },
+    "feather": 0,
+    "fixedRatio": null
+  },
+  "protect": {
+    "kind": "ellipse",
+    "mode": "new",
+    "rect": {
+      "x": 50,
+      "y": 45,
+      "width": 29,
+      "height": 12
+    },
+    "path": {
+      "type": "shape",
+      "kind": "ellipse",
+      "rect": {
+        "x": 50,
+        "y": 45,
+        "width": 29,
+        "height": 12
+      }
+    },
+    "feather": 0,
+    "fixedRatio": null
+  }
+}

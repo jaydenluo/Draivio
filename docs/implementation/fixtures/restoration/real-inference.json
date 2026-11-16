@@ -1,0 +1,22 @@
+[
+  {
+    "scale": 2,
+    "width": 128,
+    "height": 96,
+    "meanDifferenceFromNearest": 5.396999782986111,
+    "model": "ESPCN",
+    "cost": 0,
+    "runtime": "OpenCV CPU",
+    "fixture": "self-authored synthetic text, repeated texture, stylized face, transparency; not real face quality evidence"
+  },
+  {
+    "scale": 4,
+    "width": 256,
+    "height": 192,
+    "meanDifferenceFromNearest": 5.939107259114583,
+    "model": "ESPCN",
+    "cost": 0,
+    "runtime": "OpenCV CPU",
+    "fixture": "self-authored synthetic text, repeated texture, stylized face, transparency; not real face quality evidence"
+  }
+]
