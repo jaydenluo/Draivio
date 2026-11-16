@@ -26,26 +26,19 @@ const browserState: ModelState = {
 const browserTasks = new Map<ModelId, ReturnType<typeof setInterval>>()
 const progressListeners = new Set<(progress: ModelProgress) => void>()
 
+/** Local model downloads are available only in the Tauri desktop runtime. */
+export const supportsLocalModels = isTauri()
+
 const browserApi: ModelApi = {
   getState: async () => structuredClone(browserState),
-  start: async (modelId) => {
-    if (browserTasks.has(modelId)) return
-    const record = browserState[modelId]
-    record.status = 'downloading'
-    const step = Math.max(1, Math.round(record.totalBytes / 20))
-    browserTasks.set(modelId, setInterval(() => {
-      record.downloadedBytes = Math.min(record.totalBytes, record.downloadedBytes + step)
-      progressListeners.forEach((listener) => listener({ modelId, downloadedBytes: record.downloadedBytes, totalBytes: record.totalBytes }))
-      if (record.downloadedBytes >= record.totalBytes) { record.status = 'installed'; const task = browserTasks.get(modelId); if (task) clearInterval(task); browserTasks.delete(modelId) }
-    }, 100))
-  },
+  start: async () => { throw new Error('网页版暂未配置云端处理服务') },
   pause: async (modelId) => { browserState[modelId].status = 'paused'; const task = browserTasks.get(modelId); if (task) clearInterval(task); browserTasks.delete(modelId) },
   cancel: async (modelId) => { const task = browserTasks.get(modelId); if (task) clearInterval(task); browserTasks.delete(modelId); browserState[modelId].status = 'uninstalled'; browserState[modelId].downloadedBytes = 0 },
   remove: async (modelId) => { browserState[modelId].status = 'uninstalled'; browserState[modelId].downloadedBytes = 0 },
   onProgress: async (listener) => { progressListeners.add(listener); return () => progressListeners.delete(listener) },
 }
 
-export const modelApi: ModelApi = isTauri() ? {
+export const modelApi: ModelApi = supportsLocalModels ? {
   getState: () => invokeCommand<ModelState>('model_status'),
   start: (modelId) => invokeCommand<void>('model_download', { modelId }),
   pause: (modelId) => invokeCommand<void>('model_pause', { modelId }),
