@@ -2,7 +2,7 @@ import {createServer, type Server} from 'node:http'
 import {afterEach, expect, it, vi} from 'vitest'
 import {createCloudAccount} from './cloudAccount'
 const response=(body:unknown,status=200)=>new Response(status===204?null:JSON.stringify(body),{status})
-const model={id:'offer-id',code:'public-image',displayName:'Image',modality:'image',capabilities:['image'],constraints:{maxImages:1},availability:{available:true},estimatedCredits:7}
+const model={isDefault:true,id:'offer-id',code:'public-image',displayName:'Image',modality:'image',capabilities:['image'],constraints:{maxImages:1},availability:{available:true},estimatedCredits:7}
 function setup(){
  const calls:Array<{path:string;body:any;auth:string|undefined}>=[]
  let handler:(path:string,body:any,auth:string|undefined)=>Promise<Response>|Response=(path)=>{
@@ -36,6 +36,16 @@ it('uses registration/reset purposes without pretending email/reset results auth
  expect(calls.find(c=>c.path.endsWith('/email-codes'))?.body).toEqual({email:'member@example.test',purpose:'register'})
  expect(calls.find(c=>c.path.endsWith('/verify'))?.body).toMatchObject({purpose:'register',code:'123456',password:'password-value'})
  expect(calls.find(c=>c.path.endsWith('/password-reset'))?.body).toEqual({email:'member@example.test',code:'654321',password:'new-password'})
+})
+it('creates and authenticates an account through the explicit no-code registration endpoint',async()=>{
+ const {account,calls,setHandler}=setup()
+ setHandler(path=>path.endsWith('/register')?response({accessToken:'new-access',refreshToken:'new-refresh'},201):path.endsWith('/me')?response({email:'new@example.test'}):path.endsWith('/balance')?response({balance:'0'}):response({data:[model]}))
+ await account.registerWithoutCode(' New@Example.Test ','new-password-value')
+ expect(calls[0]).toMatchObject({path:'/api/auth/register',body:{email:'new@example.test',password:'new-password-value',installationId:expect.any(String),deviceLabel:'Draivio'}})
+ expect(calls[0].body).not.toHaveProperty('code')
+ expect(calls.some(c=>c.path.includes('email-codes'))).toBe(false)
+ expect(account.getSnapshot()).toMatchObject({authenticated:true,user:{email:'new@example.test'},balance:0})
+ expect(JSON.stringify({...localStorage})).not.toMatch(/new-access|new-refresh|new-password-value/)
 })
 it('singleflights expired-token refresh and retries only the unauthorized attempt',async()=>{
  const {account,calls,setHandler}=setup();await account.passwordLogin('member@example.test','password-value')

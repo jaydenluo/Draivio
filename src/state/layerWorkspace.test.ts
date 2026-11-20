@@ -31,7 +31,8 @@ test('patch and heal results are committed as independent repair layers', () => 
 })
 
 test('supports multi-selection and batch layer operations', () => {
-  let state = editorReducer(initialEditorState, { type: 'select-layer', id: 'art', additive: false })
+  const base = { ...initialEditorState, layers: [...initialEditorState.layers, {...initialEditorState.layers[0], id:'mask', name:'测试蒙版层'}] }
+  let state = editorReducer(base, { type: 'select-layer', id: 'art', additive: false })
   state = editorReducer(state, { type: 'toggle-layer-selection', id: 'mask' })
   expect(state.selectedLayerIds).toEqual(expect.arrayContaining(['art', 'mask']))
   state = editorReducer(state, { type: 'batch-toggle-layer', ids: state.selectedLayerIds, property: 'visible' })

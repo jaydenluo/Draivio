@@ -91,3 +91,10 @@ test('a failed delivery does not overwrite earlier successful slots and repeated
  expect(receive).toHaveBeenCalledTimes(2)
  expect(batch.getSnapshot().items.map(i=>i.status)).toEqual(['succeeded','failed'])
 })
+test('a local delivery failure is reported as received but not applied, not a network-unknown outcome',async()=>{
+ const request=vi.fn().mockResolvedValue(['received-image'])
+ const batch=new ImageBatch(1,'single',1,request,()=>{throw new Error('生成结果尺寸不符')})
+ await batch.run()
+ expect(batch.getSnapshot().items[0]).toMatchObject({status:'failed',message:expect.stringContaining('生成结果尺寸不符')})
+ expect(batch.getSnapshot().items[0].message).toContain('图片已返回')
+})

@@ -1,3 +1,4 @@
+import { useAssistantModel } from './useAssistantModel'
 vi.mock('../ai/context/editorPreview', async importOriginal => {
  const original = await importOriginal<typeof import('../ai/context/editorPreview')>()
  return {...original,captureRenderedEditorContext:(state:import('../state/editor').EditorState,id:string,scope:import('../ai/context/editorContext').EditorScope)=>original.captureRenderedEditorContext(state,id,scope,async ()=>'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==')}
@@ -60,8 +61,8 @@ test('preserves the source ID in submitted operations without retaining credenti
   await screen.findByRole('button', { name: '编辑 OpenAI · 工作' })
   fireEvent.click(screen.getByRole('button', { name: '选择模型' }))
   fireEvent.click(screen.getByRole('button', { name: 'my-image-model · OpenAI · 工作' }))
+  fireEvent.click(screen.getByRole('button', { name: '生成图片' }))
   expect(screen.getByText('供应商计费')).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
   fireEvent.click(screen.getByRole('button', { name: '执行 AI 操作' }))
   await waitFor(() => expect(state?.aiResults[0]?.request?.modelCode).toBe('my-image-model'), { timeout: 2000 })
   expect(state?.aiResults[0]?.request?.sourceId).toMatch(/^custom-/)
@@ -106,25 +107,18 @@ test('selects protocol presets, preserves proxy URLs and reopens saved protocol'
   expect(screen.getByLabelText('地址')).toHaveValue('https://proxy.example/api')
 })
 
-test('stores split generation defaults and per-model overrides compactly', async () => {
+test('keeps the service editor focused on connection essentials', async () => {
   render(<ServiceSourceSettings onClose={() => {}} />)
   fireEvent.click(screen.getByRole('button', { name: '添加来源' }))
   fireEvent.change(screen.getByLabelText('名称'), { target: { value: '中转' } })
   fireEvent.change(screen.getByLabelText('密钥'), { target: { value: 'test-only' } })
   fireEvent.change(screen.getByLabelText('模型'), { target: { value: 'image-a, image-b' } })
-  fireEvent.click(screen.getByText('生成设置'))
-  fireEvent.change(screen.getByLabelText('多图方式'), { target: { value: 'split' } })
-  expect(screen.getByLabelText('并发上限')).toHaveValue('2')
-  fireEvent.change(screen.getByLabelText('分辨率参数'), { target: { value: 'omit' } })
-  fireEvent.change(screen.getByLabelText('设置范围'), { target: { value: 'image-b' } })
-  fireEvent.change(screen.getByLabelText('并发上限'), { target: { value: '1' } })
+  expect(screen.queryByText('生成设置')).not.toBeInTheDocument()
+  expect(screen.queryByText('图片调用费用估算')).not.toBeInTheDocument()
+  expect(screen.queryByText('接口说明')).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: '保存' }))
   fireEvent.click(await screen.findByRole('button', { name: '编辑 OpenAI · 中转' }))
-  fireEvent.click(screen.getByText('生成设置'))
-  expect(screen.getByLabelText('多图方式')).toHaveValue('split')
-  expect(screen.getByLabelText('分辨率参数')).toHaveValue('omit')
-  fireEvent.change(screen.getByLabelText('设置范围'), { target: { value: 'image-b' } })
-  expect(screen.getByLabelText('并发上限')).toHaveValue('1')
+  expect(screen.queryByText('生成设置')).not.toBeInTheDocument()
 })
 
 test('opens an editor over the drawer, fetches and filters models while preserving manual selections',async()=>{
@@ -184,62 +178,71 @@ test('retains selected models when refreshing the supplier list fails', async ()
   expect(screen.getByRole('checkbox', { name: '使用模型 manual-image' })).toBeChecked()
 })
 
-test('declares assistant capabilities and persists a separate account-scoped choice without reordering images', async () => {
+test('does not require model capability configuration to save a source', async () => {
  localStorage.setItem('draivio-service-connections-v1', JSON.stringify([
   {id:'personal',provider:'OpenAI',name:'个人',baseUrl:'https://example.com/v1',apiKey:'key',protocol:'openai_compatible',enabled:true,models:['image-z','shared','image-a']},
   {id:'work',provider:'OpenAI',name:'工作',baseUrl:'https://example.com/v1',apiKey:'key',protocol:'openai_compatible',enabled:true,models:['shared'],modelCapabilities:{shared:{image:true,text:true,vision:false}}}
  ]))
  await loadConnections()
  let editorState: EditorState | undefined
- function ObserveAssistantIndependence() { editorState = useEditor().state; return null }
+ let selectedAssistant: ReturnType<typeof useAssistantModel>['selected']
+ function ObserveAssistantIndependence() { editorState = useEditor().state; selectedAssistant = useAssistantModel().selected; return null }
  render(<EditorProvider><ServiceSourceSettings onClose={()=>{}} /><ObserveAssistantIndependence /></EditorProvider>)
  const originalImageSource=editorState!.composerSourceId, originalImageModel=editorState!.composerParameters.model
- expect(screen.getByLabelText('编辑助手模型')).toHaveValue('')
+ expect(selectedAssistant).toMatchObject({sourceId:'work',model:'shared'})
  fireEvent.click(screen.getByRole('button',{name:'编辑 OpenAI · 个人'}))
- fireEvent.click(screen.getByText('模型能力'))
- fireEvent.click(screen.getByRole('checkbox',{name:'shared 文本推理'}))
- fireEvent.click(screen.getByRole('checkbox',{name:'shared 视觉输入'}))
+ expect(screen.queryByText('模型能力')).not.toBeInTheDocument()
  fireEvent.click(screen.getByRole('button',{name:'保存'}))
- await screen.findByLabelText('编辑助手模型')
- const select=screen.getByLabelText('编辑助手模型')
- fireEvent.change(select,{target:{value:JSON.stringify({sourceId:'personal',model:'shared'})}})
- await waitFor(()=>expect(select).toHaveValue(JSON.stringify({sourceId:'personal',model:'shared'})))
+ await screen.findByRole('button',{name:'编辑 OpenAI · 个人'})
  const records=JSON.parse(localStorage.getItem('draivio-service-connections-v1')!)
  expect(records.map((c:{id:string})=>c.id)).toEqual(['personal','work'])
  expect(records[0].models).toEqual(['image-z','shared','image-a'])
- expect(records[0].assistantModel).toBe('shared')
+ expect(records[0].assistantModel).toBeUndefined()
  expect(editorState!.composerSourceId).toBe(originalImageSource)
  expect(editorState!.composerParameters.model).toBe(originalImageModel)
- expect(records[0].modelCapabilities.shared).toEqual({image:true,text:true,vision:true})
- expect(screen.getByText(/模型列表可访问不代表/)).toBeInTheDocument()
+ expect(records[0].modelCapabilities).toBeUndefined()
+ expect(screen.queryByText(/模型列表可访问不代表/)).not.toBeInTheDocument()
  fireEvent.click(screen.getByLabelText('启用 OpenAI · 个人'))
- await waitFor(()=>expect(screen.getByLabelText('编辑助手模型')).toHaveValue(''))
+ await waitFor(()=>expect(selectedAssistant).toMatchObject({sourceId:'work',model:'shared'}))
 })
-test('image-only legacy accounts show assistant configuration guidance',()=>{
+test('does not show duplicate reasoning configuration for image-only accounts',()=>{
  render(<ServiceSourceSettings onClose={()=>{}} />)
- expect(screen.getByText(/暂无可用推理模型/)).toBeInTheDocument()
- expect(screen.getByLabelText('编辑助手模型')).toBeDisabled()
+ expect(screen.queryByText(/暂无可用推理模型/)).not.toBeInTheDocument()
+ expect(screen.queryByLabelText('推理模型')).not.toBeInTheDocument()
 })
 
-test('persists explicit reference and mask declarations from source configuration', async()=>{
+test('uses built-in image edit presets without exposing capability configuration', async()=>{
  render(<ServiceSourceSettings onClose={()=>{}} />)
  fireEvent.click(screen.getByRole('button',{name:'添加来源'}))
  fireEvent.change(screen.getByLabelText('名称'),{target:{value:'编辑来源'}})
  fireEvent.change(screen.getByLabelText('密钥'),{target:{value:'fixture'}})
- fireEvent.change(screen.getByLabelText('模型'),{target:{value:'custom-edit'}})
- fireEvent.click(screen.getByText('图片编辑与蒙版能力'))
- fireEvent.click(screen.getByLabelText('custom-edit 启用参考图编辑'))
- fireEvent.change(screen.getByLabelText('custom-edit 蒙版方向'),{target:{value:'white-edit'}})
- fireEvent.change(screen.getByLabelText('custom-edit 图像传输'),{target:{value:'multipart'}})
+ fireEvent.change(screen.getByLabelText('模型'),{target:{value:'gpt-image-2'}})
+ expect(screen.queryByText('图片编辑与蒙版能力')).not.toBeInTheDocument()
  fireEvent.click(screen.getByRole('button',{name:'保存'}))
  await screen.findByRole('button',{name:'编辑 OpenAI · 编辑来源'})
  const saved=JSON.parse(localStorage.getItem('draivio-service-connections-v1')!)[0]
- expect(saved.imageCapabilities['custom-edit']).toMatchObject({edit:true,reference:true,encoding:'multipart',maskedEdit:{semantics:'white-edit'}})
+ expect(saved.imageCapabilities).toBeUndefined()
 })
 
-test('accurately explains memory-only credentials when editing a source',()=>{
+test('accurately explains local credential storage when editing a source',()=>{
  render(<ServiceSourceSettings onClose={()=>{}}/>)
  fireEvent.click(screen.getByRole('button',{name:'添加来源'}))
- expect(screen.getByText(/密钥仅保存在本次会话内存/)).toBeInTheDocument()
+ expect(screen.getAllByText(/API Key 保存在本机/).length).toBeGreaterThan(0)
  expect(screen.queryByText(/明文保存/)).not.toBeInTheDocument()
+})
+
+
+test('shows recharge beside the cloud source without a duplicate reasoning-model section', () => {
+ const onClose=vi.fn(), recharge=vi.fn()
+ window.addEventListener('draivio:cloud-recharge',recharge)
+ try {
+  render(<ServiceSourceSettings onClose={onClose}/>)
+  expect(screen.queryByRole('region',{name:'推理模型配置'})).not.toBeInTheDocument()
+  expect(screen.queryByLabelText('推理模型')).not.toBeInTheDocument()
+  const button=screen.getByRole('button',{name:'充值'})
+  expect(button.closest('.service-settings-row')).toHaveTextContent('Draivio 云端')
+  fireEvent.click(button)
+  expect(onClose).toHaveBeenCalledOnce()
+  expect(recharge).toHaveBeenCalledOnce()
+ } finally { window.removeEventListener('draivio:cloud-recharge',recharge) }
 })

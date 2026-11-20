@@ -1,6 +1,9 @@
+import { Checkbox } from '../ui/Checkbox'
 import { DialogTitlebar } from '../ui/DialogTitlebar'
 import { defaultProfile, type RenderingIntent, type IccProfile } from '../color/iccPipeline'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { readFilePreferences } from '../document/filePreferences'
 import { exportSvgImage, materializeColorAdjustments, validateDimensions, validateExportResources, type ImageExportFormat } from './exportImage'
 import './exportDialog.css'
 import { useDraggableDialog } from '../ui/useDraggableDialog'
@@ -27,26 +30,34 @@ export function ExportDialog({ open, hasHighPrecision, svgSource, documentWidth,
   pixelPostProcess?: (rgba: Uint8ClampedArray, width: number, height: number, range: ExportRange) => Uint8ClampedArray
 }) {
   const dimensions = (range: ExportRange) => range === 'selection' ? { width: selectionWidth ?? documentWidth, height: selectionHeight ?? documentHeight } : { width: documentWidth, height: documentHeight }
-  const initial = useMemo<ExportSettings>(() => {
+  const [settings, setSettings] = useState<ExportSettings>({ format: 'png', range: 'canvas', width: documentWidth, height: documentHeight, lockRatio: true, quality: 90, background: '#ffffff' })
+  const [error, setError] = useState<string | null>(null)
+  useEffect(() => {
+    if (!open) return
     const defaults: ExportSettings = { format: 'png', range: 'canvas', width: documentWidth, height: documentHeight, lockRatio: true, quality: 90, background: '#ffffff' }
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}')
-      if (!saved || typeof saved !== 'object') return defaults
-      if (['png', 'jpeg', 'webp', 'svg'].includes(saved.format)) defaults.format = saved.format
-      if (['canvas', 'selection', 'layer'].includes(saved.range)) defaults.range = saved.range
-      if (typeof saved.lockRatio === 'boolean') defaults.lockRatio = saved.lockRatio
-      if (Number.isFinite(saved.quality) && saved.quality >= 1 && saved.quality <= 100) defaults.quality = saved.quality
-      if (typeof saved.background === 'string' && /^#[0-9a-f]{6}$/i.test(saved.background)) defaults.background = saved.background
-      try { validateDimensions(saved.width, saved.height); defaults.width = saved.width; defaults.height = saved.height } catch { /* invalid stored dimensions use document size */ }
-      return defaults
-    } catch { return defaults }
-  }, [documentHeight, documentWidth])
-  const [settings, setSettings] = useState<ExportSettings>(initial)
+      if (['png', 'jpeg', 'webp', 'svg'].includes(saved?.format)) defaults.format = saved.format
+      if (['canvas', 'selection', 'layer'].includes(saved?.range)) defaults.range = saved.range
+      if (typeof saved?.lockRatio === 'boolean') defaults.lockRatio = saved.lockRatio
+      if (Number.isFinite(saved?.quality) && saved.quality >= 1 && saved.quality <= 100) defaults.quality = saved.quality
+      if (typeof saved?.background === 'string' && /^#[0-9a-f]{6}$/i.test(saved.background)) defaults.background = saved.background
+      validateDimensions(saved?.width, saved?.height)
+      defaults.width = saved.width
+      defaults.height = saved.height
+    } catch { /* Unavailable or invalid preferences fall back to the document size. */ }
+    const preferences = readFilePreferences()
+    if (!hasSelection && defaults.range === 'selection') defaults.range = 'canvas'
+    setSettings({
+      ...defaults,
+      format: preferences.exportFormat ?? defaults.format,
+      quality: preferences.exportQuality ?? defaults.quality,
+    })
+    setError(null)
+  }, [open, documentHeight, documentWidth, hasSelection])
   const [colorMode,setColorMode] = useState<'convert'|'srgb'>('convert')
   const [explicit8Bit,setExplicit8Bit] = useState(false)
   const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  useEffect(() => { if (open) { setSettings({ ...initial, range: !hasSelection && initial.range === 'selection' ? 'canvas' : initial.range }); setError(null) } }, [open, initial, hasSelection])
   const root = useRef<HTMLElement>(null)
   const draggable = useDraggableDialog(root, open)
   const closeRef = useRef(onClose); closeRef.current = onClose
@@ -94,7 +105,7 @@ export function ExportDialog({ open, hasHighPrecision, svgSource, documentWidth,
       onClose()
     } catch (cause) { setError(cause instanceof Error ? cause.message : '导出失败') } finally { setBusy(false) }
   }
-  return <div className="export-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (!busy && event.currentTarget === event.target) onClose() }}><section ref={root} style={draggable.style} onPointerDown={draggable.onPointerDown} className="export-dialog" role="dialog" aria-modal="true" aria-label="导出图像">
+  return createPortal(<div className="export-dialog-backdrop" role="presentation" onMouseDown={(event) => { if (!busy && event.currentTarget === event.target) onClose() }}><section ref={root} style={draggable.style} onPointerDown={draggable.onPointerDown} className="export-dialog" role="dialog" aria-modal="true" aria-label="导出图像">
     <DialogTitlebar title="导出" closeLabel="关闭导出" disabled={busy} onClose={onClose} />
     <fieldset className="export-grid" disabled={busy} style={{ border: 0, padding: 0, margin: 0 }}>
       <label>格式<select value={settings.format} onChange={(event) => update({ format: event.target.value as ExportSettings['format'] })}><option value="png">PNG</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="svg">SVG</option></select></label>
@@ -102,14 +113,14 @@ export function ExportDialog({ open, hasHighPrecision, svgSource, documentWidth,
       <label>宽度<input type="number" min="1" max="16384" value={settings.width} onChange={(event) => updateWidth(Number(event.target.value))} /> px</label>
       <label>高度<input type="number" min="1" max="16384" value={settings.height} onChange={(event) => updateHeight(Number(event.target.value))} /> px</label>
     </fieldset>
-    <label className="export-check"><input type="checkbox" checked={settings.lockRatio} onChange={(event) => update({ lockRatio: event.target.checked })} />锁定比例</label>
+    <label className="export-check"><Checkbox checked={settings.lockRatio} onChange={(event) => update({ lockRatio: event.target.checked })} />锁定比例</label>
     {settings.format === 'jpeg' || settings.format === 'webp' ? <div className="export-inline"><label>质量<input type="number" min="1" max="100" value={settings.quality} onChange={(event) => update({ quality: Math.max(1, Math.min(100, Number(event.target.value))) })} />%</label>{settings.format === 'jpeg' ? <label>背景<input type="color" value={settings.background} onChange={(event) => update({ background: event.target.value })} /></label> : null}</div> : null}
-    {hasHighPrecision ? <label><input aria-label="显式导出 8 位显示副本" type="checkbox" checked={explicit8Bit} onChange={e=>setExplicit8Bit(e.target.checked)} />显式导出 8 位显示副本（原始高精度资源不变）</label> : null}
+    {hasHighPrecision ? <label><Checkbox aria-label="显式导出 8 位显示副本" checked={explicit8Bit} onChange={e=>setExplicit8Bit(e.target.checked)} />显式导出 8 位显示副本（原始高精度资源不变）</label> : null}
     {colorProfile ? <p>输出色彩空间：{colorMode === 'srgb' ? 'sRGB' : colorProfile.name} · PNG/JPEG/WebP 嵌入 ICC。自定义 RGB ICC 转换需要桌面原生引擎。<select aria-label="导出色彩策略" value={colorMode} onChange={e=>setColorMode(e.target.value as typeof colorMode)}><option value="convert">转换到文档色彩空间并嵌入 ICC</option><option value="srgb">保留预览 sRGB 数值并嵌入 sRGB</option></select></p> : null}
     <small className="export-hint">{settings.width} × {settings.height} px · {settings.format.toUpperCase()}{settings.range === 'layer' ? '（当前图层范围）' : ''}</small>
     {error ? <p className="export-error" role="alert">{error}</p> : null}
     <footer><button onClick={onClose} disabled={busy}>取消</button><button className="primary" onClick={runExport} disabled={busy || Boolean(hasHighPrecision && !explicit8Bit)}>{busy ? '导出中…' : '导出'}</button></footer>
-  </section></div>
+  </section></div>, document.body)
 }
 
 function downloadBlob(blob: Blob, filename: string) {

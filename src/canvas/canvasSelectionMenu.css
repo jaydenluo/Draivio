@@ -1,0 +1,7 @@
+.canvas-selection-menu { width:244px; padding:6px; border-radius:8px; background:var(--ink-850); box-shadow:0 12px 36px #0007,0 2px 6px #0005; }
+.canvas-selection-menu button { min-height:30px; padding:6px 9px; border-radius:4px; font-size:12px; }
+.canvas-selection-menu button:focus-visible { outline:1px solid var(--sky); outline-offset:-1px; }
+.canvas-selection-menu button:disabled:hover { background:transparent; }
+.canvas-selection-menu button:hover .context-menu-icon,.canvas-selection-menu button:focus-visible .context-menu-icon { color:var(--text); }
+.canvas-selection-menu>div:nth-child(2) .context-menu-icon { color:var(--coral); }
+.selection-menu-size { font:10px var(--mono); color:var(--faint); }

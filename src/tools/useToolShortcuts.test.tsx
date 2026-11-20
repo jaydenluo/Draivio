@@ -36,15 +36,17 @@ test('switches to each documented tool shortcut', () => {
   }
 })
 
-test('repeating a shortcut cycles its group and Shift also cycles it', () => {
+test('repeating a shortcut keeps its tool and Shift cycles within the Photoshop tool family', () => {
   renderShell()
 
   fireEvent.keyDown(window, { key: 'm' })
   expect(activeTool()).toBe('rectangle-select')
   fireEvent.keyDown(window, { key: 'm' })
+  expect(activeTool()).toBe('rectangle-select')
+  fireEvent.keyDown(window, { key: 'm', shiftKey: true })
   expect(activeTool()).toBe('ellipse-select')
   fireEvent.keyDown(window, { key: 'm', shiftKey: true })
-  expect(activeTool()).toBe('lasso-select')
+  expect(activeTool()).toBe('rectangle-select')
 })
 
 test('Space temporarily activates pan and restores the previous tool', () => {

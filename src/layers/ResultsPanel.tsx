@@ -1,12 +1,73 @@
-import { FloatingSurface } from '../ui/FloatingSurface'
-import { useMemo, useState } from 'react'
-import { useEditor } from '../state/editor'
+import {createPortal} from 'react-dom'
+import {useEffect,useRef,useState} from 'react'
+import {Checkbox} from '../ui/Checkbox'
+import {PanelHeader} from '../ui/dock/PanelHeader'
+import {FloatingSurface} from '../ui/FloatingSurface'
+import {useEditor,type AIResult} from '../state/editor'
+import {useResultDelivery} from '../creation/ResultDelivery'
+import {resultArchive,type ArchivedResult} from '../creation/resultArchive'
+import {ResultCardIcon} from './ResultCardIcon'
+import {message} from '../ui/message'
+import './ResultsPanel.css'
 
-export function ResultsPanel() {
-  const { state, dispatch } = useEditor()
-  const [filter, setFilter] = useState('all')
-  const [preview, setPreview] = useState<string | null>(null)
-  const [compareIds, setCompareIds] = useState<string[]>([])
-  const results = useMemo(() => state.aiResults.filter((result) => filter.startsWith('batch:') ? result.request?.maskedEdit?.batchId === filter.slice(6) : filter === 'all' || filter === 'adopted' && result.adopted || filter === 'unused' && !result.adopted || filter === 'recent' && Date.now() - Date.parse(result.createdAt) < 86400000), [state.aiResults, filter])
-  return <section className="inspector-panel results-panel" role="region" aria-label="AI 结果"><div className="panel-heading"><h2>AI 结果</h2><small>{results.length} 个结果</small></div><div className="results-toolbar"><button disabled={compareIds.length < 2} onClick={() => setPreview(compareIds[0] ?? null)}>比较 {compareIds.length}/4</button><button className="result-layer-link" aria-label="原图图层" aria-pressed={state.selectedLayerId === "original"} onClick={() => dispatch({ type: "select-layer", id: "original" })}>原图</button><select aria-label="筛选 AI 结果" value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">全部</option><option value="recent">本次生成</option><option value="adopted">已采用</option><option value="unused">未采用</option>{[...new Set(state.aiResults.flatMap(r=>r.request?.maskedEdit?[r.request.maskedEdit.batchId]:[]))].map((id,index)=><option key={id} value={`batch:${id}`}>局部编辑批次 {index+1}</option>)}</select></div>{state.aiRecovery ? <p role="status">上次 {state.aiRecovery.model || 'AI'} 任务已中断，远端结果未知。已下载结果可离线编辑；请先检查供应商记录，不会自动重发。</p> : null}{results.length ? <div className="result-grid">{results.map((result) => <article className={`result-card result-${result.status}`} key={result.id}><button className="result-preview" aria-label={`预览结果 ${result.id}`} onClick={() => setPreview(result.id)}>{result.thumbnail ? <img src={result.thumbnail} alt="" /> : <span className="result-placeholder">{result.status === 'error' ? '生成失败' : result.status === 'loading' ? '生成中…' : '无缩略图'}</span>}</button><button className="result-layer-link" aria-pressed={state.selectedLayerId === result.id} aria-label={state.layers.some(layer=>layer.id===result.id) ? `${state.layers.find(layer=>layer.id===result.id)?.name}图层` : `预览候选 ${result.id}`} onClick={() => state.layers.some(layer=>layer.id===result.id) ? dispatch({ type: 'select-layer', id: result.id }) : setPreview(result.id)}>{state.layers.find((layer) => layer.id === result.id)?.name ?? `生成结果 · ${state.aiResults.indexOf(result) + 1}`}</button><label className="result-compare"><input type="checkbox" checked={compareIds.includes(result.id)} onChange={(event) => setCompareIds((ids) => event.target.checked ? ids.length < 4 ? [...ids, result.id] : ids : ids.filter((id) => id !== result.id))} />比较</label><strong>{result.model}</strong><small>{result.size} · {result.provider}</small><p title={result.prompt}>{result.prompt || '无提示词'}</p>{result.request?.maskedEdit && state.isGenerating || result.request?.outpaint && state.isGenerating ? <small>批次完成后可采用</small> : null}{result.request?.outpaint ? <small>扩图 {result.request.outpaint.expansion.width} × {result.request.outpaint.expansion.height} · {result.request.outpaint.calls} 次调用 · 采用同时扩大画布</small> : null}{result.request?.maskedEdit ? <small>{result.request.maskedEdit.operation==='remove'?'选区移除':'选区替换'} · 原始尺寸 {result.request.maskedEdit.width} × {result.request.maskedEdit.height} · 软边 alpha 已合成 · 原图层保留 · 批次 {result.request.maskedEdit.batchId.slice(0,8)}{result.request.maskedEdit.protectedLayerIds?.length ? ` · 已保护 ${result.request.maskedEdit.protectedLayerIds.length} 个图层` : ''}</small> : null}{result.error ? <small className="error-text">{result.error}</small> : null}<div className="result-actions"><button disabled={!!result.adopted && result.request?.mode==='generate' || result.status !== 'success' || !!result.request?.maskedEdit && state.isGenerating || !!result.request?.outpaint && state.isGenerating} onClick={() => dispatch({ type: result.request?.outpaint ? 'adopt-outpaint-result' : 'adopt-ai-result-as-layer', id: result.id })}>{result.adopted && result.request?.mode==='generate' ? '已采用' : result.request?.outpaint ? '采用扩图' : '新增图层'}</button><button disabled={!!result.request?.restoration || !!result.request?.outpaint || result.status !== 'success' || !!result.request?.maskedEdit && state.isGenerating} onClick={() => dispatch({ type: 'replace-layer-with-ai-result', targetId: state.selectedLayerId, resultId: result.id })}>替换当前</button><button onClick={() => { dispatch({ type: 'set-prompt', prompt: result.prompt }); dispatch({ type: 'set-composer-mode', mode: 'edit' }) }}>继续编辑</button><button onClick={() => dispatch({ type: 'toggle-ai-result-favorite', id: result.id })}>{result.favorite ? '取消收藏' : '收藏'}</button><button onClick={() => dispatch({ type: 'delete-ai-result', id: result.id })}>删除</button></div></article>)}</div> : <p className="inspector-empty">执行 AI 操作后，结果会显示在这里。生成结果会先保存在这里，确认后再加入图层。</p>}{preview ? <div className="result-preview-modal" role="dialog" aria-label="AI 结果预览" onClick={() => setPreview(null)}><FloatingSurface title="AI 结果预览" onClose={() => setPreview(null)} closeLabel="关闭预览" onClick={(event) => event.stopPropagation()}>{(compareIds.length > 1 ? compareIds : [preview]).map((id) => { const item = state.aiResults.find((result) => result.id === id); return item?.thumbnail ? <figure key={id}><img src={item.thumbnail} alt="AI 结果合成预览" />{item.request?.outpaint ? <details><summary>查看扩图源图、分块与蒙版</summary><img src={item.request.outpaint.source.source} alt="扩图前原图"/>{item.request.outpaint.tiles.map((t,i)=><figure key={i}><figcaption>分块 {i+1} · {t.crop.x},{t.crop.y} · {t.crop.width} × {t.crop.height}</figcaption><img src={t.mask.source} alt={`扩图蒙版 ${i+1}`}/><img src={t.raw.source} alt={`扩图原始返回 ${i+1}`}/></figure>)}</details>:null}{item.request?.maskedEdit?.raw ? <details><summary>查看完整原始结果与蒙版</summary><img src={item.request.maskedEdit.raw.source} alt="完整原始结果"/><img src={item.request.maskedEdit.mask.source} alt="提交蒙版"/><img src={item.request.maskedEdit.source.source} alt="生成前原图"/></details>:null}</figure> : <span key={id} className="result-placeholder">暂无图像</span> })}</FloatingSurface></div> : null}</section>
+export function ResultsPanel(){
+ const {state,dispatch}=useEditor(),delivery=useResultDelivery()
+ const [scope,setScope]=useState<'current'|'library'>('current'),[filter,setFilter]=useState('all'),[limit,setLimit]=useState(24)
+ const [library,setLibrary]=useState<ArchivedResult[]>([]),[loading,setLoading]=useState(false),[error,setError]=useState(''),[refresh,setRefresh]=useState(0)
+ const [compareIds,setCompareIds]=useState<string[]>([]),[previewIds,setPreviewIds]=useState<string[]>([])
+ const surface=useRef<HTMLDivElement>(null)
+ const alive=useRef(true),pending=useRef(new Set<string>())
+ const [busy,setBusy]=useState<string[]>([])
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false}},[])
+ const runImageAction=async(result:AIResult,action:(image:AIResult)=>void|Promise<unknown>)=>{
+  if(pending.current.has(result.id))return
+  pending.current.add(result.id);setBusy([...pending.current])
+  try{
+   const source=result.source??await resultArchive.load(result.id)
+   if(alive.current)await action({...result,source})
+  }catch(error){if(alive.current)message.error(error instanceof Error?error.message:'无法读取图片，请重试')}
+  finally{pending.current.delete(result.id);if(alive.current)setBusy([...pending.current])}
+ }
+ useEffect(()=>{const reload=()=>setRefresh(v=>v+1);window.addEventListener('draivio:result-library-changed',reload);return()=>window.removeEventListener('draivio:result-library-changed',reload)},[])
+ useEffect(()=>{
+  if(scope!=='library')return
+  let cancelled=false;setLoading(true);setError('')
+  void resultArchive.list().then(values=>{if(!cancelled)setLibrary(values)}).catch(()=>{if(!cancelled)setError('本地作品库读取失败，请重试')}).finally(()=>{if(!cancelled)setLoading(false)})
+  return()=>{cancelled=true}
+ },[scope,refresh])
+ useEffect(()=>{
+  if(!previewIds.length)return
+  const previous=document.activeElement as HTMLElement|null;surface.current?.focus()
+  return()=>{if(previous?.isConnected)previous.focus()}
+ },[previewIds.length])
+ const selected=compareIds.filter(id=>state.aiResults.some(r=>r.id===id&&r.status==='success'&&r.source))
+ const all:AIResult[]=scope==='library'?library:state.aiResults
+ const filtered=all.filter(r=>filter==='all'||filter==='favorite'&&r.favorite||filter==='adopted'&&r.adopted||filter==='unused'&&!r.adopted)
+ const results=filtered.slice(0,limit)
+ const selectScope=(next:typeof scope)=>{setScope(next);setLimit(24);setFilter('all')}
+ return <section className="inspector-panel results-panel" role="region" aria-label="AI 结果">
+  <PanelHeader title="AI 结果"><small className="panel-header-caption">{filtered.length} 张</small></PanelHeader>
+  <div className="result-library-tabs" role="tablist" aria-label="图片来源"><button role="tab" aria-selected={scope==='current'} onClick={()=>selectScope('current')}>当前作品</button><button role="tab" aria-selected={scope==='library'} onClick={()=>selectScope('library')}>本地作品库</button></div>
+  <div className="results-toolbar">{scope==='current'?<button disabled={selected.length<2} onClick={()=>setPreviewIds(selected)}>比较 {selected.length}/4</button>:<span className="result-library-hint">原图仅保存在本机</span>}<select aria-label="筛选 AI 结果" value={filter} onChange={e=>{setFilter(e.target.value);setLimit(24)}}><option value="all">全部图片</option><option value="favorite">已收藏</option><option value="adopted">已采用</option><option value="unused">未采用</option></select></div>
+  {state.aiRecovery&&scope==='current'?<p role="status">上次 {state.aiRecovery.model||'AI'} 任务已中断，远端结果未知。已下载结果可离线编辑；请先检查供应商记录，不会自动重发。</p>:null}
+  {error?<p role="alert">{error} <button onClick={()=>setRefresh(v=>v+1)}>重试</button></p>:null}
+  {loading&&!library.length?<p className="inspector-empty" role="status">正在读取本地图片…</p>:null}
+  {results.length?<div className="result-grid">{results.map(result=>{
+   const unavailable=result.status!=='success'||scope==='current'&&!result.source,working=busy.includes(result.id)
+   return <article className={`result-card result-${result.status}`} key={result.id}>
+   <button className="result-preview" aria-label={`${scope==='library'?'预览本地图片':'预览结果'} ${result.id}`} disabled={unavailable} onClick={()=>scope==='library'?void delivery.openArchived(result as ArchivedResult):delivery.open(result.id)}>
+    {(scope==='current'?result.source||result.thumbnail:result.thumbnail)?<img loading="lazy" decoding="async" src={scope==='current'?result.source||result.thumbnail:result.thumbnail} alt=""/>:<span className="result-placeholder">{result.status==='error'?'生成失败':result.status==='loading'?'生成中…':'点击查看原图'}</span>}
+   </button>
+   <div className="result-card-caption"><strong title={result.prompt||'无生成描述'}>{result.prompt||'无生成描述'}</strong>{result.adopted?<span className="result-adopted-mark" role="img" aria-label="已采用" title="已采用"><ResultCardIcon kind="adopted"/></span>:null}</div>
+   {result.error?<p className="error-text">{result.error}</p>:null}
+   <div className="result-card-actions" role="group" aria-label={`图片操作 ${result.id}`} aria-busy={working}>
+    {scope==='current'?<label className="result-compare" title={selected.includes(result.id)?'取消比较':'加入比较（最多 4 张）'}><Checkbox aria-label={`比较结果 ${result.id}`} checked={selected.includes(result.id)} disabled={unavailable||!selected.includes(result.id)&&selected.length>=4} onChange={e=>setCompareIds(e.target.checked?[...selected,result.id].slice(0,4):selected.filter(id=>id!==result.id))}/></label>:null}
+    <button title="继续修改" aria-label={`继续修改结果 ${result.id}`} disabled={unavailable||working} onClick={()=>void runImageAction(result,image=>delivery.continueEditing(image))}><ResultCardIcon kind="edit"/></button>
+    <button title="另存原图" aria-label={`另存结果 ${result.id}`} disabled={unavailable||working} onClick={()=>void runImageAction(result,async image=>{if(await resultArchive.export(image))message.success('已请求保存图片')})}><ResultCardIcon kind="save"/></button>
+    {scope==='current'?<><button className="result-favorite" title={result.favorite?'取消收藏':'收藏'} aria-label={`${result.favorite?'取消收藏':'收藏'}结果 ${result.id}`} aria-pressed={result.favorite} disabled={unavailable} onClick={()=>dispatch({type:'toggle-ai-result-favorite',id:result.id})}><ResultCardIcon kind="favorite"/></button><button className="result-remove" title={result.source?'移除当前记录，原图仍保存在本地作品库；可撤销':'移除当前记录；可撤销'} aria-label={`移除结果记录 ${result.id}`} disabled={working||!!result.source&&delivery.storage[result.id]!=='saved'} onClick={()=>{dispatch({type:'delete-ai-result',id:result.id});message.info(result.source?'记录已移除，原图仍在本地作品库':'记录已移除，可撤销')}}><ResultCardIcon kind="remove"/></button></>:null}
+   </div>
+  </article>})}</div>:!loading&&!error?<p className="inspector-empty">{scope==='library'?'生成后的原图会自动保存在本机，关闭作品后仍可在这里找回。':'生成后点击图片，在画布中预览、保存或继续修改。'}</p>:null}
+  {filtered.length>limit?<button className="result-load-more" onClick={()=>setLimit(v=>v+24)}>显示更多图片</button>:null}
+  {previewIds.length?createPortal(<div className="result-preview-modal" role="dialog" aria-modal="true" aria-label="AI 结果对比" onClick={()=>setPreviewIds([])}><FloatingSurface surfaceRef={surface} tabIndex={-1} title="AI 结果对比" onClose={()=>setPreviewIds([])} closeLabel="关闭预览" onClick={e=>e.stopPropagation()}>{previewIds.map(id=>{const item=state.aiResults.find(r=>r.id===id);return item?<figure key={id}><figcaption>{item.model} · {item.size}</figcaption><img src={item.source||item.thumbnail} alt="AI 结果合成预览"/><button onClick={()=>{setPreviewIds([]);delivery.open(id)}}>在画布中查看</button></figure>:null})}</FloatingSurface></div>,document.body):null}
+ </section>
 }

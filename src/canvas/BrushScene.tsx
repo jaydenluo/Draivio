@@ -1,8 +1,11 @@
 import { Fragment, useId, type ReactNode } from 'react'
-import { strokeSvgPath, type BrushStroke } from './BrushEngine'
+import { brushGradientAxis, strokeSvgPath, type BrushStroke } from './BrushEngine'
 
 function Stroke({ stroke, erase = false, width, height }: { stroke: BrushStroke; erase?: boolean; width: number; height: number }) {
   const id = `soft-${useId().replaceAll(':', '')}`
+  const gradientId = `${id}-gradient`
+  const axis = erase ? null : brushGradientAxis(stroke, width, height)
+  const paint = axis ? `url(#${gradientId})` : erase ? 'black' : stroke.color
   const first = stroke.points[0]
   if (!first) return null
   const blur = (100 - stroke.hardness) / 100 * stroke.size / 5
@@ -13,9 +16,9 @@ function Stroke({ stroke, erase = false, width, height }: { stroke: BrushStroke;
     minY = Math.min(minY, point.y * height / 100); maxY = Math.max(maxY, point.y * height / 100)
   }
   return <g className="brush-stroke" data-stroke={stroke.id} opacity={stroke.opacity / 100 * stroke.flow / 100}>
-    <defs><filter id={id} filterUnits="userSpaceOnUse" x={minX - padding} y={minY - padding} width={maxX - minX + padding * 2} height={maxY - minY + padding * 2}><feGaussianBlur stdDeviation={blur} /></filter></defs>
+    <defs>{axis?<linearGradient id={gradientId} gradientUnits="userSpaceOnUse" x1={axis.from.x} y1={axis.from.y} x2={axis.to.x} y2={axis.to.y} colorInterpolation="sRGB"><stop offset="0" stopColor={stroke.color}/><stop offset="1" stopColor={stroke.endColor}/></linearGradient>:null}<filter id={id} filterUnits="userSpaceOnUse" x={minX - padding} y={minY - padding} width={maxX - minX + padding * 2} height={maxY - minY + padding * 2}><feGaussianBlur stdDeviation={blur} /></filter></defs>
     <g filter={stroke.hardness < 100 ? `url(#${id})` : undefined}>
-      {stroke.points.length === 1 ? <circle cx={first.x * width / 100} cy={first.y * height / 100} r={stroke.size / 2} fill={erase ? 'black' : stroke.color} /> : <path d={strokeSvgPath(stroke, width, height)} fill="none" stroke={erase ? 'black' : stroke.color} strokeWidth={stroke.size} strokeLinecap="round" strokeLinejoin="round" />}
+      {stroke.points.length === 1 ? <circle cx={first.x * width / 100} cy={first.y * height / 100} r={stroke.size / 2} fill={paint} /> : <path d={strokeSvgPath(stroke, width, height)} fill="none" stroke={paint} strokeWidth={stroke.size} strokeLinecap="round" strokeLinejoin="round" />}
     </g>
   </g>
 }

@@ -1,3 +1,4 @@
+import { drawTestSelection } from '../test/selectionFixture'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 import { AppShell } from '../app/AppShell'
@@ -13,12 +14,12 @@ test('canvas tools perform visible actions on the canvas', async () => {
   vi.spyOn(raster, 'sampleCanvasColor').mockResolvedValue('#dd806d')
   const view = render(<EditorProvider><AppShell /></EditorProvider>)
   const interaction = screen.getByLabelText('画布交互层')
-  selectTool('画笔', '画笔 (B)')
+  selectTool('画笔', /^画笔 \(/i)
   fireEvent.pointerDown(interaction, { pointerId: 1, clientX: 120, clientY: 160, buttons: 1 })
   fireEvent.pointerUp(interaction, { pointerId: 1, clientX: 120, clientY: 160 })
   expect(view.container.querySelectorAll('.canvas-art .scene-layer .brush-stroke:not(mask .brush-stroke)')).toHaveLength(1)
   expect(view.container.querySelector('.canvas-art .brush-stroke circle')).toHaveAttribute('r', '10')
-  selectTool('擦除/修复', '橡皮 (E)')
+  selectTool('擦除/修复', /^橡皮 \(/i)
   fireEvent.pointerDown(interaction, { pointerId: 2, clientX: 120, clientY: 160, buttons: 1 })
   fireEvent.pointerUp(interaction, { pointerId: 2, clientX: 120, clientY: 160 })
   expect(view.container.querySelector('mask[data-eraser]')).toBeInTheDocument()
@@ -53,6 +54,7 @@ test('selection handles resize an existing rectangle', () => {
   const artboard = view.container.querySelector('.artboard')!
   vi.spyOn(artboard, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 500, height: 625, right: 500, bottom: 625, x: 0, y: 0, toJSON: () => ({}) })
   selectTool('选区', '选区')
+  drawTestSelection()
   const handle = screen.getByRole('button', { name: '调整选区nw' })
   fireEvent.pointerDown(handle, { pointerId: 6, clientX: 135, clientY: 162, buttons: 1 })
   fireEvent.pointerMove(handle, { pointerId: 6, clientX: 100, clientY: 120, buttons: 1 })

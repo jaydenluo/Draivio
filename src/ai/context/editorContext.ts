@@ -1,3 +1,4 @@
+import { artworkRevision } from '../../document/contentIdentity'
 import type { EditorState, Layer } from '../../state/editor'
 import type { Selection, SelectionRect } from '../../canvas/selectionGeometry'
 import { multiplyPoint, type AffineMatrix } from '../../canvas/layerCoordinates'
@@ -48,14 +49,13 @@ export function contentRevision(state: EditorState, ownRequestId?: string): stri
       JSON.stringify(layer.aiOperation) !== JSON.stringify(result.request)) return true
     return false
   }) : state.layers
-  const text = JSON.stringify([state.documentWidth, state.documentHeight, state.documentBackground, layers,
-    state.brushStrokes, state.canvasTexts, state.canvasShapes, state.layerMasks, state.sceneOrder, state.smartObjectSources])
-  let a = 2166136261, b = 5381
-  for (let i = 0; i < text.length; i++) {
-    a = Math.imul(a ^ text.charCodeAt(i), 16777619)
-    b = Math.imul(b, 33) ^ text.charCodeAt(i)
+  // Pristine same-request receipts also acquire an artboard assignment at commit.
+  // Ignore those assignments with the receipt, while retaining real board edits.
+  if(layers.length!==state.layers.length){
+    const ids=new Set(layers.map(layer=>layer.id))
+    return artworkRevision({...state,artboards:state.artboards.map(board=>({...board,layerIds:board.layerIds.filter(id=>ids.has(id))}))},layers)
   }
-  return `${text.length}:${a >>> 0}:${b >>> 0}`
+  return artworkRevision(state, layers)
 }
 
 function multiply(left: AffineMatrix, right: AffineMatrix): AffineMatrix {

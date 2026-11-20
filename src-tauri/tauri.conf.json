@@ -7,7 +7,7 @@
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": "npm run build:desktop"
   },
   "app": {
     "windows": [
@@ -15,8 +15,8 @@
         "title": "",
         "width": 1440,
         "height": 900,
-        "minWidth": 1020,
-        "minHeight": 680,
+        "minWidth": 800,
+        "minHeight": 600,
         "resizable": true,
         "fullscreen": false,
         "decorations": false,
@@ -47,8 +47,17 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico"
+      }
+    },
     "android": {
       "debugApplicationIdSuffix": ".debug"
+    },
+    "resources": {
+      "image-worker/bin/": "image-worker/"
     }
   }
 }

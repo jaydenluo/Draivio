@@ -1,4 +1,10 @@
+import { SoftwareSettings } from './SoftwareSettings'
+import { ApplicationMenu } from '../commands/ApplicationMenu'
+import { ShortcutSettings } from '../commands/ShortcutSettings'
+import { commands, COMMAND_EVENT, matchesShortcut, runCommand, formatShortcut, shortcutFor, useShortcutVersion, isShortcutTextTarget } from '../commands/shortcuts'
+import { executeEditorCommand } from '../commands/editorCommands'
 import "./topBar.css";
+import { CreativeTools } from "./CreativeTools";
 import { cloudAccount } from "../account/cloudAccount";
 import { useCloudAccount } from "../account/useCloudAccount";
 import { CloudAccountDialog } from "../account/CloudAccountDialog";
@@ -6,7 +12,7 @@ import { RawControls } from "../raw/RawControls";
 import { CmykDialog } from "../color/CmykDialog";
 import { SoftProofDialog } from "../color/SoftProofDialog";
 import { PrecisionDialog } from "../render/PrecisionDialog";
-import { FloatingSurface } from "../ui/FloatingSurface";
+import { AnchoredWindow } from "../ui/AnchoredWindow";
 import { ProjectFileControl } from "../document/ProjectFileControl";
 import { DocumentSizeControl } from "../document/DocumentSizeControl";
 import { BillingDialog } from "./BillingDialog";
@@ -22,7 +28,8 @@ import { ArtboardControls } from "../document/ArtboardControls";
 import { isTauri } from "@tauri-apps/api/core";
 import { AppVersionLabel, WindowControls } from "./WindowControls";
 
-export function TopBar() {
+export function TopBar({ compact = false }: { compact?: boolean } = {}) {
+  useShortcutVersion()
   const { state, dispatch } = useEditor();
   const account = useCloudAccount();
   const [loginOpen, setLoginOpen] = useState(false);
@@ -32,16 +39,34 @@ export function TopBar() {
       message.info(state.notice, { key: "editor-notice" });
   }, [state.notice]);
   const [accountOpen, setAccountOpen] = useState(false);
-  const accountRoot = useRef<HTMLDivElement>(null);
+  const accountTrigger = useRef<HTMLButtonElement>(null);
+  const closeAccount = useCallback(() => setAccountOpen(false), []);
   const [billingOpen, setBillingOpen] = useState(false);
   const closeBilling = useCallback(() => setBillingOpen(false), []);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [softwareSettingsOpen, setSoftwareSettingsOpen] = useState(false);
+  const closeSoftwareSettings = useCallback(() => setSoftwareSettingsOpen(false), []);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [batchOpen, setBatchOpen] = useState(false);
+  const [creativeToolsOpen, setCreativeToolsOpen] = useState(false);
+  const moreToolsRoot = useRef<HTMLDivElement>(null);
+  const [moreToolsOpen, setMoreToolsOpen] = useState(false);
+  const closeMoreTools = useCallback(() => setMoreToolsOpen(false), []);
+  const closeCreativeTools = useCallback(() => {
+    setCreativeToolsOpen(false);
+    moreToolsRoot.current?.focus({ preventScroll: true });
+  }, []);
   const [precisionOpen, setPrecisionOpen] = useState(false);
   const [cmykOpen, setCmykOpen] = useState(false);
   const [softProofOpen, setSoftProofOpen] = useState(false);
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
+  const openRecharge = useCallback(() => {
+    setAccountOpen(false);
+    setSettingsOpen(false);
+    if (cloudAccount.getSnapshot().authenticated) setBillingOpen(true);
+    else setLoginOpen(true);
+  }, []);
   useEffect(() => {
     const open = () => {
       setAccountOpen(false);
@@ -53,43 +78,14 @@ export function TopBar() {
     };
     window.addEventListener("draivio:service-settings", open);
     window.addEventListener("draivio:cloud-login", login);
+    window.addEventListener("draivio:cloud-recharge", openRecharge);
     return () => {
       window.removeEventListener("draivio:service-settings", open);
       window.removeEventListener("draivio:cloud-login", login);
+      window.removeEventListener("draivio:cloud-recharge", openRecharge);
     };
-  }, []);
-  useEffect(() => {
-    if (!accountOpen) return;
-    accountRoot.current
-      ?.querySelector<HTMLButtonElement>(
-        ".account-popover button:not(:disabled)",
-      )
-      ?.focus();
-    const pointerdown = (event: PointerEvent) => {
-      if (
-        event.target instanceof Node &&
-        !accountRoot.current?.contains(event.target)
-      )
-        setAccountOpen(false);
-    };
-    const keydown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        event.stopPropagation();
-        setAccountOpen(false);
-        accountRoot.current
-          ?.querySelector<HTMLButtonElement>(".avatar")
-          ?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", pointerdown);
-    document.addEventListener("keydown", keydown, true);
-    return () => {
-      document.removeEventListener("pointerdown", pointerdown);
-      document.removeEventListener("keydown", keydown, true);
-    };
-  }, [accountOpen]);
-  const toggleAccount = () => setAccountOpen((open) => !open);
+  }, [openRecharge]);
+  const toggleAccount = () => { setMoreToolsOpen(false); setAccountOpen((open) => !open) };
   const hasHighPrecision = state.layers.some((layer) =>
     Boolean(layer.highPrecision),
   );
@@ -127,6 +123,34 @@ export function TopBar() {
       refinement.colorCorrection,
     );
   };
+  useEffect(() => {
+    const onCommand = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail
+      if (executeEditorCommand(id, state, dispatch)) return
+      if (id === 'export') {
+        if (state.colorModel === 'cmyk') setCmykOpen(true)
+        else if (!document.querySelector('.canvas-art')) dispatch({type:'set-notice',message:'没有可导出的画布'})
+        else setExportOpen(true)
+      }
+      if (id === 'shortcuts') setShortcutsOpen(true)
+      if (id === 'cmyk') setCmykOpen(true)
+      if (id === 'proof') setSoftProofOpen(true)
+      if (id === 'precision') setPrecisionOpen(true)
+      if (id === 'creative') setCreativeToolsOpen(true)
+      if (id === 'batch') setBatchOpen(true)
+      if (id === 'artboards') setMoreToolsOpen(true)
+      if (id === 'sources') setSettingsOpen(true)
+    }
+    const keyboard = (event: KeyboardEvent) => {
+      if(document.querySelector('.result-stage') || event.defaultPrevented || event.isComposing || event.repeat || document.querySelector('[role="dialog"][aria-modal="true"]')) return
+      if(isShortcutTextTarget(event.target) || isShortcutTextTarget(document.activeElement)) return
+      const command = commands.find(c => ['export','shortcuts','size','canvasSize','cmyk','raw','proof','precision','creative','batch','artboards','sources'].includes(c.id) && matchesShortcut(event,c.id))
+      if(command){event.preventDefault();runCommand(command.id)}
+    }
+    window.addEventListener(COMMAND_EVENT,onCommand)
+    window.addEventListener('keydown',keyboard)
+    return()=>{window.removeEventListener(COMMAND_EVENT,onCommand);window.removeEventListener('keydown',keyboard)}
+  },[state,dispatch])
   const isDesktopRuntime =
     isTauri() &&
     typeof window !== "undefined" &&
@@ -138,45 +162,28 @@ export function TopBar() {
     );
   return (
     <>
+      {shortcutsOpen ? <ShortcutSettings onClose={()=>setShortcutsOpen(false)} /> : null}
+      {creativeToolsOpen ? <CreativeTools onClose={closeCreativeTools} /> : null}
       <header
         className={`topbar app-titlebar${usesNativeMacControls ? " app-titlebar-macos" : ""}`}
-        data-tauri-drag-region
+        data-tauri-drag-region={isDesktopRuntime ? "deep" : undefined}
       >
-        <div className="brand app-titlebar-brand" data-tauri-drag-region>
+        <div className="brand app-titlebar-brand">
           <span className="brand-mark app-titlebar-mark" aria-hidden="true" />
           <span className="app-titlebar-wordmark">Draivio</span>
           <span className="app-titlebar-name">AI 图片创作</span>
           <AppVersionLabel isDesktopRuntime={isDesktopRuntime} />
         </div>
         <div className="app-titlebar-content">
-          <ProjectFileControl />
-          <details className="topbar-more">
-            <summary className="top-button">更多工具</summary>
-            <div className="topbar-tools-panel">
-              <RawControls />
-              <button className="top-button" onClick={() => setBatchOpen(true)}>
-                批量处理
-              </button>
-              <ArtboardControls />
-              <DocumentSizeControl />
-              <button className="top-button" onClick={() => setCmykOpen(true)}>
-                文档模式 / CMYK
-              </button>
-              <button
-                className="top-button"
-                aria-pressed={state.proofSettings.enabled}
-                onClick={() => setSoftProofOpen(true)}
-              >
-                校样颜色
-              </button>
-              <button
-                className="top-button"
-                onClick={() => setPrecisionOpen(true)}
-              >
-                高精度资源
-              </button>
-            </div>
-          </details>
+          <ApplicationMenu compact={compact} onCommand={runCommand} disabled={id => id === 'undo' ? !state.undoStack.length : id === 'redo' ? !state.redoStack.length : false} />
+          <div className="quick-actions" ref={moreToolsRoot} tabIndex={-1} role="toolbar" aria-label="快捷操作">
+            <ProjectFileControl compact />
+            <button type="button" className="top-button quick-action-secondary" aria-label="撤销" title={`撤销 ${formatShortcut(shortcutFor('undo'))}`} disabled={!state.undoStack.length} onClick={()=>runCommand('undo')}>撤销</button>
+            <button type="button" className="top-button quick-action-secondary" aria-label="重做" title={`重做 ${formatShortcut(shortcutFor('redo'))}`} disabled={!state.redoStack.length} onClick={()=>runCommand('redo')}>重做</button>
+            <button type="button" className="top-button" title={`导出 ${formatShortcut(shortcutFor('export'))}`} onClick={()=>runCommand('export')}>导出</button>
+          </div>
+          <div hidden><RawControls /><DocumentSizeControl /></div>
+          {moreToolsOpen ? <AnchoredWindow anchor={moreToolsRoot} title="画板管理" width={640} onClose={closeMoreTools} className="topbar-tools-panel"><div className="topbar-tools-content"><ArtboardControls /></div></AnchoredWindow> : null}
           <div className="top-actions">
             <button
               className="balance top-button"
@@ -193,35 +200,26 @@ export function TopBar() {
                 ? `${account.balance.toLocaleString("zh-CN", { maximumFractionDigits: 6 })} 积分`
                 : "登录云端"}
             </button>
-            <button
-              className="top-button"
-              onClick={() => {
-                if (state.colorModel === "cmyk") setCmykOpen(true);
-                else if (!document.querySelector(".canvas-art"))
-                  dispatch({ type: "set-notice", message: "没有可导出的画布" });
-                else setExportOpen(true);
-              }}
-            >
-              导出
-            </button>
-            <div className="account-wrap" ref={accountRoot}>
+            <div className="account-wrap">
               <button
+                ref={accountTrigger}
                 className="avatar"
                 title="账户与设置"
                 aria-label="账户设置"
                 aria-expanded={accountOpen}
                 onClick={toggleAccount}
               >
-                {account.user?.email.slice(0, 2).toUpperCase() || "登录"}
+                {account.user?.email.slice(0, 2).toUpperCase() || "登"}
               </button>
               {accountOpen ? (
-                <FloatingSurface
+                <AnchoredWindow
+                  anchor={accountTrigger}
+                  width={320}
+                  dismissOnOutside
                   className="account-popover"
-                  role="dialog"
-                  aria-label="账户设置"
+                  label="账户设置"
                   title="账户与设置"
-                  onClose={() => setAccountOpen(false)}
-                  closeLabel="关闭账户设置"
+                  onClose={closeAccount}
                 >
                   {account.authenticated ? (
                     <p className="account-email">{account.user?.email}</p>
@@ -234,7 +232,13 @@ export function TopBar() {
                         setLoginOpen(true);
                       }}
                     >
-                      登录 / 注册
+                      <AccountMenuIcon kind="login" />
+                      <span className="account-menu-copy">
+                        <span className="account-menu-title">登录 / 注册</span>
+                        <span className="account-menu-description">
+                          登录后，快速使用AI能力
+                        </span>
+                      </span>
                     </button>
                   )}
                   <button
@@ -256,10 +260,7 @@ export function TopBar() {
                   <button
                     className="account-menu-item"
                     aria-label="云服务充值"
-                    onClick={() => {
-                      setAccountOpen(false);
-                      setBillingOpen(true);
-                    }}
+                    onClick={openRecharge}
                   >
                     <AccountMenuIcon kind="billing" />
                     <span className="account-menu-copy">
@@ -269,33 +270,38 @@ export function TopBar() {
                       </span>
                     </span>
                   </button>
-                  <div className="account-menu-divider" />
-                  <button
-                    className="account-menu-item account-menu-item--logout"
-                    aria-label="退出登录"
-                    disabled={!account.authenticated}
-                    onClick={() => {
-                      setAccountOpen(false);
-                      void cloudAccount
-                        .logout()
-                        .catch(() =>
-                          message.error(
-                            "本机已退出，云端会话撤销失败，请稍后重试",
-                          ),
-                        );
-                    }}
-                  >
-                    <AccountMenuIcon kind="logout" />
-                    <span className="account-menu-copy">
-                      <span className="account-menu-title">退出登录</span>
-                      <span className="account-menu-description">
-                        {account.authenticated
-                          ? "退出本次云端会话"
-                          : "当前未登录"}
-                      </span>
-                    </span>
+                  <button className="account-menu-item" aria-label="软件设置" onClick={() => { setAccountOpen(false); setSoftwareSettingsOpen(true) }}>
+                    <AccountMenuIcon kind="settings" />
+                    <span className="account-menu-copy"><span className="account-menu-title">软件设置</span><span className="account-menu-description">存储、导入导出与快捷键</span></span>
                   </button>
-                </FloatingSurface>
+                  {account.authenticated ? (
+                    <>
+                      <div className="account-menu-divider" />
+                      <button
+                        className="account-menu-item account-menu-item--logout"
+                        aria-label="退出登录"
+                        onClick={() => {
+                          setAccountOpen(false);
+                          void cloudAccount
+                            .logout()
+                            .catch(() =>
+                              message.error(
+                                "本机已退出，云端会话撤销失败，请稍后重试",
+                              ),
+                            );
+                        }}
+                      >
+                        <AccountMenuIcon kind="logout" />
+                        <span className="account-menu-copy">
+                          <span className="account-menu-title">退出登录</span>
+                          <span className="account-menu-description">
+                            退出本次云端会话
+                          </span>
+                        </span>
+                      </button>
+                    </>
+                  ) : null}
+                </AnchoredWindow>
               ) : null}
             </div>
           </div>
@@ -329,6 +335,9 @@ export function TopBar() {
           onClose={() => setBatchOpen(false)}
         />
       ) : null}
+      {softwareSettingsOpen ? <SoftwareSettings anchor={accountTrigger} onClose={closeSoftwareSettings}
+        onOpenShortcuts={() => { closeSoftwareSettings(); setShortcutsOpen(true); }}
+        onOpenServices={() => { closeSoftwareSettings(); setSettingsOpen(true); }} /> : null}
       <ExportDialog
         hasHighPrecision={hasHighPrecision}
         renderingIntent={state.colorManagement.renderingIntent}
@@ -362,7 +371,7 @@ export function TopBar() {
   );
 }
 
-function AccountMenuIcon({ kind }: { kind: "sources" | "billing" | "logout" }) {
+function AccountMenuIcon({ kind }: { kind: "sources" | "billing" | "login" | "logout" | "settings" }) {
   return (
     <svg
       className="account-menu-icon"
@@ -376,7 +385,9 @@ function AccountMenuIcon({ kind }: { kind: "sources" | "billing" | "logout" }) {
       strokeLinejoin="round"
       aria-hidden="true"
     >
-      {kind === "sources" ? (
+      {kind === "settings" ? (
+        <><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5" fill="var(--ink-850)"/><circle cx="15" cy="17" r="2.5" fill="var(--ink-850)"/></>
+      ) : kind === "sources" ? (
         <>
           <rect x="3" y="4" width="18" height="6" rx="2" />
           <rect x="3" y="14" width="18" height="6" rx="2" />
@@ -386,6 +397,11 @@ function AccountMenuIcon({ kind }: { kind: "sources" | "billing" | "logout" }) {
         <>
           <rect x="3" y="5" width="18" height="14" rx="2" />
           <path d="M3 10h18M7 15h4" />
+        </>
+      ) : kind === "login" ? (
+        <>
+          <circle cx="12" cy="8" r="3" />
+          <path d="M5 20c.7-3.3 3.1-5 7-5s6.3 1.7 7 5" />
         </>
       ) : (
         <>

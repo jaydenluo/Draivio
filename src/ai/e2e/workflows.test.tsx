@@ -25,7 +25,7 @@ function Harness(){
 beforeEach(()=>{savedProject='';localStorage.clear();localStorage.removeItem(WORKSPACE_RECOVERY_KEY)})
 const bytes=(source:string)=>new Resvg(source).render()
 const hash=(value:Uint8Array)=>createHash('sha256').update(value).digest('hex')
-async function plan(){const mode=screen.getByRole('button',{name:'一句话编辑'});if(mode.getAttribute('aria-pressed')!=='true')fireEvent.click(mode);const box=screen.getByRole('textbox',{name:'AI 操作'});fireEvent.change(box,{target:{value:'向右10像素然后旋转15度'}});fireEvent.keyDown(box,{key:'Enter',ctrlKey:true});await screen.findByLabelText('编辑计划预览');fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}));return screen.findByRole('region',{name:'编辑效果预览'})}
+async function plan(){const mode=screen.getByRole('button',{name:'编辑画布'});if(mode.getAttribute('aria-pressed')!=='true')fireEvent.click(mode);const box=screen.getByRole('textbox',{name:'AI 操作'});fireEvent.change(box,{target:{value:'向右10像素然后旋转15度'}});fireEvent.keyDown(box,{key:'Enter',ctrlKey:true});await screen.findByLabelText('编辑计划预览');fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}));return screen.findByRole('region',{name:'编辑效果预览'})}
 it('completes actual UI selection→multi-step→retune→before/after→adopt→undo→pixel export→offline project reopen',async()=>{
  const network=vi.spyOn(globalThis,'fetch').mockRejectedValue(new Error('offline: no provider request allowed'))
  try{
@@ -55,7 +55,7 @@ it('preserves document on failed locked edits and corrupted offline open then pe
  fireEvent.click(screen.getByRole('button',{name:`${latest.layers.find(l=>l.id==='art')!.name}图层`}))
  fireEvent.click(screen.getByRole('button',{name:`${latest.layers.find(l=>l.id==='art')!.name}锁定`}))
  const locked=latest
- fireEvent.click(screen.getByRole('button',{name:'一句话编辑'}));const box=screen.getByRole('textbox',{name:'AI 操作'});fireEvent.change(box,{target:{value:'向右10像素然后旋转15度'}});fireEvent.keyDown(box,{key:'Enter',ctrlKey:true});await screen.findByLabelText('编辑计划预览');fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}))
+ fireEvent.click(screen.getByRole('button',{name:'编辑画布'}));const box=screen.getByRole('textbox',{name:'AI 操作'});fireEvent.change(box,{target:{value:'向右10像素然后旋转15度'}});fireEvent.keyDown(box,{key:'Enter',ctrlKey:true});await screen.findByLabelText('编辑计划预览');fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}))
  await screen.findByText('执行失败');expect(latest.layers).toBe(locked.layers)
  fireEvent.click(screen.getByText('尝试损坏项目'));expect(latest.layers).toBe(locked.layers)
  expect(screen.queryByRole('region',{name:'编辑效果预览'})).not.toBeInTheDocument()
@@ -63,10 +63,10 @@ it('preserves document on failed locked edits and corrupted offline open then pe
  fireEvent.click(screen.getByRole('button',{name:`${latest.layers.find(l=>l.id==='art')!.name}解锁`}))
  const recovered=await plan();expect(within(recovered).getByRole('button',{name:'采用预览'})).toBeEnabled()
 },30000)
-it('uses labelled keyboard controls without submitting Enter/IME and allows compact composer docking',async()=>{
+it('uses Enter to submit, preserves Shift+Enter for newlines, and allows compact composer docking',async()=>{
  render(<EditorProvider><Harness/></EditorProvider>)
- fireEvent.click(screen.getByRole('button',{name:'一句话编辑'}));const box=screen.getByRole('textbox',{name:'AI 操作'})
- await userEvent.click(box);await userEvent.clear(box);await userEvent.type(box,'向右10像素');await userEvent.keyboard('{Enter}');expect(screen.queryByLabelText('编辑计划预览')).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'编辑画布'}));const box=screen.getByRole('textbox',{name:'AI 操作'})
+ await userEvent.click(box);await userEvent.clear(box);await userEvent.type(box,'向右10像素');await userEvent.keyboard('{Shift>}{Enter}{/Shift}');expect(screen.queryByLabelText('编辑计划预览')).not.toBeInTheDocument()
  fireEvent.keyDown(box,{key:'Enter',ctrlKey:true,isComposing:true});expect(screen.queryByLabelText('编辑计划预览')).not.toBeInTheDocument()
  fireEvent.click(screen.getByRole('button',{name:'移到右侧'}));expect(screen.getByRole('region',{name:'AI 操作'})).toHaveAttribute('data-placement','right')
  fireEvent.click(screen.getByRole('button',{name:'最小化 AI 对话框'}));expect(screen.getByRole('textbox',{name:'AI 操作'})).toHaveValue('向右10像素\n')

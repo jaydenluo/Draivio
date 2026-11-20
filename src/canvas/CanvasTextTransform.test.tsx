@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 import { AppShell } from '../app/AppShell'
 import { EditorProvider, useEditor } from '../state/editor'
@@ -19,9 +19,9 @@ function setup() {
 
 test('selected text can be moved on the canvas and commits one object update', () => {
   const textObject = setup()
-  fireEvent.pointerDown(textObject, { pointerId: 1, clientX: 100, clientY: 100, button: 0 })
-  fireEvent.pointerMove(textObject, { pointerId: 1, clientX: 140, clientY: 130, buttons: 1 })
-  fireEvent.pointerUp(textObject, { pointerId: 1, clientX: 140, clientY: 130, button: 0 })
+  fireEvent.pointerDown(textObject, { pointerId: 1, clientX: 100, clientY: 130, button: 0 })
+  fireEvent.pointerMove(textObject, { pointerId: 1, clientX: 140, clientY: 160, buttons: 1 })
+  fireEvent.pointerUp(textObject, { pointerId: 1, clientX: 140, clientY: 160, button: 0 })
 
   const current = JSON.parse(screen.getByTestId('text-transform-state').textContent ?? '[]') as Array<{ x: number; y: number }>
   expect(current[0].x).toBeGreaterThan(20)
@@ -54,6 +54,6 @@ test('an inward corner drag shrinks the actual text before committing and can be
   expect(JSON.parse(screen.getByTestId('text-transform-state').textContent!)[0].fontSize).toBe(24)
   fireEvent.pointerUp(corner, { pointerId: 3, clientX: 190, clientY: 185, button: 0 })
   expect(JSON.parse(screen.getByTestId('text-transform-state').textContent!)[0].fontSize).toBeCloseTo(12)
-  fireEvent.click(screen.getByLabelText('撤销'))
+  fireEvent.click(within(screen.getByRole('toolbar', { name: '快捷操作' })).getByRole('button', { name: '撤销' }))
   expect(sceneText).toHaveAttribute('font-size', '24')
 })

@@ -18,3 +18,30 @@ it('covers five effects on transparent image edges, text, shape and isolated gro
  }
 })
 it('extends shadow support beyond source object bounds without filter clipping',()=>{const p=pixels('shadow','<rect x="0" y="8" width="4" height="4" fill="red"/>',{distance:10,angle:0,blur:0,opacity:100,color:'#0000ff'});expect(at(p,12,9)).toEqual([0,0,255,255])})
+it('keeps opaque source colors intact when adding an outer shadow',()=>{
+ const p=pixels('shadow','<rect x="4" y="4" width="20" height="20" fill="red"/>',{blur:0,distance:4,angle:0})
+ expect(at(p,12,12)).toEqual([255,0,0,255])
+ expect(at(p,26,12)[3]).toBeGreaterThan(0)
+})
+it.each(['colorOverlay','gradientOverlay'] as EffectKind[])('%s preserves semi-transparent source alpha',kind=>{
+ const p=pixels(kind,'<rect x="8" y="8" width="8" height="8" fill="red" opacity="0.5"/>',{color:'#00ff00'})
+ expect(at(p,12,12)[3]).toBe(128)
+ if(kind==='colorOverlay')expect(at(p,12,12).slice(0,3)).toEqual([0,128,0])
+})
+it('renders gradient reverse, radial, scale, offsets and gradient stroke',()=>{
+ const linear=pixels('gradientOverlay',undefined,{angle:0,reverse:false})
+ const reverse=pixels('gradientOverlay',undefined,{angle:0,reverse:true})
+ expect(at(linear,10,12)).not.toEqual(at(reverse,10,12))
+ const radial=pixels('gradientOverlay',undefined,{gradientType:'radial',scale:50,offsetX:-25})
+ expect(at(radial,10,12)).not.toEqual(at(linear,10,12))
+ const stroke=pixels('stroke',undefined,{fillType:'gradient',width:4,angle:0})
+ expect(at(stroke,6,9)).not.toEqual(at(stroke,17,9))
+})
+it.each(['colorOverlay','gradientOverlay','innerShadow'] as EffectKind[])('%s at zero opacity does not alter transparent source pixels',kind=>{
+ const p=pixels(kind,'<rect x="8" y="8" width="8" height="8" fill="red" opacity="0.5"/>',{opacity:0})
+ expect(at(p,12,12)).toEqual([128,0,0,128])
+})
+it('blends a color overlay without increasing source alpha',()=>{
+ const p=pixels('colorOverlay','<rect x="8" y="8" width="8" height="8" fill="#808080" opacity="0.5"/>',{color:'#808080',blendMode:'multiply'})
+ expect(at(p,12,12)[3]).toBe(128);expect(at(p,12,12)[0]).toBeCloseTo(32,0)
+})

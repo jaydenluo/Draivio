@@ -10,7 +10,6 @@ import { loadConnections } from './serviceConnections'
 
 afterEach(() => vi.useRealTimers())
 beforeEach(async () => {
-  vi.spyOn(window, 'confirm').mockReturnValue(true)
   localStorage.setItem('draivio-service-connections-v1', JSON.stringify([{ id:'proxy', provider:'OpenAI', name:'中转', baseUrl:'https://proxy.example/v1', apiKey:'test-runtime-key', protocol:'openai_compatible', models:['gpt-image-2.5'], enabled:true, imageCapabilities:{'gpt-image-2.5':{generate:true,edit:true,reference:true,encoding:'base64-json'}}, generation:{multiImage:'split', concurrency:2, sendSize:false} }]))
   vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response(JSON.stringify({ data: [{ b64_json: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==' }] })))
   await loadConnections()
@@ -43,9 +42,9 @@ test('replaces separate controls with nested ratio and resolution choices applie
   expect(state().composerParameters).toMatchObject({ ratio: '16:9', size: '1920 × 1080' })
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   expect(screen.getByRole('button', { name: '选择比例与分辨率' })).toHaveTextContent('16:9 · 1920 × 1080')
-  fireEvent.click(screen.getByRole('button', { name: '撤销' }))
+  fireEvent.click(within(screen.getByRole('toolbar', { name: '快捷操作' })).getByRole('button', { name: '撤销' }))
   expect(state().composerParameters).toMatchObject({ ratio: '1:1', size: '1024 × 1024' })
-  fireEvent.click(screen.getByRole('button', { name: '重做' }))
+  fireEvent.click(within(screen.getByRole('toolbar', { name: '快捷操作' })).getByRole('button', { name: '重做' }))
   expect(state().composerParameters).toMatchObject({ ratio: '16:9', size: '1920 × 1080' })
 })
 
@@ -71,7 +70,7 @@ test('captures the chosen format at submission and dismisses the picker with Esc
   const dialog = openFormat()
   fireEvent.click(within(dialog).getByRole('button', { name: '比例 9:16' }))
   fireEvent.click(within(dialog).getByRole('button', { name: '1080 × 1920' }))
-  fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
+  fireEvent.click(screen.getByRole('button', { name: '生成图片' }))
   fireEvent.click(screen.getByRole('button', { name: '执行 AI 操作' }))
   openFormat()
   fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })

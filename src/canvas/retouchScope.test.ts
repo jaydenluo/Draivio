@@ -38,3 +38,14 @@ test('transparent repair deltas preserve untouched translucent pixels and upper-
   expect(Array.from(repaired.slice(8))).toEqual(Array.from(baseline.slice(8)))
   expect(Array.from(repaired.slice(4, 8))).toEqual([0, 255, 0, 255])
 })
+
+test('copying a smart object retains its embedded document without copying sibling layers', () => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  svg.setAttribute('viewBox', '0 0 4 2')
+  svg.innerHTML = '<g data-layer-id="smart"><svg data-smart-source="embedded"><g data-layer-id="nested"><rect data-repair-id="nested" width="2" height="2" fill="red"/></g></svg></g><g data-layer-id="sibling"><svg data-smart-source="other"><g data-layer-id="smart"><rect x="2" width="2" height="2" fill="blue"/></g></svg></g>'
+  const layers: Layer[] = ['smart', 'sibling'].map(id => ({id, name:id, className:'', visible:true, opacity:100, blendMode:'正常'}))
+  const scoped = retouchScopeSvg(svg, layers, 'smart', 'current', ['smart'], true)
+  const pixels = new Resvg(serializeSvg(scoped).source).render().pixels
+  expect(Array.from(pixels.slice(0,4))).toEqual([255,0,0,255])
+  expect(Array.from(pixels.slice(8,12))).toEqual([0,0,0,0])
+})

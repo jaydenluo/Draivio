@@ -13,7 +13,7 @@ export class ImageRequestError extends Error {
   constructor(message: string, public uncertain: boolean, public status?: number, public retryAfter = 1000) { super(message) }
 }
 export type ImageIntent = 'generate' | 'edit' | 'reference'
-export type ImageInput = { expectedCloudSession?:number; signal?:AbortSignal; operation?: GenerativeOperation; model: string; prompt: string; count: number; size: string; options: GenerationOptions; intent?: ImageIntent; reference?: string; mask?: string; parameters?: { quality?: string; steps?: number; guidance?: number; strength?: number }; capabilities?: ImageModelCapabilities }
+export type ImageInput = { expectedCloudSession?:number; signal?:AbortSignal; operation?: GenerativeOperation; model: string; prompt: string; count: number; size: string; options: GenerationOptions; intent?: ImageIntent; reference?: string; additionalReference?: string; mask?: string; parameters?: { quality?: string; steps?: number; guidance?: number; strength?: number }; capabilities?: ImageModelCapabilities }
 export function imagePayload(input: ImageInput) {
   const filtered=input.capabilities?filterImageParameters({...(input.options.sendSize?{size:input.size}:{}),quality:input.options.quality==='omit'?undefined:input.options.quality,...input.parameters},input.capabilities):{...(input.options.sendSize?{size:input.size}:{}),...(input.options.quality!=='omit'?{quality:input.options.quality}:{})}
   return {model:input.model,prompt:input.prompt,...(input.options.multiImage==='single'?{n:input.count}:{}),...filtered,...(filtered.size?{size:filtered.size.replace(/\s/g,'').replace('×','x')}: {})}
@@ -22,7 +22,7 @@ export function imageEditPayload(input: ImageInput) {
   if (!input.reference) throw new ImageRequestError('编辑请求缺少参考图', false)
   const capabilities = input.capabilities ?? { generate: true, edit: true, reference: true, encoding: 'base64-json' as const, quality: ['auto', 'low', 'medium', 'high'] as const }
   const filtered = filterImageParameters({ ...(input.options.sendSize?{size:input.size}:{}), quality: input.options.quality === 'omit' ? undefined : input.options.quality, ...input.parameters }, capabilities)
-  return { model: input.model, prompt: input.prompt, image: input.reference, ...(input.mask ? { mask: input.mask } : {}), ...(input.options.multiImage === 'single' ? { n: input.count } : {}), ...filtered, ...(filtered.size ? { size: filtered.size.replace(/\s/g, '').replace('×', 'x') } : {}) }
+  return { model: input.model, prompt: input.prompt, image: input.reference, ...(input.additionalReference ? { additional_reference: input.additionalReference } : {}), ...(input.mask ? { mask: input.mask } : {}), ...(input.options.multiImage === 'single' ? { n: input.count } : {}), ...filtered, ...(filtered.size ? { size: filtered.size.replace(/\s/g, '').replace('×', 'x') } : {}) }
 }
 /** Fixed multipart contract used by documented OpenAI image edit endpoints. */
 export function imageEditFormData(input: ImageInput): FormData {
@@ -41,7 +41,7 @@ export function imageEditFormData(input: ImageInput): FormData {
   if(mask&&!image.slice(16,24).every((v,i)=>v===mask[16+i]))throw new ImageRequestError('参考图与蒙版尺寸必须一致',false)
   const form = new FormData()
   Object.entries(payload).forEach(([key, value]) => {
-    if(key==='image'||key==='mask')form.append(key,new Blob([key==='image'?image:mask!],{type:'image/png'}),`${key}.png`)
+    if(key==='image'||key==='mask'||key==='additional_reference')form.append(key==='additional_reference'||key==='image'&&input.additionalReference?'image[]':key,new Blob([key==='image'?image:key==='mask'?mask!:pngBytes(input.additionalReference)],{type:'image/png'}),`${key}.png`)
     else form.append(key,String(value))
   })
   return form
@@ -80,7 +80,8 @@ export async function generateOpenAIImages(connection: ServiceConnection, input:
   const capabilities=route.capabilities,editing=route.path==='images/edits'
   const normalized={...input,capabilities,...(route.size?{size:route.size}:{})}
   const payload=editing?imageEditPayload(normalized):imagePayload(normalized)
-  const requestBody=editing&&route.encoding==='multipart'?imageEditFormData(normalized):payload
+  const jsonPayload = editing && input.additionalReference ? (() => { const {additional_reference: _extra, ...rest}=payload as ReturnType<typeof imageEditPayload>; return {...rest,image:[input.reference,input.additionalReference]} })() : payload
+  const requestBody=editing&&route.encoding==='multipart'?imageEditFormData(normalized):jsonPayload
   let response: { status: number; body: unknown; retryAfter?: number }
   if (connection.id === 'draivio-cloud') {
     if (editing) throw new ImageRequestError('官方目录未声明真实蒙版编辑契约；不会退回整图生成', false)

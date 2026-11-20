@@ -1,6 +1,7 @@
 import type { EditorState } from '../../state/editor'
 import type { PlanStep } from '../planning/planner'
 import { executeEditorCommand, type EditorCommand } from '../tools/editorTools'
+import { assertRegionRasterCapability } from '../../render/regionScene'
 
 export type NumericEditParameter = { key: string; label: string; min?: number; max?: number; step: number }
 /** Only numeric arguments of real reducer-backed EditorCommands are exposed. */
@@ -33,6 +34,10 @@ export function executePreviewStep(draft: EditorState, step: Pick<PlanStep,'tool
  const targets: string[] = [...(typeof single === 'string' ? [single] : []), ...(Array.isArray(multiple) ? multiple : [])]
  if (!targets.length) throw new Error('需要明确目标图层，不能回退当前选中对象')
  if (targets.some(id => !scopeIds.includes(id) || !draft.layers.some(layer => layer.id === id))) throw new Error('目标不在所选编辑范围内')
+ for (const id of targets) {
+  const layer = draft.layers.find(item => item.id === id)
+  if (layer?.rasterRef) assertRegionRasterCapability({ width: layer.contentWidth ?? draft.documentWidth, height: layer.contentHeight ?? draft.documentHeight, rasterRef: layer.rasterRef, nativeTiles: false }, 'ai')
+ }
  const next = executeEditorCommand(draft, { ...step.args, op: step.tool } as EditorCommand)
  if (next.notice?.includes('锁定') && next.layers === draft.layers) throw new Error(next.notice)
  return next

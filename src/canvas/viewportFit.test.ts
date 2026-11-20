@@ -14,3 +14,8 @@ describe('fitViewportZoom', () => {
     expect(fitViewportZoom({ documentWidth: 4000, documentHeight: 4000, canvasWidth: 100, canvasHeight: 100, composerHeight: 200 })).toBe(10)
   })
 })
+
+it('keeps the same canvas zoom when a floating task history expands above the draft',()=>{
+ const base={documentWidth:500,documentHeight:625,canvasWidth:900,canvasHeight:650,composerHeight:160}
+ expect(fitViewportZoom({...base,composerHeight:420,composerHistoryHeight:260})).toBe(fitViewportZoom(base))
+})

@@ -3,11 +3,15 @@ import { invertMatrix, layerMatrix, multiplyPoint, type AffineMatrix } from '../
 import { layerParentId, layerSubtreeIds, layerWriteIsLocked } from '../state/layerHierarchy'
 
 export type AlignmentRect = { x: number; y: number; width: number; height: number }
-export type AlignmentMode = 'left' | 'center-horizontal' | 'right' | 'top' | 'center-vertical' | 'bottom'
+export type AlignmentMode = 'left' | 'center-horizontal' | 'right' | 'top' | 'center-vertical' | 'bottom' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 export type AlignmentTarget = 'canvas' | 'selection' | 'key-object'
 
 export function alignRects(rects: AlignmentRect[], mode: AlignmentMode, reference: AlignmentRect): AlignmentRect[] {
   return rects.map((rect) => {
+    if (mode === 'top-left') return { ...rect, x: reference.x, y: reference.y }
+    if (mode === 'top-right') return { ...rect, x: reference.x + reference.width - rect.width, y: reference.y }
+    if (mode === 'bottom-left') return { ...rect, x: reference.x, y: reference.y + reference.height - rect.height }
+    if (mode === 'bottom-right') return { ...rect, x: reference.x + reference.width - rect.width, y: reference.y + reference.height - rect.height }
     if (mode === 'left') return { ...rect, x: reference.x }
     if (mode === 'center-horizontal') return { ...rect, x: reference.x + (reference.width - rect.width) / 2 }
     if (mode === 'right') return { ...rect, x: reference.x + reference.width - rect.width }

@@ -1,0 +1,9 @@
+.object-transform-overlay { position:absolute; inset:0; pointer-events:none; z-index:7; }
+.object-transform-box { position:absolute; border:1px solid #a79bff; transform-origin:50% 50%; pointer-events:none; }
+.object-handle { position:absolute; transform:translate(-50%,-50%); padding:0; border:1px solid #8677ed; border-radius:1px; background:#fff; pointer-events:auto; touch-action:none; cursor:nwse-resize; }
+.object-handle-n,.object-handle-s { cursor:ns-resize; }
+.object-handle-e,.object-handle-w { cursor:ew-resize; }
+.object-handle-ne,.object-handle-sw { cursor:nesw-resize; }
+.object-handle-rotate { border-radius:50%; background:#b9aeff; cursor:grab; }
+.object-handle-from,.object-handle-to,.object-handle[class*="anchor:"] { cursor:crosshair; background:#fff; }
+.object-handle[class*="in:"],.object-handle[class*="out:"] { border-radius:50%; cursor:crosshair; background:#79ccff; }

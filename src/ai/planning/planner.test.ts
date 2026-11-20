@@ -4,6 +4,38 @@ import { planNaturalLanguage } from './planner'
 const options = { selectedLayerId: 'art', layers: [{ id: 'art', name: '海报' }, { id: 'photo', name: '照片' }] }
 
 describe('natural language planner', () => {
+  it('maps corner placement and percentage scaling to deterministic layer steps', () => {
+    const plan = planNaturalLanguage('把当前图层移到左上角并缩小 10%', options)
+    expect(plan.steps.map(step => [step.tool, step.args])).toEqual([
+      ['align', { layerIds: ['art'], mode: 'top-left', target: 'canvas' }],
+      ['scale', { layerId: 'art', sx: 0.9, sy: 0.9 }],
+    ])
+    expect(plan.clarifications).toEqual([])
+    expect(plan.warnings).toEqual([])
+  })
+
+  it.each([
+    ['移到右上角', 'top-right'],
+    ['移到左下角', 'bottom-left'],
+    ['移到右下角', 'bottom-right'],
+  ])('supports %s corner placement', (text, mode) => {
+    expect(planNaturalLanguage(`把当前图层${text}`, options).steps[0]).toMatchObject({
+      tool: 'align',
+      args: { layerIds: ['art'], mode, target: 'canvas' },
+    })
+  })
+
+  it.each([
+    ['放大 10%', 1.1],
+    ['扩大 20%', 1.2],
+    ['缩小 25%', 0.75],
+  ])('converts %s into a scale multiplier', (text, multiplier) => {
+    expect(planNaturalLanguage(`把当前图层${text}`, options).steps[0]).toMatchObject({
+      tool: 'scale',
+      args: { layerId: 'art', sx: multiplier, sy: multiplier },
+    })
+  })
+
   it.each([
     ['重命名为海报副本', 'rename', {layerId:'art',name:'海报副本'}],
     ['上移一层', 'reorder', {layerId:'art',direction:'up'}],

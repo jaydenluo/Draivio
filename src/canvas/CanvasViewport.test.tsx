@@ -6,13 +6,48 @@ import * as rasterTools from './rasterTools'
 
 afterEach(() => vi.restoreAllMocks())
 
-test('selecting a drawing tool updates its pressed state and selection overlay', () => {
+test('routes WebKit trackpad pinch to the canvas while preventing page zoom', () => {
+  render(<EditorProvider><AppShell /></EditorProvider>)
+  const canvas = screen.getByRole('region', { name: '主画布' })
+  const board = canvas.querySelector<HTMLElement>('.artboard')!
+  const pinch = (target: Element, type: string, scale: number) => {
+    const event = Object.assign(new Event(type, { bubbles: true, cancelable: true }), { scale })
+    fireEvent(target, event)
+    expect(event.defaultPrevented).toBe(true)
+  }
+
+  pinch(board, 'gesturestart', 1)
+  pinch(board, 'gesturechange', 1.5)
+  expect(board.style.transform).toContain('scale(1.5)')
+  pinch(board, 'gesturechange', 0.8)
+  expect(board.style.transform).toContain('scale(0.8)')
+  pinch(board, 'gestureend', 0.8)
+  pinch(board, 'gesturechange', 2)
+  expect(board.style.transform).toContain('scale(0.8)')
+
+  pinch(board, 'gesturestart', 1)
+  pinch(board, 'gesturechange', 1.25)
+  expect(board.style.transform).toContain('scale(1)')
+  pinch(board, 'gestureend', 1.25)
+
+  const header = screen.getByRole('banner')
+  pinch(header, 'gesturestart', 1)
+  pinch(board, 'gesturechange', 2)
+  pinch(header, 'gestureend', 2)
+  const prompt = screen.getByRole('textbox', { name: 'AI 操作' })
+  pinch(prompt, 'gesturestart', 1)
+  pinch(prompt, 'gesturechange', 2)
+  pinch(prompt, 'gestureend', 2)
+  expect(board.style.transform).toContain('scale(1)')
+})
+
+test('selecting a drawing or selection tool does not invent a selection', () => {
   render(<EditorProvider><AppShell /></EditorProvider>)
   fireEvent.click(screen.getByRole('button', { name: '打开工具组菜单：画笔' }))
-  fireEvent.click(screen.getByRole('menuitem', { name: '画笔 (B)' }))
+  fireEvent.click(screen.getByRole('menuitem', { name: /^画笔 \(/i }))
   fireEvent.click(screen.getByRole('button', { name: '打开工具组菜单：选区' }))
   fireEvent.click(screen.getByRole('menuitem', { name: '选区' }))
-  expect(screen.getByLabelText('局部选区')).toBeInTheDocument()
+  expect(screen.queryByLabelText('局部选区')).toBeNull()
 })
 
 test('cancels an in-flight healing gesture at non-default zoom and rotation without writing a repair layer', async () => {
@@ -27,7 +62,7 @@ test('cancels an in-flight healing gesture at non-default zoom and rotation with
   fireEvent.click(screen.getByRole('menuitem', { name: /旋转画布/ }))
   fireEvent.click(screen.getByRole('button', { name: '顺时针旋转 15°' }))
   fireEvent.click(screen.getByRole('button', { name: '打开工具组菜单：擦除/修复' }))
-  fireEvent.click(screen.getByRole('menuitem', { name: '修复画笔 (J)' }))
+  fireEvent.click(screen.getByRole('menuitem', { name: /^修复画笔 \(/i }))
   fireEvent.click(screen.getByRole('button', { name: '放大' }))
   const artboard = document.querySelector('.artboard') as HTMLElement
   fireEvent.pointerDown(artboard, { pointerId: 1, clientX: 120, clientY: 140, button: 0 })

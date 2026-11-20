@@ -1,3 +1,14 @@
+import type { GenerationMetadata } from '../creation/generationMetadata'
+import { useCloudModelDefaults } from '../account/useCloudModelDefaults'
+import {resultSizeLabel} from '../creation/resultImage'
+import {RasterProjectPreview} from '../document/RasterProjectPreview'
+import type { RasterReference } from '../assets/imageAssetTypes'
+import { validateRasterReference, editorResourceRoots, imageResourceOwnership } from '../assets/imageAssetStore'
+import { layerStyleUnavailableReason } from '../layers/layerStyleCapability'
+import { LayerStyleEditorProvider } from '../layers/LayerStyleEditor'
+import { SmartFilterEditorProvider } from '../layers/SmartFilterEditor'
+import { groupSelectedLayers, placeLayer, type LayerPlacement } from '../layers/layerPanelModel'
+import { translateMoveTargets, type MoveTarget } from '../canvas/moveTargets'
 import type { ProductRecord } from '../ai/recipes/product'
 import type { AIRecovery } from '../ai/persistence/editRecord'
 import type { CmykRaster } from '../color/cmykRaster'
@@ -23,11 +34,13 @@ import { layerWorldPixelMatrix } from '../canvas/layerWorldMatrix'
 import { selectionToLayer } from '../canvas/layerCoordinates'
 import { dimensionError, resizedDocument, layerPixelScale, type DocumentAnchor } from '../document/documentGeometry'
 import { ImageGenerationProvider } from '../creation/ImageGeneration'
+import { ResultDeliveryProvider } from '../creation/ResultDelivery'
+import { ComposerDraftProvider } from '../creation/ComposerDraft'
 import { createDocumentWorkspace, workspaceReducer, type DocumentSession, type WorkspaceAction } from '../document/documentWorkspace'
 import { DocumentWorkspaceProvider } from '../document/DocumentWorkspaceProvider'
 import { defaultGenerationCount, readComposerPreferences, readGenerationCount, saveComposerPreferences, saveGenerationCount } from '../creation/composerPreferences'
 import { isValidOutputFormat, type OutputRatio } from '../creation/outputFormats'
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, type Dispatch, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState, type Dispatch, type ReactNode, type SetStateAction } from 'react'
 import { createSelection, invertSelection, morphSelection, type Selection, type SelectionRect } from '../canvas/selectionGeometry'
 import type { BrushStroke } from '../canvas/BrushEngine'
 import type { CanvasTextObject } from '../canvas/TextObject'
@@ -52,7 +65,7 @@ export type ComposerPlacement = 'floating' | 'right'
 export type ComposerParameter = 'model' | 'size' | 'ratio' | 'count' | 'strength'
 export type ComposerParameters = Record<ComposerParameter, string>
 export type HistoryTab = 'operations' | 'results' | 'compare'
-export type AIOperation = { restoration?: {width:number;height:number;scale:2|4;mode:'size'|'detail'|'deblur';backend:string}; generationJob?: { batchId:string; jobId:string; attemptId:string }; outpaint?: OutpaintProvenance; maskedEdit?: MaskedEditProvenance; context?: EditorRequestContext; mode: ComposerMode; intent?: 'generate' | 'edit' | 'reference'; prompt: string; sourceLayerId: string; selection: Selection | null; parameters: ComposerParameters; sourceId?: ModelSourceId; modelCode?: string; reference?: { source: string; thumbnail?: string; layerId: string } }
+export type AIOperation = { generationMetadata?: GenerationMetadata; restoration?: {width:number;height:number;scale:2|4;mode:'size'|'detail'|'deblur';backend:string}; generationJob?: { batchId:string; jobId:string; attemptId:string }; outpaint?: OutpaintProvenance; maskedEdit?: MaskedEditProvenance; context?: EditorRequestContext; mode: ComposerMode; intent?: 'generate' | 'edit' | 'reference'; prompt: string; sourceLayerId: string; selection: Selection | null; parameters: ComposerParameters; sourceId?: ModelSourceId; modelCode?: string; reference?: { source: string; thumbnail?: string; layerId: string } }
 import { defaultCurves, validateCurves, type CurvesSettings } from '../adjustments/curves'
 import { defaultLevels, validateLevels, type LevelsSettings } from '../adjustments/levels'
 import { defaultColorBalance, defaultHsl, type ColorBalanceSettings, type HslSettings } from '../adjustments/hsl'
@@ -62,15 +75,15 @@ import type { WarpRecipe } from '../filters/warp'
 export type LayerAdjustments = { brightness: number; contrast: number; saturation: number; temperature: number; tint?: number; sharpness: number; blur: number; shadows: number; highlights: number; exposureEV?: number; whiteBalance?: { r: number; g: number; b: number }; curves?: CurvesSettings; levels?: LevelsSettings; hsl?: HslSettings; colorBalance?: ColorBalanceSettings }
 export const neutralAdjustments: LayerAdjustments = { brightness: 0, contrast: 0, saturation: 0, temperature: 0, sharpness: 0, blur: 0, shadows: 0, highlights: 0, exposureEV: 0, curves: defaultCurves(), levels: defaultLevels(), hsl: defaultHsl(), colorBalance: defaultColorBalance() }
 export type AIResultStatus = 'loading' | 'success' | 'partial-failure' | 'error'
-export type AIResult = { id: string; source?: string; thumbnail?: string; prompt: string; model: string; provider: string; size: string; createdAt: string; status: AIResultStatus; favorite: boolean; adopted: boolean; error?: string; request?: AIOperation }
-export type Layer = { posterProtection?: { reason: 'logo-protected' | 'source-protected'; sourceLayerId: string }; productRecipe?: ProductRecord; warpRecipe?: WarpRecipe; sourceInterpolation?: 'nearest'; highPrecision?: PrecisionAsset; rawSource?: RawSourceRecord; maskedCompositeSourceIds?: string[]; maskedCompositeBackground?: boolean; smartFilters?: SmartFilterChain; effects?: LayerEffects; smartObject?: SmartObjectInstance; contentFill?: FillMetadata & { sampling: 'automatic' | 'manual'; sourceRevision: string; sourceLayerId: string }; clipBaseId?: string; mergeBatchId?: string; inputProfile?: { bytes: number[]; checksum: string; policy: 'preserve' | 'assign' }; documentSpace?: boolean; preserveSourceAlpha?: boolean; repairCoverage?: string; repairSourceIds?: string[]; contentWidth?: number; contentHeight?: number; source?: string; thumbnail?: string; transform?: TransformDraft; aiOperation?: AIOperation; id: string; name: string; className: string; kind?: 'image' | 'text' | 'shape' | 'group' | 'mask' | 'adjustment' | 'ai-result'; textObjectId?: string; visible: boolean; locked?: boolean; opacity: number; blendMode: string; groupId?: string; children?: string[]; collapsed?: boolean; adjustments?: LayerAdjustments }
+export type AIResult = { generationMetadata?: GenerationMetadata; id: string; source?: string; thumbnail?: string; prompt: string; model: string; provider: string; size: string; createdAt: string; status: AIResultStatus; favorite: boolean; adopted: boolean; error?: string; request?: AIOperation }
+export type Layer = { rasterRef?: RasterReference; sourceOffset?: { x: number; y: number }; posterProtection?: { reason: 'logo-protected' | 'source-protected'; sourceLayerId: string }; productRecipe?: ProductRecord; warpRecipe?: WarpRecipe; sourceInterpolation?: 'nearest'; highPrecision?: PrecisionAsset; rawSource?: RawSourceRecord; maskedCompositeSourceIds?: string[]; maskedCompositeBackground?: boolean; smartFilters?: SmartFilterChain; effects?: LayerEffects; smartObject?: SmartObjectInstance; contentFill?: FillMetadata & { sampling: 'automatic' | 'manual'; sourceRevision: string; sourceLayerId: string }; clipBaseId?: string; mergeBatchId?: string; inputProfile?: { bytes: number[]; checksum: string; policy: 'preserve' | 'assign' }; documentSpace?: boolean; preserveSourceAlpha?: boolean; repairCoverage?: string; repairSourceIds?: string[]; contentWidth?: number; contentHeight?: number; source?: string; thumbnail?: string; transform?: TransformDraft; aiOperation?: AIOperation; id: string; name: string; className: string; kind?: 'image' | 'text' | 'shape' | 'group' | 'mask' | 'adjustment' | 'ai-result'; textObjectId?: string; visible: boolean; locked?: boolean; opacity: number; blendMode: string; groupId?: string; children?: string[]; collapsed?: boolean; adjustments?: LayerAdjustments }
 export type CanvasStroke = { id: string; x: number; y: number; size: number; color: string }
 export type CanvasText = { id: string; x: number; y: number; text: string }
 export type { SelectionRect } from '../canvas/selectionGeometry'
-type EditorSnapshot = Pick<EditorState, 'colorModel' | 'cmykRaster' | 'aiRecovery' | 'savedRecipes' | 'conversationRuns' | 'pixelFormat' | 'documentWidth' | 'documentHeight' | 'documentBackground' | 'colorManagement' | 'proofSettings' | 'guideSettings' | 'layers' | 'smartObjectSources' | 'selectedLayerId' | 'selectedLayerIds' | 'aiResults' | 'history' | 'selectedHistoryId' | 'selectionVisible' | 'selection' | 'selectionRect' | 'prompt' | 'composerMode' | 'composerSourceId' | 'composerParameters' | 'brushStrokes' | 'canvasTexts' | 'canvasShapes' | 'layerMasks' | 'cropRect' | 'sceneOrder' | 'adjustmentPresets' | 'artboards' | 'activeArtboardId'>
-export type EditorState = { aiRecovery?: AIRecovery; colorModel?: 'rgb' | 'cmyk'; cmykRaster?: CmykRaster; savedRecipes?: SavedRecipe[]; conversationRuns?: ConversationRun[]; pixelFormat: PixelFormat; curvePreviewOffLayerId?: string; colorManagement: ColorManagementSettings; proofSettings: SoftProofSettings; guideSettings: GuideSettings; documentWidth: number; documentHeight: number; documentBackground: string; activeTool: Tool; activeToolGroup: ToolGroupId; activeToolId: ToolId; recentToolByGroup: Record<ToolGroupId, ToolId>; toolOptions: ToolOptions; inspectorTab: InspectorTab; selectionVisible: boolean; selection: Selection; selectionRect: SelectionRect; zoom: number; selectedHistoryId: string; history: HistoryItem[]; historyTab: HistoryTab; historyCollapsed: boolean; isGenerating: boolean; prompt: string; composerMode: ComposerMode; composerPlacement: ComposerPlacement; composerMinimized: boolean; composerSourceId: ModelSourceId; composerParameters: ComposerParameters; layers: Layer[]; smartObjectSources: Record<string, SmartObjectSource>; selectedLayerId: string; selectedLayerIds: string[]; aiResults: AIResult[]; notice: string | null; brushColor: string; recentColors: string[]; brushStrokes: BrushStroke[]; canvasTexts: CanvasTextObject[]; canvasShapes: CanvasShape[]; layerMasks: Record<string, LayerMask>; cropRect: SelectionRect | null; canvasRotation: number; sceneOrder: string[]; adjustmentPresets: Array<Record<string, unknown>>; canvasOffset: { x: number; y: number }; artboards: Artboard[]; activeArtboardId: string | null; undoStack: EditorSnapshot[]; redoStack: EditorSnapshot[] }
-export type EditorAction = {type:'apply-raw';id:string;name:string;record:RawSourceRecord;asset:PrecisionAsset;preview:string;expectedState:EditorState;replace:boolean} | {type:'import-precision-image';id:string;name:string;asset:PrecisionAsset;preview:string} | {type:'set-precision-resource';id:string;asset:PrecisionAsset;preview:string;expectedAsset:PrecisionAsset} | { type: 'set-smart-filters'; id: string; chain: SmartFilterChain; expectedLayer?: Layer; expectedSourceRevision?: number }
-  | { type: 'set-layer-warp'; id: string; recipe: WarpRecipe } | {type:'set-layer-effects';id:string;effects:LayerEffects}
+type EditorSnapshot = Pick<EditorState, 'colorModel' | 'cmykRaster' | 'aiRecovery' | 'savedRecipes' | 'conversationRuns' | 'pixelFormat' | 'documentWidth' | 'documentHeight' | 'documentBackground' | 'colorManagement' | 'proofSettings' | 'guideSettings' | 'layers' | 'smartObjectSources' | 'selectedCanvasTargets' | 'selectedLayerId' | 'selectedLayerIds' | 'aiResults' | 'history' | 'selectedHistoryId' | 'selectionVisible' | 'selection' | 'selectionRect' | 'prompt' | 'composerMode' | 'composerSourceId' | 'composerParameters' | 'brushStrokes' | 'canvasTexts' | 'canvasShapes' | 'layerMasks' | 'cropRect' | 'sceneOrder' | 'adjustmentPresets' | 'artboards' | 'activeArtboardId'>
+export type EditorState = { rasterPreviewOnly?: boolean; selectedCanvasTargets?: MoveTarget[]; aiRecovery?: AIRecovery; colorModel?: 'rgb' | 'cmyk'; cmykRaster?: CmykRaster; savedRecipes?: SavedRecipe[]; conversationRuns?: ConversationRun[]; pixelFormat: PixelFormat; curvePreviewOffLayerId?: string; colorManagement: ColorManagementSettings; proofSettings: SoftProofSettings; guideSettings: GuideSettings; documentWidth: number; documentHeight: number; documentBackground: string; activeTool: Tool; activeToolGroup: ToolGroupId; activeToolId: ToolId; recentToolByGroup: Record<ToolGroupId, ToolId>; toolOptions: ToolOptions; inspectorTab: InspectorTab; selectionVisible: boolean; selection: Selection; selectionRect: SelectionRect; zoom: number; selectedHistoryId: string; history: HistoryItem[]; historyTab: HistoryTab; historyCollapsed: boolean; isGenerating: boolean; prompt: string; composerMode: ComposerMode; composerPlacement: ComposerPlacement; composerMinimized: boolean; composerSourceId: ModelSourceId; composerParameters: ComposerParameters; layers: Layer[]; smartObjectSources: Record<string, SmartObjectSource>; selectedLayerId: string; selectedLayerIds: string[]; aiResults: AIResult[]; notice: string | null; brushColor: string; backgroundColor?: string; recentColors: string[]; brushStrokes: BrushStroke[]; canvasTexts: CanvasTextObject[]; canvasShapes: CanvasShape[]; layerMasks: Record<string, LayerMask>; cropRect: SelectionRect | null; canvasRotation: number; sceneOrder: string[]; adjustmentPresets: Array<Record<string, unknown>>; canvasOffset: { x: number; y: number }; artboards: Artboard[]; activeArtboardId: string | null; undoStack: EditorSnapshot[]; redoStack: EditorSnapshot[] }
+export type EditorAction = {type:'import-raster-reference';id:string;name:string;rasterRef:RasterReference;width:number;height:number} | {type:'apply-raw';id:string;name:string;record:RawSourceRecord;asset:PrecisionAsset;preview:string;expectedState:EditorState;replace:boolean} | {type:'import-precision-image';id:string;name:string;asset:PrecisionAsset;preview:string} | {type:'set-precision-resource';id:string;asset:PrecisionAsset;preview:string;expectedAsset:PrecisionAsset} | { type: 'set-smart-filters'; id: string; chain: SmartFilterChain; expectedLayer?: Layer; expectedSourceRevision?: number }
+  | { type: 'set-layer-warp'; id: string; recipe: WarpRecipe } | {type:'set-layer-effects';id:string;effects:LayerEffects;expectedEffects?:LayerEffects|null}
   | { type: 'convert-to-smart-object'; id: string }
   | { type: 'replace-smart-object'; id: string; source: SmartObjectSource; expectedSource?: SmartObjectSource }
   | { type: 'update-smart-object-source'; sourceId: string; patch: Partial<SmartObjectSource>; baseRevision?: number; expectedSource?: SmartObjectSource }
@@ -86,8 +99,10 @@ export type EditorAction = {type:'apply-raw';id:string;name:string;record:RawSou
   | { type: 'set-temporary-tool'; tool: Tool }
   | { type: 'set-tool-options'; options: ToolOptions }
   | { type: 'select-tab'; tab: InspectorTab }
+  | { type: 'reveal-layer-in-inspector'; id: string }
   | { type: 'select-history'; id: string }
   | { type: 'set-prompt'; prompt: string }
+  | { type: 'clear-submitted-prompt'; prompt: string }
   | { type: 'set-generating'; value: boolean }
   | { type: 'append-history'; item: HistoryItem }
   | { type: 'append-ai-result'; id: string; request: AIOperation; image: string; index: number }
@@ -100,12 +115,14 @@ export type EditorAction = {type:'apply-raw';id:string;name:string;record:RawSou
   | { type: 'complete-ai-operation'; id: string; request: AIOperation }
   | { type: 'set-zoom'; zoom: number }
   | { type: 'set-selection-visible'; visible: boolean }
+  | { type: 'clear-selection' }
   | { type: 'set-selection-rect'; rect: SelectionRect }
   | { type: 'commit-selection'; selection: Selection }
   | { type: 'invert-selection' }
   | { type: 'morph-selection'; amount: number }
   | { type: 'set-composer-mode'; mode: ComposerMode }
   | { type: 'set-composer-source'; sourceId: ModelSourceId }
+  | { type: 'set-default-composer-model'; sourceId: ModelSourceId; model: string }
   | { type: 'set-composer-placement'; placement: ComposerPlacement }
   | { type: 'set-composer-minimized'; minimized: boolean }
   | { type: 'set-output-format'; ratio: OutputRatio; size: string }
@@ -116,6 +133,14 @@ export type EditorAction = {type:'apply-raw';id:string;name:string;record:RawSou
   | { type: 'set-notice'; message: string | null }
   | { type: 'add-layer' }
   | { type: 'add-adjustment-layer' }
+  | { type: 'set-selected-layer-properties'; ids: string[]; opacity?: number; blendMode?: string }
+  | { type: 'place-layer'; id: string; targetId: string; placement: LayerPlacement }
+  | { type: 'update-layer-mask'; id: string; operation: 'toggle' | 'invert' | 'apply' | 'delete' }
+  | { type: 'add-layer-mask'; id: string }
+  | { type: 'add-layer-group' }
+  | { type:'select-canvas-targets'; targets:MoveTarget[] }
+  | { type:'update-canvas-objects'; shapes?:CanvasShape[]; texts?:CanvasTextObject[] }
+  | { type: 'select-layers'; ids: string[]; keyId?: string }
   | { type: 'select-layer'; id: string; additive?: boolean }
   | { type: 'toggle-layer-selection'; id: string }
   | { type: 'batch-toggle-layer'; ids: string[]; property: 'visible' | 'locked' }
@@ -153,8 +178,12 @@ export type EditorAction = {type:'apply-raw';id:string;name:string;record:RawSou
   | { type: 'create-text-layer'; object: CanvasTextObject }
   | { type: 'set-canvas-offset'; x: number; y: number }
   | { type: 'set-brush-color'; color: string }
+  | { type: 'set-background-color'; color: string }
+  | { type: 'swap-colors' }
+  | { type: 'reset-colors' }
   | { type: 'commit-brush-stroke'; stroke: BrushStroke }
   | { type: 'upsert-text'; object: CanvasTextObject }
+  | { type: 'create-shape-layer'; shape: CanvasShape }
   | { type: 'add-shape'; shape: CanvasShape }
   | { type: 'update-shape'; shape: CanvasShape }
   | { type: 'combine-shapes'; shape: CanvasShape; sourceIds: string[] }
@@ -163,6 +192,7 @@ export type EditorAction = {type:'apply-raw';id:string;name:string;record:RawSou
   | { type: 'invert-mask' }
   | { type: 'clear-mask' }
   | { type: 'apply-mask' }
+  | { type: 'move-canvas-targets'; targets: MoveTarget[]; delta: { x: number; y: number } }
   | { type: 'commit-layer-transform'; layerId: string; transform: TransformDraft }
   | { type: 'commit-crop'; rect: SelectionRect }
   | { type: 'set-canvas-rotation'; rotation: number }
@@ -210,19 +240,19 @@ function rememberColor(colors: string[], color: string) {
 export const initialEditorState: EditorState = {
   pixelFormat: 'rgba8',
   colorManagement: { profile: defaultProfile(), renderingIntent: 'relative-colorimetric' }, proofSettings: defaultSoftProofSettings(), guideSettings: defaultGuideSettings(), documentWidth: 500, documentHeight: 625, documentBackground: 'transparent',
-  activeTool: 'select', activeToolGroup: 'select-move', activeToolId: 'select', recentToolByGroup: { 'select-move': 'select', selection: 'selection', brush: 'brush', 'erase-heal': 'eraser', mask: 'mask', 'crop-transform': 'crop', 'text-shape': 'text', 'color-fill': 'picker', navigation: 'pan', cutout: 'cutout', upscale: 'upscale' }, toolOptions: {}, inspectorTab: 'layers', selectionVisible: true, selection: createSelection('rectangle', { x: 27, y: 26, width: 46, height: 40 }), selectionRect: { x: 27, y: 26, width: 46, height: 40 }, zoom: 100, selectedHistoryId: 'original',
+  activeTool: 'select', activeToolGroup: 'select-move', activeToolId: 'select', recentToolByGroup: { 'select-move': 'select', selection: 'selection', brush: 'brush', 'erase-heal': 'eraser', mask: 'mask', 'crop-transform': 'crop', 'text-shape': 'text', 'color-fill': 'picker', navigation: 'pan', cutout: 'cutout', upscale: 'upscale' }, toolOptions: {}, inspectorTab: 'layers', selectionVisible: false, selection: createSelection('rectangle', { x: 0, y: 0, width: 0, height: 0 }), selectionRect: { x: 0, y: 0, width: 0, height: 0 }, zoom: 100, selectedHistoryId: 'original',
   history: [
     { id: 'original', label: '原图 · 现在', tone: 'original' }, { id: 'variation-1', label: '文生图 · 1', tone: 'warm' },
     { id: 'variation-2', label: '文生图 · 2', tone: 'violet' }, { id: 'upscale-1', label: '放大 · 1', tone: 'upscale' },
   ], historyTab: 'operations', historyCollapsed: false, isGenerating: false, prompt: '一张春日黄昏海报，暖色天空，远山和树影，安静、留白、杂志感', composerMode: 'edit', composerPlacement: 'floating', composerMinimized: false, composerSourceId: 'draivio-cloud',
   composerParameters: { model: 'Image Pro', size: '1024 × 1024', ratio: '1:1', count: defaultGenerationCount, strength: '强度 48%' },
-  layers: [{ id: 'art', source: 'fixture', name: '春日海报 · 变体 1', className: 'layer-art', visible: true, opacity: 100, blendMode: '正常', adjustments: { ...neutralAdjustments } }, { id: 'mask', name: '局部蒙版', className: 'layer-mask', visible: true, opacity: 100, blendMode: '正常', adjustments: { ...neutralAdjustments } }, { id: 'original', source: 'fixture', name: '原图', className: 'layer-original', visible: false, opacity: 100, blendMode: '正常', adjustments: { ...neutralAdjustments } }], smartObjectSources: {}, selectedLayerId: 'art', selectedLayerIds: ['art'], aiResults: [], notice: null, brushColor: '#ff765f', recentColors: [], brushStrokes: [], canvasTexts: [], canvasShapes: [], layerMasks: {}, cropRect: null, canvasRotation: 0, sceneOrder: [], adjustmentPresets: [], canvasOffset: { x: 0, y: 0 },
-  artboards: [{ id: 'board-1', name: '画板 1', x: 0, y: 0, width: 500, height: 625, background: 'transparent', layerIds: ['art', 'mask', 'original'] }], activeArtboardId: 'board-1', undoStack: [], redoStack: [],
+  layers: [{ id: 'art', source: 'fixture', name: '春日海报 · 变体 1', className: 'layer-art', visible: true, opacity: 100, blendMode: '正常', adjustments: { ...neutralAdjustments } }, { id: 'original', source: 'fixture', name: '原图', className: 'layer-original', visible: false, opacity: 100, blendMode: '正常', adjustments: { ...neutralAdjustments } }], smartObjectSources: {}, selectedLayerId: 'art', selectedLayerIds: ['art'], aiResults: [], notice: null, brushColor: '#ff765f', backgroundColor: '#ffffff', recentColors: [], brushStrokes: [], canvasTexts: [], canvasShapes: [], layerMasks: {}, cropRect: null, canvasRotation: 0, sceneOrder: [], adjustmentPresets: [], canvasOffset: { x: 0, y: 0 },
+  artboards: [{ id: 'board-1', name: '画板 1', x: 0, y: 0, width: 500, height: 625, background: 'transparent', layerIds: ['art', 'original'] }], activeArtboardId: 'board-1', undoStack: [], redoStack: [],
 }
 
 export function snapshot(state: EditorState): EditorSnapshot {
-  const { pixelFormat, colorManagement, proofSettings, documentWidth, documentHeight, documentBackground, layers, smartObjectSources, selectedLayerId, selectedLayerIds, aiResults, history, selectedHistoryId, selectionVisible, selection, selectionRect, prompt, composerMode, composerSourceId, composerParameters, brushStrokes, canvasTexts, canvasShapes, layerMasks, cropRect, sceneOrder, adjustmentPresets, artboards, activeArtboardId } = state
-  return { colorModel: state.colorModel, cmykRaster: state.cmykRaster, aiRecovery: state.aiRecovery, savedRecipes: state.savedRecipes, conversationRuns: state.conversationRuns, pixelFormat, colorManagement, proofSettings, guideSettings: state.guideSettings, documentWidth, documentHeight, documentBackground, layers, smartObjectSources, selectedLayerId, selectedLayerIds, aiResults, history, selectedHistoryId, selectionVisible, selection, selectionRect, prompt, composerMode, composerSourceId, composerParameters, brushStrokes, canvasTexts, canvasShapes, layerMasks, cropRect, sceneOrder, adjustmentPresets, artboards, activeArtboardId }
+  const { pixelFormat, colorManagement, proofSettings, documentWidth, documentHeight, documentBackground, layers, smartObjectSources, selectedCanvasTargets, selectedLayerId, selectedLayerIds, aiResults, history, selectedHistoryId, selectionVisible, selection, selectionRect, prompt, composerMode, composerSourceId, composerParameters, brushStrokes, canvasTexts, canvasShapes, layerMasks, cropRect, sceneOrder, adjustmentPresets, artboards, activeArtboardId } = state
+  return { colorModel: state.colorModel, cmykRaster: state.cmykRaster, aiRecovery: state.aiRecovery, savedRecipes: state.savedRecipes, conversationRuns: state.conversationRuns, pixelFormat, colorManagement, proofSettings, guideSettings: state.guideSettings, documentWidth, documentHeight, documentBackground, layers, smartObjectSources, selectedCanvasTargets, selectedLayerId, selectedLayerIds, aiResults, history, selectedHistoryId, selectionVisible, selection, selectionRect, prompt, composerMode, composerSourceId, composerParameters, brushStrokes, canvasTexts, canvasShapes, layerMasks, cropRect, sceneOrder, adjustmentPresets, artboards, activeArtboardId }
 }
 function commit(state: EditorState, next: EditorState): EditorState {
  const layers=releaseInvalidClipping(next.layers)
@@ -238,14 +268,24 @@ function commit(state: EditorState, next: EditorState): EditorState {
 }
 
 export function editorReducer(state: EditorState, action: EditorAction): EditorState {
+  // Consuming a submitted draft is UI state, not a canvas edit or undo entry.
+  if(action.type==='clear-submitted-prompt')return state.prompt===action.prompt?{...state,prompt:''}:state
+  if(state.rasterPreviewOnly && action.type!=='set-notice')return {...state,notice:'此项目当前为只读预览；原件已保留，尚未启用区域编辑与原始精度导出'}
+  if(action.type==='set-layer-effects'){const reason=layerStyleUnavailableReason(state,action.id);if(reason)return {...state,notice:reason};if(action.expectedEffects!==undefined&&JSON.stringify(state.layers.find(l=>l.id===action.id)?.effects??null)!==JSON.stringify(action.expectedEffects))return {...state,notice:'图层样式已被其他操作修改，请恢复打开时状态后重新编辑。'}}
   if (action.type === 'apply-cmyk-document' && action.expectedState !== state) return { ...state, notice: '文档已更改，请重新预览 CMYK 转换' }
   // A CMYK raster is authoritative; RGB-only tools must use an explicit working copy.
   if (state.colorModel === 'cmyk') {
-    const ui = new Set(['undo','redo','restore-project','set-notice','select-tab','select-layer','select-layers','set-zoom','set-canvas-offset','set-canvas-rotation','set-active-tool','set-tool','set-active-tool-group','set-tool-option','set-prompt','set-composer-mode','set-composer-placement','set-composer-minimized','set-composer-parameter','set-composer-source','set-output-format','set-selection-visible','toggle-selection','select-history','set-history-tab','set-history-collapsed','select-tool','set-temporary-tool','set-tool-options','toggle-layer-selection','new-document','select-artboard','set-active-artboard','set-generating'])
+    const ui = new Set(['select-canvas-targets','set-brush-color','set-background-color','swap-colors','reset-colors','undo','redo','restore-project','set-notice','select-tab','reveal-layer-in-inspector','select-layer','select-layers','set-zoom','set-canvas-offset','set-canvas-rotation','set-active-tool','set-tool','set-active-tool-group','set-tool-option','set-prompt','set-composer-mode','set-composer-placement','set-composer-minimized','set-composer-parameter','set-composer-source','set-output-format','set-selection-visible','clear-selection','toggle-selection','select-history','set-history-tab','set-history-collapsed','select-tool','set-temporary-tool','set-tool-options','toggle-layer-selection','new-document','select-artboard','set-active-artboard','set-generating'])
     const conversion = action.type === 'apply-cmyk-document' && (action.document.colorModel === 'rgb' || action.document.colorModel === 'cmyk' && action.document.cmykRaster !== state.cmykRaster)
     if (!ui.has(action.type) && !conversion) return { ...state, notice: 'CMYK 通道保持不变。此工具仅支持 RGB，请先在文档模式中显式创建 RGB 工作副本。' }
   }
 
+  if(action.type==='import-raster-reference') {
+    validateRasterReference(action.rasterRef)
+    const error=dimensionError(action.width,action.height)
+    if(error)return {...state,notice:error}
+    return commit(state,{...state,layers:[{id:action.id,name:action.name,className:'layer-art',kind:'image',visible:true,opacity:100,blendMode:'正常',rasterRef:{...action.rasterRef},contentWidth:action.width,contentHeight:action.height},...state.layers],selectedLayerId:action.id,selectedLayerIds:[action.id]})
+  }
   if (layerWriteIsLocked(state, action)) return { ...state, notice: '图层或其祖先已锁定，请先解锁后再编辑' }
   const precisionTargetId = 'targetId' in action && typeof action.targetId === 'string' ? action.targetId : 'layerId' in action && typeof action.layerId === 'string' ? action.layerId : 'id' in action && typeof action.id === 'string' ? action.id : state.selectedLayerId
   const precisionTarget = state.layers.find(layer => layer.id === precisionTargetId)?.highPrecision
@@ -274,7 +314,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const sourceId = `smart-source-${action.id}-${Date.now()}`
       const source = createSmartObjectSource(layer, sourceId, state)
       const sources = { ...state.smartObjectSources, [sourceId]: source }
-      return commit(state, { ...state, smartObjectSources: sources, sceneOrder: state.sceneOrder.filter(id => !source.document!.sceneOrder.includes(id)), canvasTexts: state.canvasTexts.filter(item => item.layerId !== layer.id), canvasShapes: state.canvasShapes.filter(item => item.layerId !== layer.id), brushStrokes: state.brushStrokes.filter(item => item.layerId !== layer.id), layers: state.layers.map(item => item.id === action.id ? { ...item, contentWidth: source.width, contentHeight: source.height, smartObject: { sourceId, linked: true, instanceWidth: source.width, instanceHeight: source.height } } : item), notice: '已转换为智能对象' })
+      return commit(state, { ...state, smartObjectSources: sources, sceneOrder: state.sceneOrder.filter(id => !source.document!.sceneOrder.includes(id)), canvasTexts: state.canvasTexts.filter(item => item.layerId !== layer.id), canvasShapes: state.canvasShapes.filter(item => item.layerId !== layer.id), brushStrokes: state.brushStrokes.filter(item => item.layerId !== layer.id), layers: state.layers.map(item => item.id === action.id ? { ...item, sourceOffset: undefined, contentWidth: source.width, contentHeight: source.height, smartObject: { sourceId, linked: true, instanceWidth: source.width, instanceHeight: source.height } } : item), notice: '已转换为智能对象' })
     }
     case 'duplicate-smart-object-independent': {
       const layer = state.layers.find(item => item.id === action.id)
@@ -321,7 +361,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       if (action.replace && (!old?.rawSource || effectiveLayerState(state.layers,action.id).locked)) return {...state,notice:'RAW图层已改变或锁定'}
       try {validateRawSourceRecord(action.record);validatePrecisionAsset(action.asset)} catch(e){return {...state,notice:e instanceof Error?e.message:'RAW资源无效'}}
       if(!action.preview.startsWith('data:image/png;base64,'))return state
-      const layer:Layer={...(old??{id:action.id,name:action.name,className:'layer-art',kind:'image',visible:true,opacity:100,blendMode:'正常'}),rawSource:action.record,highPrecision:action.asset,source:action.preview,thumbnail:action.preview,contentWidth:action.asset.width,contentHeight:action.asset.height}
+      const layer:Layer={...(old??{id:action.id,name:action.name,className:'layer-art',kind:'image',visible:true,opacity:100,blendMode:'正常'}),rasterRef:undefined,rawSource:action.record,highPrecision:action.asset,source:action.preview,thumbnail:action.preview,contentWidth:action.asset.width,contentHeight:action.asset.height}
       return commit(state,{...state,pixelFormat:'rgba16',layers:action.replace?state.layers.map(l=>l.id===layer.id?layer:l):[layer,...state.layers],selectedLayerId:layer.id,selectedLayerIds:[layer.id],notice:'已应用RAW显影；原始字节和参数保留，可撤销重开'})
     }
     case 'import-precision-image': {
@@ -337,11 +377,11 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       let asset: PrecisionAsset
       try { asset=validatePrecisionAsset(action.asset) } catch(error) {return {...state,notice:error instanceof Error?error.message:'高精度资源无效'}}
       if(asset.width!==layer.highPrecision.width||asset.height!==layer.highPrecision.height||!action.preview.startsWith('data:image/png;base64,'))return {...state,notice:'高精度结果尺寸或预览无效'}
-      return commit(state,{...state,pixelFormat:asset.format,layers:state.layers.map(item=>item.id===layer.id?{...item,highPrecision:asset,source:action.preview,thumbnail:action.preview}:item),notice:'已应用高精度处理；原始资源可撤销恢复'})
+      return commit(state,{...state,pixelFormat:asset.format,layers:state.layers.map(item=>item.id===layer.id?{...item,rasterRef:undefined,highPrecision:asset,source:action.preview,thumbnail:action.preview}:item),notice:'已应用高精度处理；原始资源可撤销恢复'})
     }
     case 'set-pixel-format': { if (!['rgba8','rgba16','rgba32f'].includes(action.format)) return { ...state, notice: '不支持的文档位深' }; return commit(state, { ...state, pixelFormat: action.format, notice: action.format === 'rgba8' ? '已切换 8 位文档' : '高精度格式将在导出时按能力矩阵处理' }) }
     case 'update-guide-settings': { try { return commit(state, { ...state, guideSettings: updateGuideSettings(state.guideSettings, action.action) }) } catch (error) { return { ...state, notice: error instanceof Error ? error.message : '参考线设置无效' } } }
-    case 'select-tool': { const definition = getTool(action.tool); if (!definition) return state; return { ...state, activeTool: action.tool, activeToolGroup: definition.groupId, activeToolId: definition.id, recentToolByGroup: { ...state.recentToolByGroup, [definition.groupId]: definition.id }, selectionVisible: definition.groupId === 'selection' || action.tool === 'mask' || state.selectionVisible } }
+    case 'select-tool': { const definition = getTool(action.tool); if (!definition) return state; return { ...state, activeTool: action.tool, activeToolGroup: definition.groupId, activeToolId: definition.id, recentToolByGroup: { ...state.recentToolByGroup, [definition.groupId]: definition.id } } }
     case 'set-temporary-tool': { const definition = getTool(action.tool); if (!definition) return state; return { ...state, activeTool: definition.id, activeToolGroup: definition.groupId, activeToolId: definition.id } }
     case 'set-tool-options': {
       const options = { ...state.toolOptions, ...action.options }
@@ -354,17 +394,26 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return selection.feather !== state.selection.feather ? commit(state, next) : next
     }
     case 'select-tab': return { ...state, inspectorTab: action.tab }
+    case 'reveal-layer-in-inspector': {
+      const ancestors = new Set<string>()
+      let parent = layerParentId(state.layers, action.id)
+      while (parent && !ancestors.has(parent)) {
+        ancestors.add(parent)
+        parent = layerParentId(state.layers, parent)
+      }
+      if (!state.layers.some(layer => layer.collapsed && ancestors.has(layer.id))) return state
+      return { ...state, layers: state.layers.map(layer => layer.collapsed && ancestors.has(layer.id) ? { ...layer, collapsed: false } : layer) }
+    }
     case 'select-history': return { ...state, selectedHistoryId: action.id }
     case 'set-prompt': return commit(state, { ...state, prompt: action.prompt })
     case 'set-generating': return { ...state, isGenerating: action.value }
     case 'append-history': return { ...state, history: [...state.history, action.item], selectedHistoryId: action.item.id }
     case 'append-ai-result': {
-      if (action.request.context && !contextCanCommit(state,action.request.context)) return {...state,notice:'文档内容已更改，结果未写入，请重试'}
       if(state.aiResults.some(result=>result.id===action.id)) return state
-      const result: AIResult = { id: action.id, source: action.image, thumbnail: action.image, prompt: action.request.prompt, model: action.request.modelCode ?? action.request.parameters.model, provider: action.request.sourceId ?? 'unknown', size: action.request.parameters.size, createdAt: new Date().toISOString(), status: 'success', favorite: false, adopted: false, request: action.request }
-      return { ...state, aiResults: [result, ...state.aiResults], inspectorTab:'results', notice: `已收到第 ${action.index + 1} 张候选图片，确认采用后才加入图层` }
+      const result: AIResult = { id: action.id, source: action.image, thumbnail: action.image, prompt: action.request.prompt, model: action.request.modelCode ?? action.request.parameters.model, provider: action.request.sourceId ?? 'unknown', size: resultSizeLabel(action.image,action.request.parameters.size), createdAt: new Date().toISOString(), status: 'success', favorite: false, adopted: false, request: action.request, generationMetadata: action.request.generationMetadata }
+      return { ...state, aiResults: [result, ...state.aiResults], notice: `已收到第 ${action.index + 1} 张候选图片，确认采用后才加入图层` }
     }
-    case 'add-ai-result': if(action.result.request?.context && !contextCanCommit(state,action.result.request.context)) return {...state,notice:'文档内容已更改，结果未写入'}; return { ...state, aiResults: [action.result, ...state.aiResults], notice: action.result.status === 'error' ? 'AI 结果生成失败' : '已收到 AI 结果' }
+    case 'add-ai-result': return { ...state, aiResults: [action.result, ...state.aiResults], notice: action.result.status === 'error' ? 'AI 结果生成失败' : '已收到 AI 结果' }
     case 'toggle-ai-result-favorite': return commit(state, { ...state, aiResults: state.aiResults.map((result) => result.id === action.id ? { ...result, favorite: !result.favorite } : result) })
     case 'delete-ai-result': return commit(state, { ...state, aiResults: state.aiResults.filter((result) => result.id !== action.id), notice: '已删除 AI 结果' })
     case 'adopt-outpaint-result': {
@@ -406,7 +455,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         const layer:Layer={id:`masked-${crypto.randomUUID()}`,name:`局部替换快照 · ${target.name}`,className:'layer-art',kind:'image',visible:true,opacity:100,blendMode:'正常',documentSpace:true,contentWidth:state.documentWidth,contentHeight:state.documentHeight,source:result.source,thumbnail:result.source,aiOperation:result.request,maskedCompositeSourceIds:state.layers.map(l=>l.id),maskedCompositeBackground:true}
         return commit(state,{...state,layers:[layer,...state.layers],selectedLayerId:layer.id,selectedLayerIds:[layer.id],aiResults:state.aiResults.map(r=>r.id===result.id?{...r,adopted:true}:r),notice:'已采用局部替换合成快照；原图层保留，隐藏或删除快照可恢复'})
       }
-      return commit(state, { ...state, aiResults: state.aiResults.map((item) => item.id === result.id ? { ...item, adopted: true } : item), layers: state.layers.map((item) => item.id === target.id ? { ...item, source: result.source, thumbnail: result.thumbnail, aiOperation: result.request, name: `替换 · ${result.model}` } : item), selectedLayerId: target.id, notice: '已替换当前图层，原图可通过撤销恢复' })
+      return commit(state, { ...state, aiResults: state.aiResults.map((item) => item.id === result.id ? { ...item, adopted: true } : item), layers: state.layers.map((item) => item.id === target.id ? { ...item, rasterRef: undefined, source: result.source, thumbnail: result.thumbnail, aiOperation: result.request, name: `替换 · ${result.model}` } : item), selectedLayerId: target.id, notice: '已替换当前图层，原图可通过撤销恢复' })
     }
     case 'complete-ai-operation': {
       const { request } = action
@@ -416,6 +465,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, aiResults: [...results, ...state.aiResults], isGenerating: false, inspectorTab: 'results', notice: `已创建 ${count} 个 AI 候选占位；没有完成图像时不可采用` }
     }
     case 'set-zoom': return { ...state, zoom: Math.min(400, Math.max(10, action.zoom)) }
+    case 'clear-selection': return state.selectionVisible ? commit(state, { ...state, selectionVisible: false }) : state
     case 'set-selection-visible': return { ...state, selectionVisible: action.visible }
     case 'set-selection-rect': return { ...state, selection: createSelection(state.selection.kind, action.rect, state.selection), selectionRect: action.rect, selectionVisible: true }
     case 'commit-selection': return commit(state, { ...state, selection: action.selection, selectionRect: action.selection.rect, selectionVisible: true })
@@ -423,6 +473,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'morph-selection': { const selection = morphSelection(state.selection, action.amount, state.documentWidth, state.documentHeight); return commit(state, { ...state, selection, selectionRect: selection.rect, selectionVisible: true }) }
     case 'set-composer-mode': return commit(state, { ...state, composerMode: action.mode })
     case 'set-composer-source': return commit(state, { ...state, composerSourceId: action.sourceId })
+    case 'set-default-composer-model': return { ...state, composerSourceId: action.sourceId, composerParameters: { ...state.composerParameters, model: action.model } }
     case 'set-composer-placement': return { ...state, composerPlacement: action.placement }
     case 'set-composer-minimized': return { ...state, composerMinimized: action.minimized }
     case 'set-output-format': return isValidOutputFormat(action.ratio, action.size) ? commit(state, { ...state, composerParameters: { ...state.composerParameters, ratio: action.ratio, size: action.size } }) : state
@@ -439,7 +490,52 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const layers = selectedIndex < 0 ? [layer, ...state.layers] : [...state.layers.slice(0, selectedIndex + 1), layer, ...state.layers.slice(selectedIndex + 1)]
       return commit(state, { ...state, layers, selectedLayerId: id, selectedLayerIds: [id], notice: '已添加调整图层（影响其下方内容）' })
     }
-    case 'select-layer': return { ...state, selectedLayerId: action.id, selectedLayerIds: action.additive ? Array.from(new Set([...state.selectedLayerIds, action.id])) : [action.id] }
+    case 'set-selected-layer-properties': {
+      const ids = [...new Set(action.ids)].filter(id => state.layers.some(l => l.id === id))
+      if (!ids.length) return state
+      if (ids.some(id => layerSubtreeIds(state.layers,id).some(key => effectiveLayerState(state.layers,key).locked))) return {...state,notice:'请先解锁所选图层'}
+      if (action.opacity !== undefined && (!Number.isFinite(action.opacity) || action.opacity < 0 || action.opacity > 100)) return {...state,notice:'不透明度必须在 0–100% 之间'}
+      if (action.blendMode !== undefined) { try { resolveBlendMode(action.blendMode) } catch { return {...state,notice:'不支持的混合模式'} } }
+      const layers=state.layers.map(l=>ids.includes(l.id)?{...l,...(action.opacity!==undefined?{opacity:action.opacity}:{}),...(action.blendMode!==undefined?{blendMode:action.blendMode}:{})}:l)
+      if(layers.every((l,i)=>l.opacity===state.layers[i].opacity&&l.blendMode===state.layers[i].blendMode))return state
+      return commit(state,{...state,layers})
+    }
+    case 'place-layer': { try {const next=placeLayer(state,action.id,action.targetId,action.placement);return next===state?state:commit(state,next)} catch(e){return {...state,notice:e instanceof Error?e.message:'无法移动图层'}} }
+    case 'add-layer-group': {
+      const id=`group-${crypto.randomUUID()}`
+      return commit(state,{...state,layers:[{id,name:'图层组',className:'layer-group',children:[],visible:true,opacity:100,blendMode:'正常'},...state.layers],selectedLayerId:id,selectedLayerIds:[id]})
+    }
+    case 'add-layer-mask': {
+      if(!state.layers.some(l=>l.id===action.id)||layerSubtreeIds(state.layers,action.id).some(id=>effectiveLayerState(state.layers,id).locked)||state.layerMasks[action.id])return state
+      const layer=state.layers.find(l=>l.id===action.id)!
+      const selection=state.selectionVisible?selectionToLayer(state.selection,layer.transform,state.documentWidth,state.documentHeight):undefined
+      return commit(state,{...state,layerMasks:{...state.layerMasks,[action.id]:{strokes:[],inverted:false,applied:true,...(selection?{selection}:{})}}})
+    }
+    case 'update-layer-mask': {
+      if(layerSubtreeIds(state.layers,action.id).some(id=>effectiveLayerState(state.layers,id).locked))return {...state,notice:'请先解锁图层'}
+      const mask=state.layerMasks[action.id];if(!mask)return state
+      const layerMasks={...state.layerMasks}
+      if(action.operation==='delete')delete layerMasks[action.id]
+      else layerMasks[action.id]={...mask,...(action.operation==='toggle'?{disabled:!mask.disabled}:action.operation==='invert'?{inverted:!mask.inverted}:{applied:true,disabled:false})}
+      return commit(state,{...state,layerMasks})
+    }
+    case 'select-canvas-targets': { const targets=action.targets.filter(t=>state.layers.some(l=>l.id===t.layerId));const ids=[...new Set(targets.map(t=>t.layerId))];return {...state,selectedCanvasTargets:targets,...(ids.length?{selectedLayerIds:ids,selectedLayerId:ids[0]}:{})} }
+    case 'update-canvas-objects': {
+      const shapes=action.shapes??[],texts=action.texts??[]
+      if([...shapes,...texts].some(o=>{const l=state.layers.find(l=>l.id===o.layerId);return !l||!!l.highPrecision||!!l.smartObject||!effectiveLayerState(state.layers,o.layerId).visible}))return {...state,notice:'目标图层不可编辑'}
+      if(shapes.some(shape=>layerWriteIsLocked(state,{type:'update-shape',shape}))||texts.some(object=>layerWriteIsLocked(state,{type:'upsert-text',object})))return {...state,notice:'请先解锁所有选中对象的图层'}
+      if(!shapes.length&&!texts.length)return state
+      const sm=new Map(shapes.map(o=>[o.id,o])),tm=new Map(texts.map(o=>[o.id,o]))
+      return commit(state,{...state,canvasShapes:state.canvasShapes.map(o=>sm.get(o.id)?.layerId===o.layerId?sm.get(o.id)!:o),canvasTexts:state.canvasTexts.map(o=>{
+        const next=tm.get(o.id);if(!next||next.layerId!==o.layerId)return o
+        if(o.text===next.text||!o.runs)return next
+        let prefix=0;while(prefix<o.text.length&&prefix<next.text.length&&o.text[prefix]===next.text[prefix])prefix++
+        let suffix=0;while(suffix<o.text.length-prefix&&suffix<next.text.length-prefix&&o.text[o.text.length-suffix-1]===next.text[next.text.length-suffix-1])suffix++
+        return {...next,runs:shiftTextRunRanges(o.runs,prefix,o.text.length-prefix-suffix,next.text.length-prefix-suffix) as typeof o.runs}
+      })})
+    }
+    case 'select-layers': { const ids = [...new Set(action.ids)].filter(id => state.layers.some(l => l.id === id)); return { ...state, selectedCanvasTargets:[], selectedLayerIds: ids, selectedLayerId: action.keyId && ids.includes(action.keyId) ? action.keyId : ids[0] ?? state.selectedLayerId } }
+    case 'select-layer': return { ...state, selectedCanvasTargets:[], selectedLayerId: action.id, selectedLayerIds: action.additive ? Array.from(new Set([...state.selectedLayerIds, action.id])) : [action.id] }
     case 'toggle-layer-selection': return { ...state, selectedLayerIds: state.selectedLayerIds.includes(action.id) ? (state.selectedLayerIds.length > 1 ? state.selectedLayerIds.filter((id) => id !== action.id) : state.selectedLayerIds) : [...state.selectedLayerIds, action.id], selectedLayerId: action.id }
     case 'batch-toggle-layer': {
       const ids = [...new Set(action.ids)].filter((id) => state.layers.some((layer) => layer.id === id))
@@ -457,16 +553,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       if (skipped) next.notice = `已跳过 ${skipped} 个锁定图层；${next.layers === state.layers ? next.notice ?? '没有可删除图层' : '其余图层已删除'}`
       return next.layers === state.layers ? next : commit(state, next)
     }
-    case 'group-layers': {
-      const selected = [...new Set(action.ids)].filter((id) => state.layers.some((layer) => layer.id === id))
-      const ids = selected.filter((id) => !layerWriteIsLocked(state, { type: 'delete-layer', id }))
-      const skipped = selected.length - ids.length
-      const skippedNotice = skipped ? `已跳过 ${skipped} 个锁定图层；` : ''
-      if (ids.length < 2) return { ...state, notice: `${skippedNotice}至少选择两个可编辑图层才能分组` }
-      const groupId = `group-${crypto.randomUUID()}`
-      const group: Layer = { id: groupId, name: '图层组', className: 'layer-group', visible: true, opacity: 100, blendMode: '正常', children: ids, collapsed: false }
-      return commit(state, { ...state, layers: [group, ...state.layers.map((layer) => ids.includes(layer.id) ? { ...layer, groupId, children: layer.children?.filter((id) => !ids.includes(id)) } : layer.children?.some((id) => ids.includes(id)) ? { ...layer, children: layer.children.filter((id) => !ids.includes(id)) } : layer)], selectedLayerId: groupId, selectedLayerIds: [groupId], notice: `${skippedNotice}已创建图层组` })
-    }
+    case 'group-layers': { try { const next=groupSelectedLayers(state,action.ids); return next===state?state:commit(state,next) } catch(e) { return {...state,notice:e instanceof Error?e.message:'编组失败'} } }
     case 'toggle-group': return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.id ? { ...layer, collapsed: !layer.collapsed } : layer) })
     case 'toggle-layer': return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.id ? { ...layer, visible: !layer.visible } : layer) })
     case 'set-layer-opacity': return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.id && !layer.locked ? { ...layer, opacity: Math.max(0, Math.min(100, action.opacity)) } : layer) })
@@ -507,7 +594,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const source = state.layers.find((layer) => layer.id === action.resultId)
       const target = state.layers.find((layer) => layer.id === action.targetId)
       if (!source || !target || target.locked) return { ...state, notice: target?.locked ? '目标图层已锁定' : '找不到结果图层' }
-      return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === target.id ? { ...layer, name: source.name, source: source.source, thumbnail: source.thumbnail, transform: source.transform, aiOperation: source.aiOperation } : layer), selectedLayerId: target.id, notice: '已替换当前图层' })
+      return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === target.id ? { ...layer, rasterRef: source.rasterRef, name: source.name, source: source.source, thumbnail: source.thumbnail, transform: source.transform, sourceOffset: source.sourceOffset, aiOperation: source.aiOperation } : layer), selectedLayerId: target.id, notice: '已替换当前图层' })
     }
     case 'add-stroke': return state // Legacy point API is replaced by atomic continuous strokes.
     case 'remove-stroke': return commit(state, { ...state, brushStrokes: state.brushStrokes.filter((stroke) => stroke.id !== action.id) })
@@ -516,18 +603,37 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const object = { ...action.object, layout: action.object.layout ?? 'point', width: action.object.width ?? 160, height: action.object.height ?? Math.max(1, action.object.fontSize * 1.4), lineHeight: action.object.lineHeight ?? 1.4, letterSpacing: action.object.letterSpacing ?? 0 }
       const currentLayer = state.layers.find((item) => item.id === object.layerId)
       if (currentLayer) {
-        return commit(state, { ...state, canvasTexts: [...state.canvasTexts, object], sceneOrder: [...state.sceneOrder, object.id], selectedLayerId: currentLayer.id, selectedLayerIds: [currentLayer.id], notice: '已在当前图层添加文字' })
+        return commit(state, { ...state, selectedCanvasTargets:[{kind:'text' as const,id:object.id,layerId:object.layerId}], canvasTexts: [...state.canvasTexts, object], sceneOrder: [...state.sceneOrder, object.id], selectedLayerId: currentLayer.id, selectedLayerIds: [currentLayer.id], notice: '已在当前图层添加文字' })
       }
       const layer: Layer = { id: object.layerId, name: object.text.trim() || '文字图层', className: 'layer-text', kind: 'text', textObjectId: object.id, visible: true, opacity: 100, blendMode: '正常', contentWidth: state.documentWidth, contentHeight: state.documentHeight }
       const index = state.layers.findIndex((item) => item.id === state.selectedLayerId)
       const layers = index < 0 ? [layer, ...state.layers] : [...state.layers.slice(0, index), layer, ...state.layers.slice(index)]
-      return commit(state, { ...state, layers, canvasTexts: [...state.canvasTexts, object], sceneOrder: [...state.sceneOrder, object.id], selectedLayerId: layer.id, selectedLayerIds: [layer.id], notice: '已创建文字图层' })
+      return commit(state, { ...state, layers, selectedCanvasTargets:[{kind:'text' as const,id:object.id,layerId:object.layerId}], canvasTexts: [...state.canvasTexts, object], sceneOrder: [...state.sceneOrder, object.id], selectedLayerId: layer.id, selectedLayerIds: [layer.id], notice: '已创建文字图层' })
     }
     case 'set-canvas-offset': return { ...state, canvasOffset: { x: action.x, y: action.y } }
+    case 'set-background-color': return { ...state, backgroundColor: action.color, recentColors: rememberColor(state.recentColors, action.color) }
+    case 'swap-colors': return { ...state, brushColor: state.backgroundColor ?? '#ffffff', backgroundColor: state.brushColor }
+    case 'reset-colors': return { ...state, brushColor: '#000000', backgroundColor: '#ffffff' }
     case 'set-brush-color': return { ...state, brushColor: action.color, recentColors: rememberColor(state.recentColors, action.color), notice: `已取色 ${action.color}` }
     case 'commit-brush-stroke': return commit(state, { ...state, brushStrokes: [...state.brushStrokes, action.stroke], sceneOrder: [...state.sceneOrder, action.stroke.id] })
     case 'upsert-text': { const previous = state.canvasTexts.find(object => object.id === action.object.id); let object = action.object; if (previous && previous.text !== object.text && previous.runs) { let prefix = 0; while (prefix < previous.text.length && prefix < object.text.length && previous.text[prefix] === object.text[prefix]) prefix++; let suffix = 0; while (suffix < previous.text.length - prefix && suffix < object.text.length - prefix && previous.text[previous.text.length - suffix - 1] === object.text[object.text.length - suffix - 1]) suffix++; object = { ...object, runs: shiftTextRunRanges(previous.runs, prefix, previous.text.length - prefix - suffix, object.text.length - prefix - suffix) as typeof object.runs } } return commit(state, { ...state, canvasTexts: [...state.canvasTexts.filter((object) => object.id !== action.object.id), object], layers: state.layers.map((layer) => layer.textObjectId === action.object.id ? { ...layer, name: object.text.trim() || '文字图层' } : layer), sceneOrder: state.sceneOrder.includes(action.object.id) ? state.sceneOrder : [...state.sceneOrder, action.object.id] }) }
-    case 'add-shape': return commit(state, { ...state, canvasShapes: [...state.canvasShapes, action.shape], sceneOrder: [...state.sceneOrder, action.shape.id] })
+    case 'create-shape-layer': {
+      const { shape } = action
+      const names = { rectangle: '矩形', ellipse: '椭圆', line: '线条', arrow: '箭头' }
+      if (shape.kind !== 'rectangle' && shape.kind !== 'ellipse' && shape.kind !== 'line' && shape.kind !== 'arrow') return state
+      if (state.layers.some(layer => layer.id === shape.layerId)) return state
+      const layer: Layer = {
+        id: shape.layerId, name: names[shape.kind], kind: 'shape', className: 'layer-art',
+        visible: true, opacity: 100, blendMode: '正常',
+        contentWidth: state.documentWidth, contentHeight: state.documentHeight,
+      }
+      return commit(state, {
+        ...state, layers: [layer, ...state.layers], canvasShapes: [...state.canvasShapes, shape],
+        sceneOrder: [...state.sceneOrder, shape.id], selectedLayerId: layer.id, selectedLayerIds: [layer.id],
+        selectedCanvasTargets: [{ kind: 'shape', id: shape.id, layerId: layer.id }],
+      })
+    }
+    case 'add-shape': return commit(state, { ...state, ...(!['fill','gradient'].includes(action.shape.kind)?{selectedCanvasTargets:[{kind:'shape' as const,id:action.shape.id,layerId:action.shape.layerId}]}:{}), canvasShapes: [...state.canvasShapes, action.shape], sceneOrder: [...state.sceneOrder, action.shape.id] })
     case 'combine-shapes': return commit(state, { ...state, canvasShapes: [...state.canvasShapes.map(s => action.sourceIds.includes(s.id) ? {...s,hidden:true} : s), {...action.shape, boolean: action.shape.boolean ? {...action.shape.boolean, sourceIds: action.sourceIds.slice(0,2) as [string,string]} : undefined}], sceneOrder: [...state.sceneOrder,action.shape.id] })
     case 'update-shape': {
       const shapes = state.canvasShapes.map(s => s.id === action.shape.id ? action.shape : s)
@@ -562,6 +668,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       if (!mask) return { ...state, notice: '请先绘制蒙版或将选区转为蒙版' }
       return commit(state, { ...state, layerMasks: { ...state.layerMasks, [state.selectedLayerId]: { ...mask, applied: true } }, notice: '已应用蒙版，可撤销恢复' })
     }
+    case 'move-canvas-targets': { const next = translateMoveTargets(state, action.targets, action.delta); return next === state ? state : commit(state, { ...next, notice: '已移动所选内容，可撤销' }) }
     case 'commit-layer-transform': return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.layerId && !layer.locked ? { ...layer, transform: action.transform } : layer) })
     case 'set-adjustment-presets': return commit(state, { ...state, adjustmentPresets: action.presets })
     case 'set-smart-filters': {
@@ -588,7 +695,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'set-canvas-rotation': return { ...state, canvasRotation: ((action.rotation % 360) + 360) % 360 }
     case 'rasterize-layer': {
       const layerMasks = { ...state.layerMasks }; delete layerMasks[action.id]
-      return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.id ? { ...layer, source: action.source, transform: undefined, contentWidth: state.documentWidth, contentHeight: state.documentHeight } : layer), layerMasks, brushStrokes: state.brushStrokes.filter((s) => s.layerId !== action.id), canvasTexts: state.canvasTexts.filter((s) => s.layerId !== action.id), canvasShapes: state.canvasShapes.filter((s) => s.layerId !== action.id) })
+      return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.id ? { ...layer, rasterRef: undefined, source: action.source, sourceOffset: undefined, transform: undefined, contentWidth: state.documentWidth, contentHeight: state.documentHeight } : layer), layerMasks, brushStrokes: state.brushStrokes.filter((s) => s.layerId !== action.id), canvasTexts: state.canvasTexts.filter((s) => s.layerId !== action.id), canvasShapes: state.canvasShapes.filter((s) => s.layerId !== action.id) })
     }
     case 'add-repair-layer': {
       if (action.baseContentRevision !== undefined && action.baseContentRevision !== contentRevision(state)) return { ...state, notice: '文档已更改，已取消过期补洞结果' }
@@ -629,7 +736,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const insertion = action.rootPlacement ? (hasUnsampledForegroundAbove || !hasSampledRootBelow ? rootIndex : rootIndex + 1) : rootIndex
       return commit(state, { ...state, layers: [...state.layers.slice(0, insertion), layer, ...state.layers.slice(insertion)].map(item => item.id === parentId && item.children ? { ...item, children: (() => { const at = action.frontierParentId ? 0 : Math.max(0, item.children.indexOf(base.id)); return [...item.children.slice(0, at), id, ...item.children.slice(at)] })() } : item), selectedLayerId: id, selectedLayerIds: [id], history: [...state.history, { id, label: action.name, tone: 'mint' }], selectedHistoryId: id, notice: `${action.name}已创建为独立修复层` })
     }
-    case 'set-layer-source': return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.id ? { ...layer, source: action.source } : layer) })
+    case 'set-layer-source': return commit(state, { ...state, layers: state.layers.map((layer) => layer.id === action.id ? { ...layer, rasterRef: undefined, source: action.source } : layer) })
     case 'update-artboard': {
       if (!action.name.trim() || !Number.isFinite(action.x) || !Number.isFinite(action.y)) return { ...state, notice: '画板名称和位置无效' }
       return commit(state, { ...state, artboards: state.artboards.map(board => board.id === action.id ? { ...board, name: action.name.trim(), x: action.x, y: action.y } : board) })
@@ -742,7 +849,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       const importedState = auto ? resizedDocument(state, action.width!, action.height!, 'canvas', 'top-left') : state
 
       const historyItem = { id: action.id, label: `导入 · ${action.name}`, tone: 'original' as const }
-      return commit(state, { ...importedState, layers: [{ inputProfile: action.inputProfile, contentWidth: auto ? action.width : state.documentWidth, contentHeight: auto ? action.height : state.documentHeight, id: action.id, name: action.name, className: 'layer-art', visible: true, opacity: 100, blendMode: '正常', source: action.source }, ...importedState.layers], selectedLayerId: action.id, selectedLayerIds: [action.id], history: [...state.history, historyItem], selectedHistoryId: action.id, notice: `已导入 ${action.name}` })
+      return commit(state, { ...importedState, selectedCanvasTargets: [], layers: [{ inputProfile: action.inputProfile, contentWidth: auto ? action.width : state.documentWidth, contentHeight: auto ? action.height : state.documentHeight, id: action.id, name: action.name, className: 'layer-art', visible: true, opacity: 100, blendMode: '正常', source: action.source }, ...importedState.layers], selectedLayerId: action.id, selectedLayerIds: [action.id], history: [...state.history, historyItem], selectedHistoryId: action.id, notice: `已导入 ${action.name}` })
     }
     case 'undo': { const previous = state.undoStack.at(-1); if (!previous) return { ...state, notice: '没有可撤销的操作' }; return { ...state, ...previous, undoStack: state.undoStack.slice(0, -1), redoStack: [...state.redoStack, snapshot(state)], notice: '已撤销' } }
     case 'redo': { const next = state.redoStack.at(-1); if (!next) return { ...state, notice: '没有可重做的操作' }; return { ...state, ...next, undoStack: [...state.undoStack, snapshot(state)], redoStack: state.redoStack.slice(0, -1), notice: '已重做' } }
@@ -750,12 +857,22 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
   }
 }
 
-const EditorContext = createContext<{ state: EditorState; dispatch: Dispatch<EditorAction>; documentId: string; viewInitialized: boolean } | null>(null)
+type CurveDraft = { layerId: string; curves?: CurvesSettings; levels?: LevelsSettings } | null
+const EditorContext = createContext<{ curveDraft: CurveDraft; setCurveDraft: Dispatch<SetStateAction<CurveDraft>>; state: EditorState; dispatch: Dispatch<EditorAction>; documentId: string; viewInitialized: boolean } | null>(null)
 function DocumentSessionProvider({ document, dispatchWorkspace, children }: { document: DocumentSession; dispatchWorkspace: Dispatch<WorkspaceAction>; children?: ReactNode }) {
   const state = document.state
+  useEffect(() => {
+    let active=true
+    imageResourceOwnership.replaceMany(editorResourceRoots(document.id,state)).catch(error=>{
+      if(active)dispatchWorkspace({type:'edit',id:document.id,action:{type:'set-notice',message:`资源引用保护失败：${error instanceof Error?error.message:'存储不可用'}`}})
+    })
+    return ()=>{active=false}
+  },[document.id,state.layers,state.smartObjectSources,state.undoStack,state.redoStack,dispatchWorkspace])
+  const [curveDraft, setCurveDraft] = useState<CurveDraft>(null)
   const dispatch = useCallback((action: EditorAction) => dispatchWorkspace({ type: 'edit', id: document.id, action }), [document.id, dispatchWorkspace])
-  const value = useMemo(() => ({ state, dispatch, documentId: document.id, viewInitialized: !!document.viewInitialized }), [state, dispatch, document.id, document.viewInitialized])
-  return <EditorContext.Provider value={value}><ImageGenerationProvider state={state} documentId={document.id} dispatch={dispatch}>{children}</ImageGenerationProvider></EditorContext.Provider>
+  const value = useMemo(() => ({ state, dispatch, curveDraft, setCurveDraft, documentId: document.id, viewInitialized: !!document.viewInitialized }), [state, dispatch, curveDraft, document.id, document.viewInitialized])
+  if(state.rasterPreviewOnly)return <EditorContext.Provider value={value}>{children?<RasterProjectPreview state={state}/>:null}</EditorContext.Provider>
+  return <EditorContext.Provider value={value}><LayerStyleEditorProvider active={!!children}><SmartFilterEditorProvider active={!!children}><ComposerDraftProvider documentId={document.id}><ResultDeliveryProvider><ImageGenerationProvider state={state} documentId={document.id} dispatch={dispatch}>{children}</ImageGenerationProvider></ResultDeliveryProvider></ComposerDraftProvider></SmartFilterEditorProvider></LayerStyleEditorProvider></EditorContext.Provider>
 }
 export function EditorProvider({ children }: { children: ReactNode }) {
   const storedComposer = readComposerPreferences()
@@ -776,6 +893,10 @@ export function EditorProvider({ children }: { children: ReactNode }) {
     },
   }))
   const state = workspace.documents.find(document => document.id === workspace.activeId)!.state
+  const chooseCloudImage = useCallback((model: string) => {
+    dispatchWorkspace({ type: 'edit', id: workspace.activeId, action: { type: 'set-default-composer-model', sourceId: 'draivio-cloud', model } })
+  }, [workspace.activeId])
+  useCloudModelDefaults(chooseCloudImage)
   useEffect(() => { saveGenerationCount(state.composerParameters.count) }, [state.composerParameters.count])
   useEffect(() => { saveComposerPreferences({ mode: state.composerMode, sourceId: state.composerSourceId, ...state.composerParameters }) }, [state.composerMode, state.composerSourceId, state.composerParameters])
   useEffect(() => {

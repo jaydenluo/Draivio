@@ -1,3 +1,4 @@
+import { paintBucketOutline, paintBucketDrop } from '../tools/paintBucketGlyph'
 import type { ToolId } from '../tools/toolTypes'
 
 type ToolIconProps = { toolId: ToolId; className?: string }
@@ -25,6 +26,10 @@ export function ToolIcon({ toolId, className = '' }: ToolIconProps) {
     case 'eraser': return <svg {...props}><path {...common} d="m5 15 8.8-9a2 2 0 0 1 2.9 0l2.3 2.3a2 2 0 0 1 0 2.9L10 20H6.5L4 17.5a2 2 0 0 1 0-2.5Z" /><path {...common} d="m10 20 5-5" /></svg>
     case 'background-eraser': return <svg {...props}><path {...common} d="m5 15 8.8-9a2 2 0 0 1 2.9 0l2.3 2.3a2 2 0 0 1 0 2.9L10 20H6.5L4 17.5a2 2 0 0 1 0-2.5Z" /><path {...common} d="M16.5 4v3M15 5.5h3" /></svg>
     case 'healing': return <svg {...props}><path {...common} d="m5.2 15.7 7.5-7.5a3.2 3.2 0 0 1 4.5 4.5l-7.5 7.5a3.2 3.2 0 0 1-4.5-4.5Z" /><path {...common} d="m9 12 3 3M11.5 9.5l3 3" /></svg>
+    case 'remove-object': return <svg {...props}><path {...common} d="m12 7 4 4-7.5 7.5-4-4Z" /><path {...common} d="M5 15c-2 .5-2.5 2-2 5 3 .5 4.5-.5 5-2" /><path {...common} d="m18 2 1.2 3.8L23 7l-3.8 1.2L18 12l-1.2-3.8L13 7l3.8-1.2ZM9 3v3M7.5 4.5h3" strokeWidth="1.5" /></svg>
+    case 'patch': return <svg {...props}><path {...common} d="m8 4 10 2 2 10-5 5L4 17 3 9Z" /><path {...common} strokeDasharray="1 2.5" d="m8.5 7 7 1.5 1.3 6.5-3 3-7-2.5L6 10Z" /></svg>
+    case 'dodge': return <svg {...props}><path {...common} d="m5 21 7-9" /><ellipse {...common} cx="14.5" cy="8" rx="5.5" ry="4" transform="rotate(-35 14.5 8)" /><path {...common} d="M4 5V2M2.5 3.5h3M21 15v3M19.5 16.5h3" strokeWidth="1.4" /></svg>
+    case 'burn': return <svg {...props}><path {...common} d="m5 20-1-5a3 3 0 0 1 .5-2.4L8 8a1.4 1.4 0 0 1 2.2 1.7l-1.4 2.1 3.5-1.5V5.8a1.3 1.3 0 0 1 2.6 0v4.5l1.1.2V7a1.3 1.3 0 0 1 2.6 0v4.5l1 .8a3 3 0 0 1 1 2.9L19 20Z" /><path {...common} d="m10 15 3-1.5 3 1M8 20h8" /></svg>
     case 'clone-stamp': return <svg {...props}><path {...common} d="M8 10.5V8a4 4 0 1 1 8 0v2.5" /><path {...common} d="M6 10.5h12v3H6zM8 13.5v4h8v-4M5 20h14" /></svg>
     case 'mask': return <svg {...props}><rect {...common} x="4" y="4" width="16" height="16" rx="2" /><path {...common} d="M12 4v16" /><path d="M12 4a8 8 0 0 1 0 16" fill="currentColor" opacity=".25" /></svg>
     case 'mask-quick': return <svg {...props}><rect {...common} x="4" y="4" width="16" height="16" rx="2" /><path {...common} d="m12 7-3 5h3l-1 5 4-6h-3Z" /></svg>
@@ -40,7 +45,7 @@ export function ToolIcon({ toolId, className = '' }: ToolIconProps) {
     case 'shape-arrow': return <svg {...props}><path {...common} d="M5 19 19 5M10 5h9v9" /></svg>
     case 'pen': return <svg {...props}><path {...common} d="m12 3 7 7-9.5 9.5L4 20l.5-5.5Z" /><path {...common} d="m12 3 2.5 2.5L8 12" /><path {...common} d="M4 20l5.5-.5" /></svg>
     case 'picker': return <svg {...props}><path {...common} d="m14.5 4.5 5 5M12 7l5 5M5 19l2.5-2.5M8 16l8-8a2.8 2.8 0 0 1 4 4l-8 8H8Z" /><circle {...common} cx="5" cy="19" r="2" /></svg>
-    case 'fill': return <svg {...props}><path {...common} d="m5 11 6-6 8 8-6 6H7Z" /><path {...common} d="M13 19h6c1.1 0 2-.9 2-2v-1M16 21h.1" /></svg>
+    case 'fill': return <svg {...props}><path {...common} d={paintBucketOutline} /><path {...common} d={paintBucketDrop} /></svg>
     case 'gradient-fill': return <svg {...props}><rect {...common} x="4" y="5" width="16" height="14" rx="2" /><path d="M6 17 18 7" stroke="currentColor" strokeWidth="4" strokeLinecap="round" opacity=".3" /><path d="M6 17 18 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
     case 'pan': return <svg {...props}><path {...common} d="M8 11V6.5a1.5 1.5 0 0 1 3 0V10M11 9V5a1.5 1.5 0 0 1 3 0v5M14 10V6.5a1.5 1.5 0 0 1 3 0v6M17 12v-2a1.5 1.5 0 0 1 3 0v5c0 4-2 6-6 6h-2c-2.2 0-3.6-1.1-4.5-2.5L5 16a1.5 1.5 0 0 1 2.6-1.5L8 15V11" /></svg>
     case 'zoom': return <svg {...props}><circle {...common} cx="10.5" cy="10.5" r="6" /><path {...common} d="m15 15 5 5M10.5 7.5v6M7.5 10.5h6" /></svg>

@@ -5,6 +5,7 @@ const composerPreferencesStorageKey = 'draivio-composer-preferences-v1'
 
 export type ComposerPreferences = {
   mode?: 'generate' | 'edit'
+  creationMode?: 'generate' | 'edit' | 'smart' | 'auto'
   sourceId?: string
   model?: string
   ratio?: string

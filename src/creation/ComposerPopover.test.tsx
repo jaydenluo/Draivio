@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest'
 import { AppShell } from '../app/AppShell'
 import { EditorProvider } from '../state/editor'
@@ -32,5 +32,22 @@ test('keeps menus within the viewport and dismisses on outside pointer down', ()
   expect(parseFloat(popup.style.left) + parseFloat(popup.style.width)).toBeLessThanOrEqual(window.innerWidth - 12)
   expect(popup).toHaveAttribute('data-side', 'bottom')
   fireEvent.pointerDown(document.body)
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+})
+
+
+test('选择数量 opens a draggable window with a title and close button', () => {
+  render(<EditorProvider><AppShell /></EditorProvider>)
+  fireEvent.click(screen.getByRole('button', { name: '选择数量' }))
+  const dialog = screen.getByRole('dialog')
+  const surface = dialog.closest<HTMLElement>('.composer-anchored-popover')!
+  vi.spyOn(surface, 'getBoundingClientRect').mockReturnValue({ left:200, top:100, right:500, bottom:300, width:300, height:200, x:200, y:100, toJSON() {} })
+  const header = dialog.querySelector('header')!
+  expect(header).toBeInTheDocument()
+  fireEvent.pointerDown(header, { pointerId:1, button:0, clientX:230, clientY:120 })
+  fireEvent.pointerMove(window, { pointerId:1, clientX:280, clientY:150 })
+  fireEvent.pointerUp(window, { pointerId:1 })
+  expect(surface.style.translate).toBe('50px 30px')
+  fireEvent.click(within(header).getByRole('button', {name:/关闭/}))
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 })

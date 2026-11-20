@@ -22,8 +22,16 @@ export type ServiceConnection = GenerationConfiguration & {
   assistantModel?: string
 }
 const storageKey = 'draivio-service-connections-v1'
-// Browser persistence contains metadata only. Keys live in this process session and are never serialized.
-const sessionKeys = new Map<string, string>()
+// Both the browser build and the desktop WebView use the same local persistent store.
+// The native command layer is hydrated from this store so desktop requests can use the
+// saved credentials after an application restart.
+function readStoredConnections(): { raw: unknown; hasValue: boolean } {
+  const stored = localStorage.getItem(storageKey)
+  return { raw: JSON.parse(stored ?? '[]') as unknown, hasValue: stored !== null }
+}
+function writeStoredConnections(connections: ServiceConnection[]) {
+  localStorage.setItem(storageKey, JSON.stringify(connections))
+}
 
 export function validateConnection(value: ServiceConnection): string {
   if(!validImagePricing(value.imagePricing))return '图片计费单价配置无效'
@@ -42,20 +50,24 @@ export function validateConnection(value: ServiceConnection): string {
 }
 
 export async function loadConnections(): Promise<ServiceConnection[]> {
-  if (isTauri()) return decodeConnections(await invokeCommand('load_service_connections'))
-  const raw = JSON.parse(localStorage.getItem(storageKey) ?? '[]') as unknown
+  const stored = readStoredConnections()
+  const raw = stored.raw
   if (!Array.isArray(raw)) throw new Error('来源配置损坏，请恢复本地配置')
-  const legacy = raw.filter((item): item is Record<string, unknown> => Boolean(item && typeof item === 'object' && typeof (item as Record<string,unknown>).apiKey === 'string' && String((item as Record<string,unknown>).apiKey).length > 0))
-  for (const item of legacy) sessionKeys.set(String(item.id), String(item.apiKey))
-  const metadata = raw.map(item => item && typeof item === 'object' ? { ...(item as Record<string,unknown>), apiKey: '' } : item)
-  if (legacy.length) localStorage.setItem(storageKey, JSON.stringify(metadata))
-  return decodeConnections(metadata, true).map(connection => ({ ...connection, apiKey: sessionKeys.get(connection.id) ?? '' }))
+  const allowEmptyApiKey = raw.some(item => item && typeof item === 'object' && !(item as Record<string, unknown>).apiKey)
+  if (isTauri() && !stored.hasValue) {
+    const native = decodeConnections(await invokeCommand('load_service_connections'))
+    writeStoredConnections(native)
+    return native
+  }
+  const connections = decodeConnections(raw, allowEmptyApiKey)
+  if (isTauri() && connections.length) await invokeCommand('save_service_connections', { connections })
+  return connections
 }
 
 export function getBrowserConnections(throwOnError = false): ServiceConnection[] {
   try {
     const raw = JSON.parse(localStorage.getItem(storageKey) ?? '[]')
-    return decodeConnections(raw, true).map(connection => ({ ...connection, apiKey: sessionKeys.get(connection.id) ?? '' }))
+    return decodeConnections(raw, true)
   } catch (error) { if (throwOnError) throw error; return [] }
 }
 
@@ -72,8 +84,8 @@ export async function saveConnections(connections: ServiceConnection[]) {
     const invalid = validateConnection(connection)
     if (invalid) throw new Error(invalid)
   }
+  writeStoredConnections(connections)
   if (isTauri()) await invokeCommand('save_service_connections', { connections })
-  else { for (const connection of connections) sessionKeys.set(connection.id, connection.apiKey); localStorage.setItem(storageKey, JSON.stringify(connections.map(connection => ({ ...connection, apiKey: '' })))) }
 }
 
 type ModelEndpoint = Pick<ServiceConnection, 'baseUrl' | 'apiKey' | 'protocol'> & Partial<ServiceConnection>

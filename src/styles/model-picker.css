@@ -30,3 +30,5 @@
 .parameter-chip--model strong,.parameter-chip--model small { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .parameter-chip--model strong { font-size:10px; font-weight:500; color:var(--text); }
 .parameter-chip--model small { margin-top:1px; font-size:9px; color:var(--muted); }
+.ai-composer.is-auto-intent .composer-tools { flex-wrap:wrap; overflow:visible; }
+.ai-composer.is-auto-intent .composer-footer { align-items:flex-end; }

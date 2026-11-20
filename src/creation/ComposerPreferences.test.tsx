@@ -5,7 +5,7 @@ import { readComposerPreferences, saveComposerPreferences } from './composerPref
 import { EditorProvider } from '../state/editor'
 
 afterEach(() => vi.restoreAllMocks())
-beforeEach(() => localStorage.setItem('draivio-service-connections-v1', JSON.stringify([{ id: 'preferences-source', provider: 'OpenAI', name: '偏好测试', baseUrl: 'https://preferences.example/v1', apiKey: 'test-key', protocol: 'openai_compatible', models: ['preferences-model'], enabled: true }])))
+beforeEach(() => localStorage.setItem('draivio-service-connections-v1', JSON.stringify([{ id: 'preferences-source', provider: 'OpenAI', name: '偏好测试', baseUrl: 'https://preferences.example/v1', apiKey: 'test-key', protocol: 'openai_compatible', models: ['preferences-model'], modelCapabilities: { 'preferences-model': { image: true, text: false, vision: false } }, enabled: true }])))
 const storageKey = 'draivio-generation-count'
 function composer() { return render(<EditorProvider><AIComposer /></EditorProvider>) }
 
@@ -47,7 +47,7 @@ test('remembers all composer choices', () => {
 
 test('restores the selected composer controls after the editor is reopened', () => {
   const first = composer()
-  fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
+  fireEvent.click(screen.getByRole('button', { name: '生成图片' }))
   fireEvent.click(screen.getByRole('button', { name: '选择模型' }))
   fireEvent.click(screen.getByRole('button', { name: 'preferences-model · OpenAI · 偏好测试' }))
   fireEvent.click(screen.getByRole('button', { name: '选择比例与分辨率' }))
@@ -58,7 +58,8 @@ test('restores the selected composer controls after the editor is reopened', () 
   first.unmount()
 
   composer()
-  expect(screen.getByRole('button', { name: '切换到修改当前图' })).toHaveTextContent('生成新内容')
+  expect(screen.getByRole('button', { name: '生成图片' })).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByRole('button', { name: '修改图片' })).toHaveAttribute('aria-pressed', 'false')
   expect(screen.getByRole('button', { name: '选择模型' })).toHaveTextContent('preferences-model')
   expect(screen.getByRole('button', { name: '选择比例与分辨率' })).toHaveTextContent('16:9 · 1920 × 1080')
   expect(screen.getByRole('button', { name: '选择数量' })).toHaveTextContent('6 张')
@@ -66,7 +67,7 @@ test('restores the selected composer controls after the editor is reopened', () 
 
 test('composer controls do not expose provider subtitle or trailing dropdown glyphs', () => {
   composer()
-  expect(screen.getByRole('button', { name: '切换到生成新内容' })).toHaveTextContent('修改')
+  expect(screen.getByRole('button', { name: '生成图片' })).toHaveTextContent('生成图片')
   expect(screen.queryByText('画布底部')).not.toBeInTheDocument()
   expect(screen.queryByText('预计 12 积分')).not.toBeInTheDocument()
   const model = screen.getByRole('button', { name: '选择模型' })
@@ -95,7 +96,7 @@ test('sends with Enter, keeps Shift+Enter for a newline, and ignores IME Enter',
   composer()
   fireEvent.click(screen.getByRole('button', { name: '选择模型' }))
   fireEvent.click(screen.getByRole('button', { name: 'preferences-model · OpenAI · 偏好测试' }))
-  fireEvent.click(screen.getByRole('button', { name: '切换到生成新内容' }))
+  fireEvent.click(screen.getByRole('button', { name: '生成图片' }))
   const input = screen.getByRole('textbox', { name: 'AI 操作' })
   fireEvent.keyDown(input, { key: 'Enter', shiftKey: true })
   expect(screen.getByRole('button', { name: '执行 AI 操作' })).toBeEnabled()
@@ -104,7 +105,7 @@ test('sends with Enter, keeps Shift+Enter for a newline, and ignores IME Enter',
   expect(screen.getByRole('button', { name: '执行 AI 操作' })).toBeEnabled()
 
   fireEvent.keyDown(input, { key: 'Enter' })
-  expect(screen.getByRole('button', { name: '执行中…' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: '停止当前任务' })).toBeEnabled()
 })
 
 

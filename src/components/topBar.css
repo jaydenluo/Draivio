@@ -1,19 +1,66 @@
 /* Keep file controls and export reachable; overflow tools open outside the header. */
 .topbar { min-width:0; gap:10px; overflow:visible; position:relative; z-index:30; }
 .topbar > .brand { min-width:0; flex:0 0 auto; margin-right:4px; }
+/* Keep account actions inset, including when native window controls are absent. */
+.topbar .app-titlebar-content { padding-right:20px; }
 .topbar > .project-files { flex:0 1 auto; min-width:0; }
 .topbar .project-files > button,.topbar .project-save-state { flex:0 0 auto; white-space:nowrap; }
 .topbar .project-files .project-name { min-width:70px; max-width:150px; flex:1 1 120px; }
 .topbar .project-files .project-name input { width:100%; min-width:0; }
 .topbar .top-actions { flex:0 0 auto; white-space:nowrap; gap:6px; }
 .topbar .top-button,.topbar .balance,.topbar select,.topbar summary { white-space:nowrap; flex-shrink:0; }
-.topbar-more { flex:0 0 auto; }
-.topbar-more > summary { display:flex; align-items:center; gap:6px; list-style:none; cursor:pointer; }
-.topbar-more > summary::after { content:'▾'; color:var(--muted); }
-.topbar-more > summary::-webkit-details-marker { display:none; }
-.topbar-tools-panel { position:absolute; top:calc(100% + 9px); left:16px; width:min(660px,calc(100vw - 32px)); padding:12px; display:flex; flex-wrap:wrap; align-items:center; gap:9px; background:var(--ink-850); border:1px solid var(--ink-700); border-radius:9px; box-shadow:0 12px 40px #0008; z-index:80; }
-.topbar-tools-panel > * { flex-shrink:0; }
-.topbar-tools-panel details[open] { width:100%; }
-.topbar-tools-panel form { display:flex; flex-wrap:wrap; gap:8px; }
+ .topbar-more { margin-left:auto; display:flex; align-items:center; gap:6px; flex:0 0 auto; cursor:pointer; }
+.topbar-more::after { content:'▾'; color:var(--muted); }
+.topbar-more[aria-expanded=true]::after { content:'▴'; }
+.topbar-tools-content { display:flex; flex-wrap:wrap; align-items:center; gap:9px; }
+.topbar-tools-content > * { flex-shrink:0; }
+.topbar-tools-content details[open] { width:100%; }
+.topbar-tools-content form { display:flex; flex-wrap:wrap; gap:8px; }
+.topbar-tools-content .top-button { padding:6px 9px; border:1px solid transparent; border-radius:5px; background:transparent; color:var(--muted); font-size:11px; white-space:nowrap; }
+.topbar-tools-content .top-button:hover { border-color:var(--ink-700); background:var(--ink-800); color:var(--text); }
+.topbar-tools-content select,.topbar-tools-content input { min-width:0; max-width:100%; padding:5px 8px; border:1px solid var(--ink-700); border-radius:5px; background:var(--ink-900); color:var(--text); font-size:11px; }
+.topbar-tools-content>select { width:100%; }
+.artboard-copy-dialog { width:min(440px,calc(100vw - 24px)); padding:16px; border:1px solid var(--ink-700); border-radius:10px; background:var(--ink-850); font-size:12px; }
+.artboard-copy-dialog label { display:grid; gap:6px; margin:10px 0; }
+.artboard-copy-dialog input,.artboard-copy-dialog select,.artboard-copy-dialog>button { padding:5px 8px; border:1px solid var(--ink-700); border-radius:5px; background:var(--ink-900); color:var(--text); }
 @media(max-width:1150px) { .topbar .balance { display:none; } .topbar { padding:0 10px; gap:8px; } .topbar .project-files { gap:5px; } }
 .topbar .account-email { max-width:260px; overflow:hidden; text-overflow:ellipsis; padding:4px 12px; color:var(--muted); font-size:12px; }
+
+/* Desktop menu and compact action strip share the existing editor palette. */
+.application-menubar { display:flex; align-items:center; gap:1px; flex:0 0 auto; }
+.application-menubar > button { padding:6px 9px; border:0; border-radius:4px; background:transparent; color:var(--muted); font-size:12px; white-space:nowrap; }
+.application-menubar > button:hover,.application-menubar > button[aria-expanded=true] { background:var(--ink-750,var(--ink-800)); color:var(--text); }
+.application-menubar > button:focus-visible { outline:1px solid var(--sky); }
+.application-menu { position:fixed; z-index:200; width:256px; max-height:calc(100vh - 16px); overflow:auto; padding:5px; border:1px solid var(--ink-700); border-radius:6px; background:var(--ink-850); box-shadow:0 12px 32px #0007; }
+.application-menu > button { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; padding:8px 10px; text-align:left; border:0; border-radius:3px; background:transparent; color:var(--text); font-size:12px; }
+.application-menu > button:hover,.application-menu > button:focus-visible { background:var(--ink-700); outline:none; }
+.application-menu > button:disabled { color:var(--faint); opacity:.5; }
+.application-menu kbd { font:10px var(--mono); color:var(--muted); white-space:nowrap; }
+.quick-actions { display:flex; align-items:center; flex:0 0 auto; gap:3px; padding-left:10px; margin-left:8px; border-left:1px solid var(--ink-700); }
+.quick-actions .project-files { display:flex; gap:2px; }
+.quick-actions .top-button { padding:5px 7px; font-size:11px; }
+.topbar .top-actions { margin-left:auto; }
+.shortcut-backdrop { position:fixed; inset:0; z-index:300; display:grid; place-items:center; background:#0006; }
+.shortcut-settings { --text-control-height:24px; --text-control-padding:0 7px; width:min(600px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); display:flex; flex-direction:column; padding:12px; border:1px solid var(--ink-700); border-radius:10px; background:var(--ink-900); color:var(--text); box-shadow:0 18px 64px #0008; }
+.shortcut-settings > .dialog-titlebar { margin-bottom:4px; background:var(--ink-900); }
+.shortcut-settings > p { margin:4px 0 6px; color:var(--muted); font-size:11px; }
+.shortcut-settings input[type=search], .shortcut-settings .shortcut-row input[readonly] { box-sizing:border-box; min-width:0; border:1px solid var(--ink-700); border-radius:4px; background:var(--ink-850); color:var(--text); font-size:12px; }
+.shortcut-settings > input[type=search] { flex-shrink:0; }
+.shortcut-settings input:focus-visible { outline:1px solid var(--sky); outline-offset:-1px; }
+.shortcut-list { min-height:0; overflow:auto; margin:6px 0; }
+.shortcut-settings .shortcut-row { display:grid; grid-template-columns:minmax(0,1fr) clamp(80px,27%,140px) auto; align-items:center; gap:6px; margin:0; padding:3px 2px; border-bottom:1px solid var(--ink-800); font-size:12px; }
+.shortcut-row small { display:inline-block; min-width:64px; color:var(--faint); font-size:10px; }
+.shortcut-settings :is(.shortcut-row,footer) > button { min-height:24px; padding:2px 7px; border:1px solid var(--ink-700); border-radius:4px; background:var(--ink-800); color:var(--text); font-size:11px; }
+.shortcut-settings footer { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:4px 8px; font-size:10px; color:var(--muted); }
+.shortcut-settings [role=alert] { color:var(--coral); }
+@media(max-width:1250px) { .app-titlebar-name,.app-titlebar-wordmark { display:none; } .application-menubar > button { padding-inline:6px; } .quick-actions { gap:0; margin-left:3px; padding-left:4px; } }
+@media (max-width:1100px) {
+  .topbar .quick-action-secondary { display:none; }
+  .topbar .app-titlebar-content { gap:8px; padding-right:10px; }
+  .topbar .app-titlebar-brand { padding-inline:8px; }
+  .topbar .window-controls button { width:36px; }
+}
+@media (max-width:900px) {
+  .topbar .app-titlebar-content { gap:6px; }
+  .topbar .app-titlebar-product { display:none; }
+}

@@ -1,3 +1,4 @@
+import { Checkbox } from '../../ui/Checkbox'
 import {useEffect,useRef,useState} from 'react'
 import {useEditor} from '../../state/editor'
 import type {Selection} from '../../canvas/selectionGeometry'
@@ -40,8 +41,8 @@ export function PortraitRecipeWorkspace(){
   <p>本地自然精修，不自动识人、不生成或改变脸型。多人照片先明确一个目标；依次用精细选区捕获人物、皮肤、眼部，胡须、眼镜与不应改变的区域请加入保护。</p>
   <p>捕获后可继续在画布修改选区，文档/图层内容变化会清空分区。预览前原图不变。</p>
   {Object.entries(names).map(([key,name])=><button type="button" key={key} onClick={()=>capture(key as keyof typeof names)}>{`捕获${name}分区`}{masks[key as keyof typeof names]?' ✓':''}</button>)}
-  <label><input type="checkbox" aria-label="确认人物及分区" checked={confirmed} onChange={e=>{invalidate();setConfirmed(e.target.checked)}}/>我已核对目标人物和所有分区；不接受低置信度自动候选代替确认</label>
-  {([{key:'denoise',name:'降噪',min:0,max:35},{key:'heal',name:'瑕疵修复',min:0,max:50},{key:'skinTone',name:'肤色',min:-10,max:10},{key:'eyes',name:'眼部增强',min:0,max:10}] as const).map(control=><label key={control.key}><input type="checkbox" aria-label={`启用${control.name}`} checked={enabled[control.key]} onChange={e=>{invalidate();setEnabled(v=>({...v,[control.key]:e.target.checked}))}}/>{control.name}<input type="range" aria-label={`${control.name}强度`} min={control.min} max={control.max} step={1} value={settings[control.key]} onChange={e=>update(control.key,Number(e.target.value))}/><output>{settings[control.key]}</output></label>)}
+  <label><Checkbox aria-label="确认人物及分区" checked={confirmed} onChange={e=>{invalidate();setConfirmed(e.target.checked)}}/>我已核对目标人物和所有分区；不接受低置信度自动候选代替确认</label>
+  {([{key:'denoise',name:'降噪',min:0,max:35},{key:'heal',name:'瑕疵修复',min:0,max:50},{key:'skinTone',name:'肤色',min:-10,max:10},{key:'eyes',name:'眼部增强',min:0,max:10}] as const).map(control=><label key={control.key}><Checkbox aria-label={`启用${control.name}`} checked={enabled[control.key]} onChange={e=>{invalidate();setEnabled(v=>({...v,[control.key]:e.target.checked}))}}/>{control.name}<input type="range" aria-label={`${control.name}强度`} min={control.min} max={control.max} step={1} value={settings[control.key]} onChange={e=>update(control.key,Number(e.target.value))}/><output>{settings[control.key]}</output></label>)}
   <label>手工瑕疵点（图层百分比，x,y;x,y）<input aria-label="手工瑕疵点" value={points} onChange={e=>{invalidate();setPoints(e.target.value)}}/></label>
   <small>瑕疵修复只处理你明确指定的点；眼部仅轻微亮度变化。阶段保留累积快照，只有最后一层可见；修改开关与强度请重新预览。</small>
   {error?<p role="alert">{error}</p>:null}{busy?<p role="status">正在本地精修，可取消</p>:null}

@@ -1,5 +1,6 @@
+import { savedContentIdentity } from './contentIdentity'
 import { editorReducer, initialEditorState, type EditorAction, type EditorState } from '../state/editor'
-import { projectFingerprint, type ProjectMetadata, type ProjectDocument } from './projectFormat'
+import { type ProjectMetadata, type ProjectDocument } from './projectFormat'
 import type { ProjectLocation } from './projectStorage'
 
 export const MAX_OPEN_DOCUMENTS = 16
@@ -16,7 +17,7 @@ export type WorkspaceAction =
   | { type: 'recover'; workspace: DocumentWorkspace }
 
 export function documentSignature(document: DocumentSession) {
-  return JSON.stringify([document.metadata.id, document.metadata.name, projectFingerprint(document.state)])
+  return JSON.stringify([document.metadata.id, document.metadata.name, savedContentIdentity(document.state)])
 }
 export function documentIsDirty(document: DocumentSession) { return document.savedSignature !== documentSignature(document) }
 

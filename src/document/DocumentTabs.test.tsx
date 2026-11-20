@@ -45,9 +45,9 @@ test('creates tabs and restores each document view and undo independently', () =
   expect(screen.getAllByRole('tab')).toHaveLength(2)
   expect(probe()).toMatchObject({ width: 1024, zoom: 100, layers: 1, undo: 0, prompt: '' })
   fireEvent.click(screen.getByRole('tab', { name: '未命名作品 未保存' }))
-  expect(probe()).toMatchObject({ width: 500, zoom: 150, layers: 4, undo: 1 })
+  expect(probe()).toMatchObject({ width: 500, zoom: 150, layers: initialEditorState.layers.length + 1, undo: 1 })
   fireEvent.click(screen.getByText('撤销编辑'))
-  expect(probe().layers).toBe(3)
+  expect(probe().layers).toBe(initialEditorState.layers.length)
   fireEvent.keyDown(window, { key: 'Tab', ctrlKey: true })
   expect(probe().width).toBe(1024)
 })
@@ -118,7 +118,7 @@ test('generation continues on its original background document', async () => {
   await act(async () => finish(new Response(JSON.stringify({ data: [{ b64_json: 'aGVsbG8=' }] }))))
   expect(probe().layers).toBe(1)
   fireEvent.click(screen.getByRole('tab', { name: '未命名作品 未保存' }))
-  await waitFor(() => expect(probe()).toMatchObject({ layers: 3, aiResults: 1 }))
+  await waitFor(() => expect(probe()).toMatchObject({ layers: initialEditorState.layers.length, aiResults: 1 }))
   expect(probe().generating).toBe(false)
 })
 
@@ -153,6 +153,25 @@ test('restores multiple local tabs without restoring stale save locations', asyn
   expect(probe().width).toBe(640)
 })
 
+test('deferring recovery retains the snapshot while editing and allows restoring later', async () => {
+  const recovered = createDocumentSession('待恢复海报', { width: 640, height: 480 })
+  const text = await encodeWorkspace({ documents: [recovered], activeId: recovered.id })
+  localStorage.setItem(WORKSPACE_RECOVERY_KEY, text)
+  setup()
+  await screen.findByRole('dialog', { name: '恢复编辑' })
+  fireEvent.click(screen.getByRole('button', { name: '稍后' }))
+  vi.useFakeTimers()
+  try {
+    fireEvent.click(screen.getByText('添加图层'))
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000) })
+  } finally { vi.useRealTimers() }
+  expect(localStorage.getItem(WORKSPACE_RECOVERY_KEY)).toBe(text)
+  fireEvent.click(screen.getByRole('button', { name: '查看待恢复的 1 个文档' }))
+  fireEvent.click(screen.getByRole('button', { name: '恢复副本' }))
+  expect(screen.getByRole('tab', { name: '待恢复海报 未保存' })).toBeInTheDocument()
+  expect(probe().width).toBe(640)
+})
+
 test('keeps keyboard focus on the switched tab and traps close dialog focus', async () => {
   setup()
   fireEvent.click(screen.getByLabelText('新建文档标签'))
@@ -172,4 +191,77 @@ test('keeps keyboard focus on the switched tab and traps close dialog focus', as
   expect(screen.getAllByRole('tab')).toHaveLength(2)
   fireEvent.keyDown(cancel, { key: 'Escape' })
   expect(screen.queryByRole('dialog', { name: '关闭文档' })).not.toBeInTheDocument()
+})
+
+test('renames a document in its tab and cancels a pending rename without applying it',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>)
+ const tab=screen.getAllByRole('tab')[0]
+ fireEvent.doubleClick(tab)
+ const input=screen.getByRole('textbox',{name:'重命名文档'})
+ fireEvent.change(input,{target:{value:'海报项目'}})
+ fireEvent.keyDown(input,{key:'Enter'})
+ expect(screen.getByRole('tab',{name:/海报项目/})).toBeInTheDocument()
+ fireEvent.doubleClick(screen.getByRole('tab',{name:/海报项目/}))
+ fireEvent.change(screen.getByRole('textbox',{name:'重命名文档'}),{target:{value:'未应用'}})
+ fireEvent.keyDown(screen.getByRole('textbox',{name:'重命名文档'}),{key:'Escape'})
+ expect(screen.getByRole('tab',{name:/海报项目/})).toBeInTheDocument()
+ expect(screen.queryByRole('tab',{name:/未应用/})).not.toBeInTheDocument()
+})
+
+test('discard stays discarded across idle, view updates, and another launch', async()=>{
+ const old=createDocumentSession('不再恢复的副本',{width:640,height:480})
+ localStorage.setItem(WORKSPACE_RECOVERY_KEY,await encodeWorkspace({documents:[old],activeId:old.id}))
+ const view=setup()
+ await screen.findByRole('dialog',{name:'恢复编辑'})
+ fireEvent.click(screen.getByRole('button',{name:'丢弃'}))
+ fireEvent.click(screen.getByRole('button',{name:'确认丢弃'}))
+ vi.useFakeTimers()
+ try{
+  fireEvent.click(screen.getByText('缩放150'))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(2000)})
+  expect(localStorage.getItem(WORKSPACE_RECOVERY_KEY)).toBeNull()
+  view.unmount()
+  setup()
+  await act(async()=>{await vi.advanceTimersByTimeAsync(2000)})
+  expect(screen.queryByRole('dialog',{name:'恢复编辑'})).not.toBeInTheDocument()
+  expect(localStorage.getItem(WORKSPACE_RECOVERY_KEY)).toBeNull()
+ }finally{vi.useRealTimers()}
+})
+
+test.each(['before','after'])('preserves a real edit made %s discard and recovers it on next launch',async timing=>{
+ const old=createDocumentSession('旧副本',{width:640,height:480})
+ localStorage.setItem(WORKSPACE_RECOVERY_KEY,await encodeWorkspace({documents:[old],activeId:old.id}))
+ const view=setup()
+ await screen.findByRole('dialog',{name:'恢复编辑'})
+ vi.useFakeTimers()
+ try{
+  if(timing==='before')fireEvent.click(screen.getByText('添加图层'))
+  fireEvent.click(screen.getByRole('button',{name:'丢弃'}));await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'确认丢弃'}))})
+  if(timing==='after')fireEvent.click(screen.getByText('添加图层'))
+  const count=probe().layers
+  await act(async()=>{await vi.advanceTimersByTimeAsync(2000)})
+  const text=localStorage.getItem(WORKSPACE_RECOVERY_KEY)!
+  expect(decodeWorkspace(text).documents[0].state.layers).toHaveLength(count)
+  expect(text).not.toContain('旧副本')
+  view.unmount();await act(async()=>{setup()})
+  expect(screen.getByRole('dialog',{name:'恢复编辑'})).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'恢复副本'}))
+  expect(probe().layers).toBe(count)
+ }finally{vi.useRealTimers()}
+})
+
+test('does not autosave untouched startup content or retain an edit undone back to it',async()=>{
+ setup();await act(async()=>{})
+ vi.useFakeTimers()
+ try{
+  fireEvent.click(screen.getByText('缩放150'))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(2000)})
+  expect(localStorage.getItem(WORKSPACE_RECOVERY_KEY)).toBeNull()
+  fireEvent.click(screen.getByText('添加图层'))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(2000)})
+  expect(localStorage.getItem(WORKSPACE_RECOVERY_KEY)).not.toBeNull()
+  fireEvent.click(screen.getByText('撤销编辑'))
+  await act(async()=>{await vi.advanceTimersByTimeAsync(2000)})
+  expect(localStorage.getItem(WORKSPACE_RECOVERY_KEY)).toBeNull()
+ }finally{vi.useRealTimers()}
 })

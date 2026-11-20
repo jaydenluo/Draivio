@@ -5,7 +5,12 @@
 .cloud-account-tabs button[aria-pressed=true]{color:var(--ink-100);font-weight:600}
 .cloud-account-dialog form{display:grid;gap:14px}
 .cloud-account-dialog label{display:grid;gap:6px;font-size:12px}
-.cloud-account-dialog input{min-width:0;width:100%;height:34px;box-sizing:border-box}
+.cloud-account-dialog input:not([type=checkbox]):not([type=radio]):not([type=range]){min-width:0;width:100%;height:34px;box-sizing:border-box}
+.cloud-registration-option{display:grid;gap:6px}
+.cloud-account-dialog .cloud-register-toggle,.cloud-account-dialog .cloud-remember-toggle{display:flex;align-items:center;gap:8px;cursor:pointer}
+.cloud-account-dialog .cloud-remember-toggle{width:fit-content;max-width:calc(100% - 90px);margin:0 0 0 90px;color:var(--muted);line-height:1.4}
+@media(max-width:480px){.cloud-account-dialog .cloud-remember-toggle{max-width:calc(100% - 82px);margin-left:82px}}
+.cloud-account-dialog .cloud-registration-option p{margin:0}
 .cloud-account-code{display:flex;align-items:center;gap:8px}
 .cloud-account-code input{flex:1}
 .cloud-account-code button{white-space:nowrap}

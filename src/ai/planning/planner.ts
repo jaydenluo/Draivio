@@ -69,6 +69,11 @@ function parseClause(clause: string, options: PlannerOptions): { tool?: PlannerT
   const layerId = targetInfo.id
   const color=parseColorInstruction(t,layerId)
   if(color)return color.args?{tool:'adjustment',args:color.args}:color
+  const corner = actionText.match(/(?:移到|放到|定位到|对齐到)?\s*(左上角|右上角|左下角|右下角)/)
+  if (corner && layerId) {
+    const mode = ({'左上角':'top-left','右上角':'top-right','左下角':'bottom-left','右下角':'bottom-right'} as const)[corner[1] as '左上角'|'右上角'|'左下角'|'右下角']
+    return { tool: 'align', args: { layerIds: [layerId], mode, target: 'canvas' } }
+  }
   if (/USM|锐化|保边降噪|降噪/i.test(actionText)) {
     if(/不要|别|禁止|勿|不允许/.test(actionText))return {warning:'已遵守否定要求，不添加细节滤镜'}
     if(/AI|重建|恢复细节/i.test(actionText))return {clarification:'锐化和降噪为确定性滤波，不能提供 AI 细节重建或真实恢复承诺'}
@@ -89,7 +94,16 @@ function parseClause(clause: string, options: PlannerOptions): { tool?: PlannerT
   if (/复制|拷贝/.test(actionText)) return layerId ? {tool:'duplicate',args:{layerId}} : {clarification:'复制需要明确目标图层。'}
   if (/向右|右移|向左|左移|x\s*\+?/i.test(actionText)) { const n=num(actionText,/([\d.]+)\s*(?:像素|px)?/); return layerId?{tool:'move',args:{layerId,dx: /向左|左移/.test(actionText)?-n:n,dy:0}}:{clarification:'移动需要明确目标图层。'} }
   if (/向上|上移|向下|下移/.test(actionText) && !/排序|[上下]移(?:一层|图层)/.test(actionText)) { const n=num(actionText,/([\d.]+)\s*(?:像素|px)?/,10); return layerId?{tool:'move',args:{layerId,dx:0,dy:/向上|上移/.test(actionText)?-n:n}}:{clarification:'移动需要明确目标图层。'} }
-  if (/放大|缩放|缩小/.test(actionText)) { const n=num(actionText,/([\d.]+)\s*倍/,/缩小/.test(actionText)?.5:2); return layerId?{tool:'scale',args:{layerId,sx:n,sy:n}}:{clarification:'缩放需要明确目标图层。'} }
+  if (/放大|扩大|增大|缩放|缩小|减小/.test(actionText)) {
+    const percentage = actionText.match(/(放大|扩大|增大|缩小|减小)\s*([\d.]+)\s*%/)
+    let n: number
+    if (percentage) {
+      const amount = Number(percentage[2])
+      n = /缩小|减小/.test(percentage[1]) ? 1 - amount / 100 : 1 + amount / 100
+      if (!Number.isFinite(n) || n <= 0) return { clarification: '缩放百分比必须使最终比例大于 0。' }
+    } else n = num(actionText,/([\d.]+)\s*倍/,/缩小|减小/.test(actionText)?.5:2)
+    return layerId?{tool:'scale',args:{layerId,sx:n,sy:n}}:{clarification:'缩放需要明确目标图层。'}
+  }
   if (/旋转/.test(actionText)) { const n=num(actionText,/(-?[\d.]+)\s*(?:度|°)/); return layerId?{tool:'rotate',args:{layerId,degrees:n}}:{clarification:'旋转需要明确目标图层。'} }
   if (/翻转|镜像/.test(actionText)) { const axis=/垂直|上下/.test(actionText)?'vertical':'horizontal'; return layerId?{tool:'flip',args:{layerId,axis}}:{clarification:'翻转需要明确目标图层。'} }
   if (/混合模式/.test(actionText)) {
@@ -114,7 +128,7 @@ export function planNaturalLanguage(input: string, options: PlannerOptions = {})
   const separators = input.replace(/[“「『][^”」』]*[”」』]/g, value => ' '.repeat(value.length))
   const clauses: string[] = []
   let clauseStart = 0
-  for (const match of separators.matchAll(/(?:然后|接着|并且|同时|之后|，|,|。|；|;)/g)) {
+  for (const match of separators.matchAll(/(?:然后|接着|并且|同时|之后|并|，|,|。|；|;)/g)) {
     clauses.push(input.slice(clauseStart, match.index).trim())
     clauseStart = match.index + match[0].length
   }

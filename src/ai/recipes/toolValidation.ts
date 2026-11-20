@@ -30,7 +30,7 @@ export function validateEditorRecipeArgs(op: string, state: EditorState, args: R
     case 'blend':choice('blendMode',BLEND_MODES.flatMap(mode=>[mode.id,mode.label]));break
     case 'rename':if(typeof args.name!=='string'||!args.name.trim())throw new Error('配方图层名称无效');break
     case 'reorder':choice('direction',['up','down']);break
-    case 'align':choice('mode',['left','center-horizontal','right','top','center-vertical','bottom']);choice('target',['canvas','selection','key-object'],true);break
+    case 'align':choice('mode',['left','center-horizontal','right','top','center-vertical','bottom','top-left','top-right','bottom-left','bottom-right']);choice('target',['canvas','selection','key-object'],true);break
     case 'distribute':choice('axis',['horizontal','vertical']);break
     case 'group':if(ids.length<2)throw new Error('配方分组至少需要两个图层');break
     case 'duplicate':case 'delete':break

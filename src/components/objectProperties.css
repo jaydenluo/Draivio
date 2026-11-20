@@ -1,0 +1,26 @@
+.object-properties { min-width:0; font-size:11px; }
+.object-properties-heading { display:flex; flex-direction:column; gap:5px; padding:12px; border-bottom:1px solid var(--line); }
+.object-properties-heading small,.object-property-notice { color:var(--muted); }
+.object-properties section { padding:12px; border-bottom:1px solid var(--line); }
+.object-properties h4 { margin:0 0 10px; font-size:11px; font-weight:500; color:var(--muted); }
+.object-property-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px 10px; align-items:center; }
+.object-property-grid .numeric-scrubber { min-width:0; }
+.object-number,.object-select { display:flex; align-items:center; justify-content:space-between; gap:5px; min-width:0; }
+.object-properties select,.object-properties textarea { min-width:0; border:1px solid var(--ink-700); background:var(--ink-850); color:var(--text); border-radius:4px; font-size:11px; }
+.object-select select { max-width:90px; height:24px; }
+.object-color { display:flex; align-items:center; gap:4px; min-width:0; }
+.object-color .color-picker-anchor { flex-wrap:wrap; gap:4px; }
+.object-color .color-picker-trigger { min-width:0; width:76px; padding:2px 4px; }
+.object-color small { color:var(--muted); }
+.object-check { display:flex; gap:5px; align-items:center; white-space:nowrap; color:var(--muted); font-size:11px; }
+.object-content { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+.object-content textarea { min-height:54px; resize:vertical; padding:6px; }
+.object-property-actions { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.object-property-actions button { font-size:11px; padding:4px 6px; border:1px solid var(--ink-700); border-radius:4px; background:var(--ink-850); color:var(--muted); }
+.object-properties-quick { display:flex; align-items:center; gap:10px; white-space:nowrap; }
+.object-editing-badge { color:var(--muted); font-size:11px; }
+.object-properties button:disabled { opacity:.4; cursor:not-allowed; }
+.object-properties-heading > button { align-self:flex-start; border:1px solid var(--ink-700); border-radius:4px; padding:3px 7px; background:transparent; color:var(--muted); font-size:10px; }
+.object-properties-quick .color-picker-trigger { width:78px; }
+.object-property-grid .object-number { gap:4px; }
+.object-properties section > button { font-size:11px; padding:4px 7px; border:1px solid var(--ink-700); border-radius:4px; color:var(--muted); background:var(--ink-850); }

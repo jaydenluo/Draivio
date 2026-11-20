@@ -1,3 +1,5 @@
+import { useCommandHandler } from '../commands/useCommandHandler'
+import { createPortal } from 'react-dom'
 import { DialogTitlebar } from '../ui/DialogTitlebar'
 import { defaultProfile, makeProfile, type IccProfile, type ColorProfileId, type RenderingIntent } from '../color/iccPipeline'
 import { useRef, useState } from 'react'
@@ -25,9 +27,12 @@ export function DocumentSizeControl() {
   const draggable = useDraggableDialog(dialogRef, open)
   const locked = true
   const ratio = state.documentWidth / state.documentHeight
+ const openDialog=() => { setMode('image'); setWidth(String(state.documentWidth)); setHeight(String(state.documentHeight)); setBackground(state.documentBackground); setProfileId(state.colorManagement.profile.id); setCustomProfile(state.colorManagement.profile.id === 'custom' ? state.colorManagement.profile : null); setIntent(state.colorManagement.renderingIntent); setPixelFormat(state.pixelFormat); setError(null); setOpen(true) }
+ useCommandHandler('size',openDialog)
+ useCommandHandler('canvasSize',()=>{openDialog();setMode('canvas')})
   return <>
-    <button className="document-size-trigger" aria-label="文档尺寸" onClick={() => { setWidth(String(state.documentWidth)); setHeight(String(state.documentHeight)); setBackground(state.documentBackground); setProfileId(state.colorManagement.profile.id); setCustomProfile(state.colorManagement.profile.id === 'custom' ? state.colorManagement.profile : null); setIntent(state.colorManagement.renderingIntent); setPixelFormat(state.pixelFormat); setError(null); setOpen(true) }}>{state.documentWidth} × {state.documentHeight} px</button>
-    {open ? <div className="document-size-backdrop" onClick={() => setOpen(false)}><section ref={dialogRef} style={draggable.style} onPointerDown={draggable.onPointerDown} className="document-size-dialog" role="dialog" aria-modal="true" aria-label="文档尺寸设置" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false) }}>
+    <button className="document-size-trigger" aria-label="文档尺寸" onClick={()=>{openDialog();setMode('canvas')}}>{state.documentWidth} × {state.documentHeight} px</button>
+    {open ? createPortal(<div className="document-size-backdrop" onClick={() => setOpen(false)}><section ref={dialogRef} style={draggable.style} onPointerDown={draggable.onPointerDown} className="document-size-dialog" role="dialog" aria-modal="true" aria-label="文档尺寸设置" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === 'Escape') setOpen(false) }}>
       <DialogTitlebar title="文档尺寸" closeLabel="关闭文档尺寸设置" onClose={() => setOpen(false)} /><p>文档像素尺寸与 AI 模型输出尺寸分别设置。</p>
       <label>操作<select aria-label="尺寸操作" value={mode} onChange={(event) => setMode(event.target.value as typeof mode)}><option value="canvas">画布大小</option><option value="image">图像大小</option><option value="new">新建文档</option></select></label>
       {mode === 'new' ? <label>常用尺寸<select aria-label="常用文档尺寸" defaultValue="custom" onChange={(event) => { if (event.target.value !== 'custom') { const [w, h] = event.target.value.split('x'); setWidth(w); setHeight(h) } }}><option value="custom">自定义</option><option value="1024x1024">正方形 · 1024 × 1024</option><option value="1080x1350">4:5 · 1080 × 1350</option><option value="1920x1080">16:9 · 1920 × 1080</option><option value="1080x1920">9:16 · 1080 × 1920</option><option value="1200x800">3:2 · 1200 × 800</option></select></label> : null}
@@ -44,6 +49,6 @@ export function DocumentSizeControl() {
       <p>单边 1–16384 px，总面积不超过 32 百万像素。导入图片可选择 Auto 跟随原图尺寸。</p>
       {error ? <p role="alert">{error}</p> : null}
       <div className="document-size-actions"><button onClick={() => setOpen(false)}>取消</button><button onClick={() => { const problem = dimensionError(Number(width), Number(height)); if (problem) return setError(problem); if (mode === 'image' && Math.abs(Number(width) / state.documentWidth - Number(height) / state.documentHeight) > Math.max(1 / state.documentWidth, 1 / state.documentHeight)) return setError('图像大小须保持原比例'); if (mode === 'new') newDocument({ width: Number(width), height: Number(height), background, colorManagement: { profile: profileId === 'custom' ? customProfile ?? state.colorManagement.profile : defaultProfile(profileId), renderingIntent: intent } }); else dispatch({ type: 'resize-document', width: Number(width), height: Number(height), mode, anchor, background }); if (mode !== 'new') dispatch({ type: 'set-color-management', settings: { profile: profileId === 'custom' ? customProfile ?? state.colorManagement.profile : defaultProfile(profileId), renderingIntent: intent } }); dispatch({ type: 'set-pixel-format', format: pixelFormat }); setOpen(false) }}>应用尺寸</button></div>
-    </section></div> : null}
+    </section></div>, document.body) : null}
   </>
 }

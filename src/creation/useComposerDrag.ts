@@ -9,7 +9,8 @@ export function useComposerDrag(enabled: boolean) {
   const constrain = (x: number, y: number) => {
     const box = ref.current, parent = box?.parentElement
     if (!box || !parent) return null
-    return constrainComposerPosition({ x, y }, { width: parent.clientWidth, height: parent.clientHeight }, { width: box.offsetWidth, height: box.offsetHeight })
+    const reservedWidth = Number.parseFloat(getComputedStyle(parent).getPropertyValue('--composer-right-reserve')) || 0
+    return constrainComposerPosition({ x, y }, { width: parent.clientWidth - reservedWidth, height: parent.clientHeight }, { width: box.offsetWidth, height: box.offsetHeight })
   }
   useEffect(() => {
     const box = ref.current, parent = box?.parentElement

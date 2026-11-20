@@ -1,3 +1,4 @@
+import { drawTestSelection } from '../test/selectionFixture'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import { expect, test } from 'vitest'
 import { AppShell } from '../app/AppShell'
@@ -18,7 +19,7 @@ test('opens a sourced model guide and explains that strength is not universal', 
 })
 
 test('Escape closes only the guide, restores focus and preserves the prompt and selection', () => {
-  setup()
+  setup(); drawTestSelection()
   const input = screen.getByRole('textbox', { name: 'AI 操作' })
   fireEvent.change(input, { target: { value: '保留我的描述' } })
   const trigger = screen.getByRole('button', { name: '查看模型与参数指南' })

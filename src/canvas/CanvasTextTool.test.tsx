@@ -36,8 +36,8 @@ function SelectionFixture() {
       documentWidth: 500,
       documentHeight: 625,
       layers: [
-        { id: 'background', name: '背景', className: 'layer-image', kind: 'image', source: 'fixture', visible: true, opacity: 100, blendMode: '正常' },
         { id: 'art', name: '文字层', className: 'layer-text', kind: 'text', visible: true, opacity: 100, blendMode: '正常' },
+        { id: 'background', name: '背景', className: 'layer-image', kind: 'image', source: 'fixture', visible: true, opacity: 100, blendMode: '正常' },
       ],
       selectedLayerId: 'background',
       selectedLayerIds: ['background'],
@@ -73,12 +73,15 @@ test('clicking the text tool starts a blank draft and only creates point text af
   expect(current.layers).toHaveLength(before.layers.length)
   expect(current.texts[0].layerId).toBe(current.selected)
   expect(current.undoCount).toBe(before.undoCount + 1)
-  fireEvent.click(screen.getByLabelText('撤销'))
+  fireEvent.click(screen.getByRole('region', { name: '主画布' }).querySelector('[aria-label="撤销"]')!)
   expect(state().texts).toEqual(before.texts)
-  fireEvent.click(screen.getByLabelText('重做'))
+  fireEvent.click(screen.getByRole('region', { name: '主画布' }).querySelector('[aria-label="重做"]')!)
   expect(state().texts[0].text).toBe('新标题')
   fireEvent.click(screen.getByLabelText('工具组：选择/移动'))
-  fireEvent.click(document.querySelector('.canvas-text-object')!)
+  const existing = document.querySelector('.canvas-text-object')!
+  fireEvent.pointerDown(existing, { pointerId: 30, clientX: 110, clientY: 125, button: 0 })
+  fireEvent.pointerUp(existing, { pointerId: 30, clientX: 110, clientY: 125, button: 0 })
+  fireEvent.click(existing)
   expect(screen.getByRole('textbox', { name: '编辑画布文字' })).toHaveValue('新标题')
 })
 
@@ -214,6 +217,10 @@ test('select tool edits only the clicked text object when multiple texts share a
   expect(textObjects).toHaveLength(2)
   expect(screen.queryAllByRole('button', { name: '旋转文字' })).toHaveLength(0)
 
+  const board = document.querySelector('.artboard') as HTMLElement
+  vi.spyOn(board, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 500, height: 625, right: 500, bottom: 625, x: 0, y: 0, toJSON: () => ({}) })
+  fireEvent.pointerDown(textObjects[0], { pointerId: 31, clientX: 70, clientY: 80, button: 0 })
+  fireEvent.pointerUp(textObjects[0], { pointerId: 31, clientX: 70, clientY: 80, button: 0 })
   fireEvent.click(textObjects[0])
 
   expect(screen.getByRole('textbox', { name: '编辑画布文字' })).toHaveValue('文字 A')
@@ -230,9 +237,9 @@ test('select tool moves the selected text independently and background independe
   const before = state()
   const secondBefore = before.texts.find((item) => item.id === 'text-b')!
 
-  fireEvent.pointerDown(textObjects[0], { pointerId: 17, clientX: 90, clientY: 100, button: 0 })
-  fireEvent.pointerMove(textObjects[0], { pointerId: 17, clientX: 130, clientY: 130, buttons: 1 })
-  fireEvent.pointerUp(textObjects[0], { pointerId: 17, clientX: 130, clientY: 130, button: 0 })
+  fireEvent.pointerDown(textObjects[0], { pointerId: 17, clientX: 90, clientY: 80, button: 0 })
+  fireEvent.pointerMove(textObjects[0], { pointerId: 17, clientX: 130, clientY: 110, buttons: 1 })
+  fireEvent.pointerUp(textObjects[0], { pointerId: 17, clientX: 130, clientY: 110, button: 0 })
 
   const afterTextMove = state()
   expect(afterTextMove.texts.find((item) => item.id === 'text-a')!.x).toBeGreaterThan(before.texts.find((item) => item.id === 'text-a')!.x)
@@ -256,15 +263,15 @@ test('a drag followed by a browser click moves text once, while the next single 
   vi.spyOn(board, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 500, height: 625, right: 500, bottom: 625, x: 0, y: 0, toJSON: () => ({}) })
   const object = document.querySelector('.canvas-text-object')!
   const before = state()
-  fireEvent.pointerDown(object, { pointerId: 22, clientX: 90, clientY: 100, button: 0 })
-  fireEvent.pointerMove(object, { pointerId: 22, clientX: 130, clientY: 130, buttons: 1 })
-  fireEvent.pointerUp(object, { pointerId: 22, clientX: 130, clientY: 130, button: 0 })
+  fireEvent.pointerDown(object, { pointerId: 22, clientX: 90, clientY: 80, button: 0 })
+  fireEvent.pointerMove(object, { pointerId: 22, clientX: 130, clientY: 110, buttons: 1 })
+  fireEvent.pointerUp(object, { pointerId: 22, clientX: 130, clientY: 110, button: 0 })
   fireEvent.click(object)
   expect(screen.queryByRole('textbox', { name: '编辑画布文字' })).toBeNull()
   expect(state().texts.find(item => item.id === 'text-a')!.x).not.toBe(before.texts.find(item => item.id === 'text-a')!.x)
   expect(state().undoCount).toBe(before.undoCount + 1)
-  fireEvent.pointerDown(object, { pointerId: 23, clientX: 130, clientY: 130, button: 0 })
-  fireEvent.pointerUp(object, { pointerId: 23, clientX: 130, clientY: 130, button: 0 })
+  fireEvent.pointerDown(object, { pointerId: 23, clientX: 130, clientY: 110, button: 0 })
+  fireEvent.pointerUp(object, { pointerId: 23, clientX: 130, clientY: 110, button: 0 })
   fireEvent.click(object)
   expect(screen.getByRole('textbox', { name: '编辑画布文字' })).toHaveValue('文字 A')
   expect(state().undoCount).toBe(before.undoCount + 1)
@@ -294,9 +301,9 @@ test('the text tool can drag text on an unselected layer on the first gesture', 
   vi.spyOn(board, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 500, height: 625, right: 500, bottom: 625, x: 0, y: 0, toJSON: () => ({}) })
   const object = document.querySelector('.canvas-text-object')!
   const before = state()
-  fireEvent.pointerDown(object, { pointerId: 25, clientX: 90, clientY: 100, button: 0 })
-  fireEvent.pointerMove(object, { pointerId: 25, clientX: 130, clientY: 130, buttons: 1 })
-  fireEvent.pointerUp(object, { pointerId: 25, clientX: 130, clientY: 130, button: 0 })
+  fireEvent.pointerDown(object, { pointerId: 25, clientX: 90, clientY: 80, button: 0 })
+  fireEvent.pointerMove(object, { pointerId: 25, clientX: 130, clientY: 110, buttons: 1 })
+  fireEvent.pointerUp(object, { pointerId: 25, clientX: 130, clientY: 110, button: 0 })
   fireEvent.click(object)
   expect(screen.queryByRole('textbox', { name: '编辑画布文字' })).toBeNull()
   expect(state().texts.find(item => item.id === 'text-a')!.x).toBeGreaterThan(12)
@@ -311,8 +318,8 @@ test('select tool shows the text at its live drag position before pointerup', ()
   vi.spyOn(artboard, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 500, height: 625, right: 500, bottom: 625, x: 0, y: 0, toJSON: () => ({}) })
   const textObject = document.querySelector('.canvas-text-object') as HTMLElement
 
-  fireEvent.pointerDown(textObject, { pointerId: 19, clientX: 90, clientY: 100, button: 0 })
-  fireEvent.pointerMove(textObject, { pointerId: 19, clientX: 130, clientY: 130, buttons: 1 })
+  fireEvent.pointerDown(textObject, { pointerId: 19, clientX: 90, clientY: 80, button: 0 })
+  fireEvent.pointerMove(textObject, { pointerId: 19, clientX: 130, clientY: 110, buttons: 1 })
 
   expect(textObject).toHaveClass('is-transforming')
   const sceneText = document.querySelector('.canvas-art [data-text="text-a"]')!
@@ -320,7 +327,7 @@ test('select tool shows the text at its live drag position before pointerup', ()
   expect(sceneText).not.toHaveAttribute('data-editor-hidden')
   expect(state().texts.find((text) => text.id === 'text-a')?.x).toBe(12)
 
-  fireEvent.pointerUp(textObject, { pointerId: 19, clientX: 130, clientY: 130, button: 0 })
+  fireEvent.pointerUp(textObject, { pointerId: 19, clientX: 130, clientY: 110, button: 0 })
   expect(textObject).not.toHaveClass('is-transforming')
 })
 
@@ -331,8 +338,8 @@ test.each(['pointercancel', 'Escape'])('cancelling text movement with %s restore
   vi.spyOn(artboard, 'getBoundingClientRect').mockReturnValue({ left: 0, top: 0, width: 500, height: 625, right: 500, bottom: 625, x: 0, y: 0, toJSON: () => ({}) })
   const textObject = document.querySelector('.canvas-text-object') as HTMLElement
   const original = state().texts
-  fireEvent.pointerDown(textObject, { pointerId: 20, clientX: 90, clientY: 100, button: 0 })
-  fireEvent.pointerMove(textObject, { pointerId: 20, clientX: 130, clientY: 130, buttons: 1 })
+  fireEvent.pointerDown(textObject, { pointerId: 20, clientX: 90, clientY: 80, button: 0 })
+  fireEvent.pointerMove(textObject, { pointerId: 20, clientX: 130, clientY: 110, buttons: 1 })
   if (cancelWith === 'pointercancel') fireEvent.pointerCancel(textObject, { pointerId: 20 })
   else fireEvent.keyDown(window, { key: 'Escape' })
   fireEvent.click(textObject)

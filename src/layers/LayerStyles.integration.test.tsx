@@ -1,0 +1,55 @@
+import { fireEvent, render, screen, within } from '@testing-library/react'
+import { expect, it } from 'vitest'
+import { LayersPanel } from './LayersPanel'
+import { EditorProvider, useEditor } from '../state/editor'
+import { defaultEffect } from '../render/layerEffects'
+
+function Fixture(){const {state,dispatch}=useEditor();return <><button onClick={()=>dispatch({type:'set-layer-effects',id:'art',effects:{version:1,items:[defaultEffect('shadow')]}})}>准备样式</button><button onClick={()=>dispatch({type:'undo'})}>撤销样式操作</button><button onClick={()=>dispatch({type:'toggle-layer-lock',id:'original'})}>锁定目标</button><output data-testid="state">{JSON.stringify(state)}</output></>}
+const state=()=>JSON.parse(screen.getByTestId('state').textContent!)
+const menu=(name:string)=>fireEvent.contextMenu(screen.getByRole('button',{name:`${name}图层`}),{clientX:200,clientY:100})
+it('shows fx and copies, pastes and clears styles on the context target with undo',()=>{
+ render(<EditorProvider><LayersPanel/><Fixture/></EditorProvider>)
+ fireEvent.click(screen.getByText('准备样式'))
+ const fx=screen.getByRole('button',{name:'春日海报 · 变体 1图层样式'})
+ fireEvent.click(fx)
+ expect(within(screen.getByRole('list',{name:'春日海报 · 变体 1图层样式列表'})).getByText('投影')).toBeInTheDocument()
+ menu('春日海报 · 变体 1');fireEvent.click(screen.getByRole('menuitem',{name:'复制样式'}))
+ menu('原图');fireEvent.click(screen.getByRole('menuitem',{name:'粘贴样式'}))
+ expect(state().layers.find((l:any)=>l.id==='original').effects.items[0].kind).toBe('shadow')
+ menu('原图');fireEvent.click(screen.getByRole('menuitem',{name:'清除样式'}))
+ expect(state().layers.find((l:any)=>l.id==='original').effects.items).toEqual([])
+ expect(state().layers.find((l:any)=>l.id==='art').effects.items).toHaveLength(1)
+ menu('原图');expect(screen.getByRole('menuitem',{name:'清除样式'})).toBeDisabled()
+ fireEvent.keyDown(screen.getByRole('menu'),{key:'Escape'})
+ fireEvent.click(screen.getByText('撤销样式操作'))
+ expect(state().layers.find((l:any)=>l.id==='original').effects.items).toHaveLength(1)
+ fireEvent.click(screen.getByText('锁定目标'))
+ menu('原图')
+ expect(screen.getByRole('menuitem',{name:'粘贴样式'})).toBeDisabled()
+ expect(screen.getByRole('menuitem',{name:'清除样式'})).toBeDisabled()
+})
+it('uses one blending options entry and keeps effects inside the style window',()=>{
+ render(<EditorProvider><LayersPanel/><Fixture/></EditorProvider>)
+ menu('原图')
+ expect(screen.queryByRole('menuitem',{name:'图层样式'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('menuitem',{name:'混合选项…'}))
+ expect(screen.getByRole('dialog',{name:'图层样式'})).toHaveTextContent('原图')
+ fireEvent.click(screen.getByRole('button',{name:'取消'}))
+ menu('春日海报 · 变体 1');fireEvent.click(screen.getByRole('menuitem',{name:'混合选项…'}))
+ fireEvent.click(screen.getByRole('button',{name:/^描边$/}))
+ expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+ expect(screen.getByRole('region',{name:'描边设置'})).toBeInTheDocument()
+ expect(state().layers[0].effects).toBeUndefined()
+})
+it('opens styles only from row whitespace while name double-click still renames',()=>{
+ render(<EditorProvider><LayersPanel/><Fixture/></EditorProvider>)
+ const name=screen.getByRole('button',{name:'春日海报 · 变体 1图层'})
+ fireEvent.doubleClick(within(name).getByText('春日海报 · 变体 1'));expect(screen.getByRole('textbox',{name:'图层名称'})).toBeInTheDocument()
+ fireEvent.keyDown(screen.getByRole('textbox',{name:'图层名称'}),{key:'Escape'})
+ fireEvent.doubleClick(screen.getByRole('button',{name:'春日海报 · 变体 1图层'}))
+ expect(screen.getByRole('dialog',{name:'图层样式'})).toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'取消'}))
+ fireEvent.click(screen.getByText('锁定目标'));menu('原图')
+ expect(screen.getByRole('menuitem',{name:'混合选项…'})).toBeDisabled()
+ expect(screen.queryByRole('menuitem',{name:'图层样式'})).not.toBeInTheDocument()
+})

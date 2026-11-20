@@ -1,0 +1,63 @@
+.curve-editor { padding:12px 0; border-top:1px solid var(--ink-700); }
+.curve-editor-heading { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; }
+.curve-editor-heading h3 { margin:0; font-size:11px; font-weight:600; }
+.properties-panel .curve-editor .curve-preview-toggle { display:flex; flex-direction:row; align-items:center; gap:5px; margin:0; white-space:nowrap; font-size:10px; }
+.curve-tabs-row { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--ink-700); margin-bottom:8px; }
+.curve-tabs-row [role=tablist] { display:flex; gap:12px; }
+.curve-tabs-row [role=tab] { position:relative; height:27px; padding:0 2px; background:transparent; color:var(--muted); font-size:11px; }
+.curve-tabs-row [aria-selected=true] { color:var(--text); }
+.curve-tabs-row [aria-selected=true]::after { content:''; position:absolute; height:2px; background:var(--coral); bottom:-1px; left:0; right:0; }
+.curve-editor button:disabled { opacity:.35; cursor:default; }
+.curve-editor .curve-reset { width:24px; height:24px; padding:0; border-radius:4px; background:transparent; color:var(--muted); font-size:17px; }
+.curve-editor .curve-reset:hover { color:var(--text); background:var(--ink-800); }
+.curve-toolbar { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:0 0 5px; }
+.properties-panel .curve-editor .curve-toolbar label { display:flex; flex-direction:row; align-items:center; gap:7px; margin:0; font-size:10px; }
+.curve-toolbar select { width:70px; height:23px; padding:0 5px; border:1px solid var(--ink-700); border-radius:4px; background:var(--ink-850); color:var(--text); font-size:11px; }
+.curve-toolbar>button { height:23px; padding:0 6px; border-radius:4px; background:transparent; color:var(--muted); font-size:10px; }
+.curve-toolbar>button:hover { color:var(--text); background:var(--ink-800); }
+.curve-graph { display:block; width:100%; max-width:300px; aspect-ratio:1; margin:0 auto; touch-action:none; user-select:none; cursor:crosshair; --curve-color:var(--sky); }
+.curve-graph.channel-r { --curve-color:#ef8c83; }.curve-graph.channel-g { --curve-color:#8fceac; }.curve-graph.channel-b { --curve-color:#83a9ed; }
+.curve-graph[aria-disabled=true] { opacity:.4; cursor:default; }
+.curve-graph-background { fill:var(--ink-950); }
+.curve-grid path { stroke:var(--ink-700); stroke-width:.6; fill:none; }
+.curve-histogram rect { fill:var(--muted); opacity:.23; pointer-events:none; }
+.curve-identity { stroke:var(--faint); stroke-width:.7; stroke-dasharray:3 4; opacity:.55; }
+.curve-line { stroke:var(--curve-color); stroke-width:1.6; pointer-events:none; }
+.curve-anchor { cursor:grab; outline:none; }.curve-anchor:active { cursor:grabbing; }
+.curve-anchor-dot { fill:var(--ink-950); stroke:var(--curve-color); stroke-width:1.6; }
+.curve-anchor.is-selected .curve-anchor-dot,.curve-anchor:focus-visible .curve-anchor-dot { fill:var(--curve-color); stroke:var(--text); }
+.curve-selected-point { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; margin-top:5px; }
+.properties-panel .curve-editor .numeric-scrubber { min-height:24px; grid-template-columns:auto minmax(0,1fr); gap:5px; }
+.properties-panel .curve-editor .numeric-scrubber-input { height:22px; padding:0 3px; font-size:11px; }
+.properties-panel .curve-editor .numeric-scrubber-stepper button { height:22px; line-height:20px; }
+.properties-panel .curve-editor .numeric-scrubber-label { font-size:10px; }
+.curve-point-actions { display:flex; align-items:center; gap:3px; padding-top:6px; }
+.curve-point-actions>span { flex:1; color:var(--faint); font-size:10px; }
+.curve-point-actions>button { width:22px; height:22px; border:1px solid var(--ink-700); border-radius:4px; background:transparent; color:var(--muted); line-height:1; }
+.curve-editor [role=tabpanel][hidden] { display:none; }
+.levels-controls h4 { margin:8px 0 4px; font-size:10px; font-weight:500; color:var(--muted); }
+.levels-controls h4:first-child { margin-top:4px; }
+.levels-gradient { height:18px; margin:12px 0 4px; border:1px solid var(--ink-700); background:linear-gradient(90deg,#000,#fff); border-radius:3px; }
+.levels-inputs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }.levels-outputs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.properties-panel .curve-editor :is(.levels-inputs,.levels-outputs) .numeric-scrubber { display:flex; flex-direction:column; align-items:stretch; gap:2px; }
+.curve-error { display:block; margin-top:6px; font-size:10px; color:var(--coral); }
+
+.curve-graph:focus { outline:none; }.curve-graph:focus-visible { outline:1px solid var(--sky); outline-offset:1px; border-radius:2px; }
+
+.levels-graph { touch-action:none; user-select:none; cursor:ew-resize; }
+.levels-graph[aria-disabled=true] { opacity:.4; cursor:default; }
+.levels-histogram { display:block; width:calc(100% - 16px); height:24px; margin:0 8px; border:1px solid var(--ink-700); border-bottom:0; }
+.levels-histogram-background { fill:var(--ink-950); }
+.levels-histogram-grid { stroke:var(--ink-700); stroke-width:.6; }
+.levels-histogram-bin { fill:var(--muted); opacity:.65; pointer-events:none; }
+.levels-slider-body { padding:0 8px; }
+.levels-graph .levels-gradient { height:6px; margin:0; border-radius:0 0 2px 2px; }
+.levels-graph.is-output .levels-gradient { height:8px; border-radius:3px; }
+.levels-handle-rail { position:relative; height:22px; }
+.levels-graph .levels-handle { position:absolute; top:0; width:20px; height:22px; min-height:0; padding:2px 3px; transform:translateX(-50%); background:transparent; border:0; border-radius:3px; color:var(--muted); cursor:ew-resize; touch-action:none; z-index:1; }
+.levels-handle svg { display:block; width:14px; height:12px; overflow:visible; pointer-events:none; }
+.levels-handle path { stroke:var(--muted); stroke-width:1; fill:var(--ink-950); }
+.levels-handle.is-gray path { fill:#808080; }.levels-handle.is-white path { fill:#f2f2f2; }
+.levels-graph .levels-handle:focus-visible { outline:1px solid var(--sky); outline-offset:-1px; }
+.levels-handle:focus { z-index:2; }.levels-handle:focus path,.levels-handle:hover path { stroke:var(--sky); }
+.levels-graph .levels-handle:disabled { cursor:default; opacity:1; }

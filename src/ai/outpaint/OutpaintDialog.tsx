@@ -1,3 +1,4 @@
+import { Checkbox } from '../../ui/Checkbox'
 import { createPortal } from 'react-dom'
 import { useEffect,useMemo,useRef,useState } from 'react'
 import { useEditor } from '../../state/editor'
@@ -60,7 +61,7 @@ export function OutpaintDialog({onClose}:{onClose:()=>void}){
    {(['left','right','top','bottom','right-bottom'] as const).map(edge=><rect key={edge} data-outpaint-edge={edge} aria-label={`拖动扩图${edge}`} x={edge.includes('right')?expansion!.width-5:edge==='top'||edge==='bottom'?expansion!.width/2-5:-5} y={edge.includes('bottom')?expansion!.height-5:edge==='left'||edge==='right'?expansion!.height/2-5:-5} width={10} height={10} fill="#53b8ff" style={{cursor:'nwse-resize'}} onPointerDown={e=>{if(busy)return;const svg=e.currentTarget.ownerSVGElement!,r=svg.getBoundingClientRect();svg.setPointerCapture?.(e.pointerId);drag.current={edge,clientX:e.clientX,clientY:e.clientY,scaleX:(expansion!.width+24)/(r.width||expansion!.width+24),scaleY:(expansion!.height+24)/(r.height||expansion!.height+24),edges:{...edges}}}}/>)}</svg>:null}
   <output aria-label="扩图调用计划">最终 {expansion?.width??'—'} × {expansion?.height??'—'} px · 原图偏移 {expansion?.x??0}, {expansion?.y??0} · 端点上限 {limit}px · 重叠 {overlap}px · 预计 {plan.length} 次调用</output>
   {!capability?<p role="alert">当前模型没有已验证的蒙版编辑能力，请在 AI 输入框选择支持蒙版的模型。</p>:null}{locked?<p role="alert">目标或所属组已锁定，请先解锁。</p>:null}{validation||error?<p role="alert">{error||validation}</p>:null}
-  <label><input type="checkbox" aria-label="确认扩图上传与调用数" disabled={busy||!capability||!!validation} checked={approved} onChange={e=>setApproved(e.target.checked)}/>确认上传原图，并提交上述 {plan.length} 次可能计费的编辑请求；失败或重试不会自动增加请求。</label>
+  <label><Checkbox aria-label="确认扩图上传与调用数" disabled={busy||!capability||!!validation} checked={approved} onChange={e=>setApproved(e.target.checked)}/>确认上传原图，并提交上述 {plan.length} 次可能计费的编辑请求；失败或重试不会自动增加请求。</label>
   <button onClick={()=>void run()} disabled={!approved||!capability||locked||!!validation||busy||state.isGenerating}>生成扩图候选</button><button onClick={cancel}>{busy?'停止扩图':'取消扩图'}</button>{progress?<p role="status">{progress}</p>:null}
  </FloatingSurface>
 }

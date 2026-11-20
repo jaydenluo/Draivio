@@ -11,6 +11,8 @@ export type DecodedSvg = { image: CanvasImageSource; width: number; height: numb
 export type ExportDependencies = { signal?: AbortSignal; createCanvas?: () => HTMLCanvasElement; decodeSvg?: (source: string) => Promise<DecodedSvg> }
 const MAX_DIMENSION = 16_384
 const MAX_PIXELS = 32_000_000
+const nativeImageUrl = /^(?:draivio-image:\/\/localhost|https?:\/\/draivio-image\.localhost)\/[a-f0-9]{48}\/[a-f0-9]{48}\?revision=[1-9]\d*$/
+const embeddedImage = /^data:image\/(png|jpeg|webp|gif);base64,/i
 export function exportFormatMime(format: ImageExportFormat): string {
   if (!['png', 'jpeg', 'webp'].includes(format)) throw new Error('不支持的导出格式')
   return `image/${format}`
@@ -26,9 +28,45 @@ export function validateExportResources(source: string) {
   if (doc.querySelector('script, foreignObject, style')) throw new Error('导出包含不支持的外部样式或嵌入内容')
   for (const element of doc.querySelectorAll('*')) for (const attribute of element.attributes) {
     const value = attribute.value.trim()
-    if (/^(href|xlink:href)$/i.test(attribute.name) && value && !value.startsWith('#') && !/^data:image\/(png|jpeg|webp|gif);base64,/i.test(value)) throw new Error('画布包含外链图片或未内联资源，请先导入本地图片后重试')
+    if (/^(href|xlink:href)$/i.test(attribute.name) && value && !value.startsWith('#') && !embeddedImage.test(value) &&
+        !(element.localName === 'image' && nativeImageUrl.test(value))) throw new Error('画布包含外链图片或未内联资源，请先导入本地图片后重试')
     for (const match of value.matchAll(/url\(\s*['"]?([^)'"\s]+)['"]?\s*\)/gi)) if (!match[1].startsWith('#')) throw new Error('画布包含外链资源，请先内联后重试')
   }
+}
+
+export function hasNonSeparableAdjustments(settings: LayerAdjustments): boolean {
+  return !!(settings.hsl && JSON.stringify(settings.hsl) !== JSON.stringify(defaultHsl()) ||
+    settings.colorBalance && JSON.stringify(settings.colorBalance) !== JSON.stringify(defaultColorBalance()))
+}
+
+async function embedNativeImages(source: string, signal?: AbortSignal): Promise<string> {
+  if (!source.includes('draivio-image')) return source
+  const doc = new DOMParser().parseFromString(source, 'image/svg+xml')
+  const root = doc.documentElement
+  const resources = new Map<string, string>()
+  for (const image of root.querySelectorAll('image')) {
+    const attribute = image.getAttributeNode('href') ?? image.getAttributeNode('xlink:href')
+    const url = attribute?.value
+    if (!attribute || !url || !nativeImageUrl.test(url)) continue
+    let data = resources.get(url)
+    if (!data) {
+      signal?.throwIfAborted()
+      const response = await fetch(url, { signal })
+      if (!response.ok) throw new Error('无法读取本地图片预览')
+      const imageBlob = await response.blob()
+      data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(String(reader.result))
+        reader.onerror = () => reject(new Error('无法内联本地图片预览'))
+        reader.readAsDataURL(imageBlob)
+      })
+      signal?.throwIfAborted()
+      if (!imageBlob.size || !embeddedImage.test(data)) throw new Error('本地图片预览格式无效')
+      resources.set(url, data)
+    }
+    attribute.value = data
+  }
+  return new XMLSerializer().serializeToString(root)
 }
 function defaultDecodeSvg(source: string): Promise<DecodedSvg> {
   return new Promise((resolve, reject) => {
@@ -42,6 +80,7 @@ function defaultDecodeSvg(source: string): Promise<DecodedSvg> {
 /** Bake non-separable adjustments per layer, before opacity, masks on ancestors and blending.
  * The same helper is used for SVG downloads and bitmap export. */
 export async function materializeColorAdjustments(source: string, deps: ExportDependencies = {}): Promise<string> {
+  source = await embedNativeImages(source, deps.signal)
   source = await materializeSmartFilters(source, {decodeSvg:deps.decodeSvg??defaultDecodeSvg,createCanvas:deps.createCanvas??(()=>document.createElement('canvas'))},{signal:deps.signal})
   const doc = new DOMParser().parseFromString(source, 'image/svg+xml'), root = doc.documentElement
   const view = (root.getAttribute('viewBox') ?? '').split(/[ ,]+/).map(Number)
@@ -52,8 +91,7 @@ export async function materializeColorAdjustments(source: string, deps: ExportDe
     const filter = [...root.querySelectorAll('filter')].find(item => item.id === id)
     if (!filter?.hasAttribute('data-adjustments')) continue
     const settings = JSON.parse(filter.getAttribute('data-adjustments')!) as LayerAdjustments
-    const active = settings.hsl && JSON.stringify(settings.hsl) !== JSON.stringify(defaultHsl()) || settings.colorBalance && JSON.stringify(settings.colorBalance) !== JSON.stringify(defaultColorBalance())
-    if (!active) continue
+    if (!hasNonSeparableAdjustments(settings)) continue
     const multiply = (a: AffineMatrix, b: AffineMatrix): AffineMatrix => [a[0]*b[0]+a[2]*b[1],a[1]*b[0]+a[3]*b[1],a[0]*b[2]+a[2]*b[3],a[1]*b[2]+a[3]*b[3],a[0]*b[4]+a[2]*b[5]+a[4],a[1]*b[4]+a[3]*b[5]+a[5]]
     const parse = (text: string): AffineMatrix => {
       let matrix: AffineMatrix = [1,0,0,1,0,0]

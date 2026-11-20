@@ -33,11 +33,6 @@ export function WindowControls() {
 
   useEffect(() => {
     if (!isDesktopRuntime) return
-    void currentWindow().setTitle('')
-  }, [isDesktopRuntime])
-
-  useEffect(() => {
-    if (!isDesktopRuntime) return
     let active = true
     void currentWindow().isMaximized().then((value) => {
       if (active) setMaximized(value)

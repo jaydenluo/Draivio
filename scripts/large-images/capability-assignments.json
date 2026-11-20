@@ -1,0 +1,224 @@
+{
+  "LI04|original-import|Original bytes → Base64/Image; duplicate reads/decodes; preserve ICC/EXIF": [
+    "components/ImageImportControl",
+    "color/iccInput",
+    "color/iccEmbedding",
+    "color/iccPipeline"
+  ],
+  "LI05|original-reference|Persistent asset ownership/precision originals; never use display URL as edit authority": [
+    "render/precisionAsset",
+    "render/precisionPipeline",
+    "raw/rawPipeline"
+  ],
+  "LI06|original-persistence|JSON/Base64 project materialization; migrate to resource entries": [
+    "document/projectFormat",
+    "document/projectStorage",
+    "document/projectValidation",
+    "canvas/documentTypes"
+  ],
+  "LI07|original-recovery|Editor snapshots/recovery contain source strings; maintain versions and asset lifetimes": [
+    "state/editor",
+    "ai/persistence/editRecord",
+    "document/recoveryStore",
+    "document/workspaceRecovery",
+    "document/documentWorkspace",
+    "document/DocumentWorkspaceProvider"
+  ],
+  "LI09|display-preview|SVG image/thumbnail/hit-test display consumers; resource-aware viewport routing": [
+    "canvas/CanvasScene",
+    "canvas/useRasterHitTest",
+    "layers/LayersPanel",
+    "layers/layerPanelModel",
+    "layers/ResultsPanel",
+    "layers/PropertiesPanel",
+    "app/AppShell",
+    "canvas/moveTargets",
+    "canvas/artboards",
+    "document/alignment",
+    "document/ArtboardControls",
+    "document/documentGeometry"
+  ],
+  "LI10|working-composite|Scene/compositor and transforms; retain vector paths and region bounds": [
+    "engine/raster/composite",
+    "render/blendModes",
+    "render/precisionScene",
+    "canvas/layerExtraction",
+    "canvas/retouchScope",
+    "canvas/SelectionOverlay",
+    "canvas/selectionGeometry",
+    "canvas/layerCoordinates",
+    "canvas/objectProperties",
+    "document/groupTransforms",
+    "state/layerHierarchy"
+  ],
+  "LI11|working-pixels|PixelBuffer/full raster primitives and scheduler; centralize region/budget contracts": [
+    "canvas/rasterTools",
+    "render/pixelBuffer",
+    "ai/imaging/processingScheduler",
+    "ai/imaging/rasterPreview",
+    "render/precisionPreview",
+    "engine/raster/RasterSurface",
+    "engine/raster/rasterWorker",
+    "ai/imaging/processingWorker",
+    "lib/native"
+  ],
+  "LI12|working-pixels|Brush/clone/smudge/tonal paths currently rasterize and PNG encode whole surfaces": [
+    "canvas/CanvasViewport",
+    "retouch/cloneHeal",
+    "retouch/tonalBrush",
+    "canvas/rasterBrush"
+  ],
+  "LI13|working-selection|Selections/flood/warp/mask operations require cross-tile boundaries": [
+    "canvas/bucketFill",
+    "canvas/selectionRaster",
+    "filters/selection",
+    "filters/warp",
+    "masks/refineAsync",
+    "masks/refineMask",
+    "masks/refineWorker"
+  ],
+  "LI14|working-filter|Adjustment/filter/style/global-stat surfaces and previews; halo/global aggregation required": [
+    "adjustments/colorPipeline",
+    "adjustments/curves",
+    "adjustments/histogram",
+    "adjustments/hsl",
+    "adjustments/presets",
+    "imaging/layerAdjustments",
+    "imaging/enhancement",
+    "layers/LayerStylePreview",
+    "layers/SmartFilters",
+    "render/LayerEffectsFilter",
+    "render/SmartFilterGraph",
+    "render/filterPipeline",
+    "render/layerEffectBounds",
+    "render/materializeSmartFilters",
+    "ai/tools/adjustmentTools",
+    "ai/tools/filterTools",
+    "filters/common",
+    "filters/denoise",
+    "filters/sharpen",
+    "layers/HistogramPanel",
+    "ai/recipes/cinematic"
+  ],
+  "LI15|original-and-working|Smart objects/merge/proof/precision conversion must resolve original and lossless work resources": [
+    "document/SmartObjectControls",
+    "document/smartObjects",
+    "document/segmentedMerge",
+    "color/CmykDialog",
+    "color/cmykRaster",
+    "color/softProof",
+    "render/PrecisionDialog",
+    "raw/RawControls",
+    "color/cmykDocument",
+    "render/precisionCodec",
+    "color/SoftProofDialog",
+    "document/DocumentSizeControl"
+  ],
+  "LI16|working-and-model-preview|AI/OCR/recipe inputs and outputs; explicit model downscale provenance, full-resolution work references": [
+    "ai/batch/RecipeBatchWorkspace",
+    "ai/batch/recipeBatchRender",
+    "ai/context/editorContext",
+    "ai/context/editorPreview",
+    "ai/evaluation/fixture",
+    "ai/evaluation/replay",
+    "ai/maskedEdit/testIO",
+    "ai/maskedEdit/workflow",
+    "ai/outpaint/OutpaintDialog",
+    "ai/outpaint/workflow",
+    "ai/planning/remotePlanner",
+    "ai/recipes/DoubleExposureWorkspace",
+    "ai/recipes/PortraitRecipeWorkspace",
+    "ai/recipes/PosterRecipeWorkspace",
+    "ai/recipes/ProductRecipeWorkspace",
+    "ai/recipes/doubleExposure",
+    "ai/recipes/portrait",
+    "ai/recipes/portraitWorkflow",
+    "ai/recipes/poster",
+    "ai/recipes/product",
+    "ai/recipes/productFixture",
+    "ai/tools/generativeTools",
+    "ai/tools/restorationTools",
+    "ai/tools/retouchTools",
+    "ai/vision/OcrWorkspace",
+    "ai/vision/SemanticSelectionWorkspace",
+    "ai/vision/ocrCapture",
+    "ai/vision/targetResolver",
+    "ai/workflows/replaceText",
+    "creation/AIComposer",
+    "creation/ImageGeneration",
+    "creation/composerImage",
+    "creation/openaiImages",
+    "retouch/ContentFillWorkspace",
+    "ai/imaging/tiledInference",
+    "ai/maskedEdit/pixels",
+    "ai/outpaint/geometry",
+    "creation/demoImage",
+    "retouch/contentFill",
+    "ai/compositing/maskedResult",
+    "ai/evaluation/evaluate",
+    "ai/tools/selectionTools",
+    "ai/tools/toolCoverage",
+    "ai/vision/nativeOcr",
+    "ai/vision/ocrRepair"
+  ],
+  "LI17|working-export|Full-resolution batch/export serialization; streaming encoder and profile preservation": [
+    "batch/batchProcessor",
+    "batch/renderBatchImage",
+    "canvas/documentIO",
+    "components/BatchDialog",
+    "raw/rawExport",
+    "render/ExportDialog",
+    "render/exportImage",
+    "render/serializeExport",
+    "batch/batchIO",
+    "components/TopBar"
+  ],
+  "excluded|not-image-source|Provider/account source settings or documentation links; no document image resource": [
+    "ai/providers/modelCapabilities",
+    "creation/GenerationPanel",
+    "creation/ModelGuide",
+    "creation/ModelSourcePicker",
+    "creation/ServiceSourceEditor",
+    "creation/ServiceSourceSettings",
+    "creation/modelSources",
+    "models/ModelManagerDialog",
+    "components/SettingsDialog",
+    "account/cloudModels",
+    "creation/ImageCapabilityEditor",
+    "creation/imageEditCapabilities"
+  ],
+  "excluded|not-image-source|Payment QR image is a generated UI asset, not a document original or work resource": [
+    "components/BillingDialog"
+  ],
+  "excluded|not-image-source|Source denotes snapping target/dock tab; comment mentions font license": [
+    "document/snapping",
+    "ui/dock/dockLayout",
+    "text/systemFonts"
+  ],
+  "LI05|original-native-codec|Native precision Base64/image crate transport; resource-service integration required": [
+    "native/image_codecs"
+  ],
+  "LI06|original-native-project|Native UTF-8 whole-file project IO and 256MiB limit": [
+    "native/project_files"
+  ],
+  "LI16|working-native-ai|Native RAW decode/OCR inputs; source budget and cancellation integration": [
+    "native/raw_decode",
+    "native/ocr"
+  ],
+  "LI17|working-native-export|Native batch read/write file bytes; streaming import/export integration": [
+    "native/batch_files"
+  ],
+  "excluded|not-image-source|Native model download/account credential/config files, not document image bytes": [
+    "native/models",
+    "native/service_connections"
+  ],
+  "LI15|working-native-color|Native LCMS profiles and color transform buffers; region and ICC preservation requirements": [
+    "native/color_management"
+  ],
+  "excluded|not-image-source|General HTTP buffering helper; image consumers explicitly traced in caller matrix, shared response limit64MiB": [
+    "lib/http"
+  ],
+  "excluded|not-image-source|Model installation status/control IPC, no document image pixels": [
+    "models/modelApi"
+  ]
+}

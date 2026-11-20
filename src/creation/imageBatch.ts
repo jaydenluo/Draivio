@@ -70,7 +70,7 @@ export class ImageBatch {
               const index=slots[offset],item=this.snapshot.items[index]
               if(item.status!=='running'||item.attemptId!==attemptId)continue
               const image=images[offset]
-              if(image){try{await this.onImage(image,index,{...attempt,jobId:item.id});if(attempt.isCurrent())this.snapshot.items[index]={...item,status:'succeeded'}}catch(error){fail(index,error)}}
+              if(image){try{await this.onImage(image,index,{...attempt,jobId:item.id});if(attempt.isCurrent())this.snapshot.items[index]={...item,status:'succeeded'}}catch(error){fail(index,error instanceof ImageRequestError?error:new ImageRequestError(`图片已返回，但本地处理失败：${error instanceof Error?error.message:'无法接收图片'}；重新请求可能另行计费`,false))}}
               else this.snapshot.items[index]={...item,status:image===null?'unknown':'missing',message:image===null?'返回图片格式无效，结果未知，请先检查供应商记录':'接口未返回此图片，未自动补发'}
             }
           }).catch(error=>{slots.forEach(i=>fail(i,error))}).finally(()=>{this.controllers.delete(controller);if(!current())return;active--;this.publish();pump()})

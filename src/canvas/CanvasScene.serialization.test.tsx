@@ -17,7 +17,7 @@ it('serializes exactly one SVG root even with pending filters, unavailable proof
   expect(doc.querySelector('span,div,[data-artboard-overlay],[aria-label="蒙版红色预览"]')).toBeNull()
   expect(()=>new Resvg(markup).render()).not.toThrow()
  }
- const interactive=renderToStaticMarkup(<CanvasSceneView state={state}/>);expect(interactive).toContain('滤镜预览计算中');expect(interactive).toContain('软打样不可用');expect(interactive).toContain('蒙版红色预览')
+ const interactive=renderToStaticMarkup(<CanvasSceneView state={state}/>);expect(interactive).toContain('data-cpu-smart-filters');expect(interactive).toContain('软打样不可用');expect(interactive).toContain('蒙版红色预览')
 })
 it('editor decoration never changes the first document pixel',()=>{
  const state=structuredClone(initialEditorState);state.documentWidth=10;state.documentHeight=10;state.layers=[];state.documentBackground='#008000'

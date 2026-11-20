@@ -2,7 +2,7 @@ import { it,expect } from 'vitest'
 import { initialEditorState,editorReducer } from '../../state/editor'
 import { createEditPreview } from '../execution/preview'
 import { recordConversationRun,undoConversationRun } from './session'
-const base=()=>structuredClone(initialEditorState)
+const base=()=>{ const state=structuredClone(initialEditorState); state.layers.splice(1,0,{id:'mask',name:'测试蒙版层',className:'',visible:true,opacity:100,blendMode:'正常'}); state.artboards[0].layerIds=state.layers.map(l=>l.id); return state }
 it('undoes adopted AI lock without treating its own lock as a subsequent manual edit',()=>{
  const b=base(),steps=[{id:'s',tool:'lock' as const,args:{layerId:'art',locked:true},dependsOn:[]}]
  const p=createEditPreview(b,'doc',steps,['art']),after=recordConversationRun(b,p.document,'doc','run',steps)

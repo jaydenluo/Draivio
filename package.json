@@ -4,12 +4,16 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/clear-dev-port.mjs 5173",
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:desktop": "tsc -b && vite build --mode desktop",
     "preview": "vite preview",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build",
-    "test": "vitest"
+    "tauri:build": "npm run image-worker:build && tauri build",
+    "test": "vitest",
+    "image-worker:build": "sh src-tauri/image-worker/build.sh",
+    "image-worker:test": "node --test src-tauri/image-worker/tests/worker.test.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.12.4",
@@ -31,6 +35,7 @@
     "@types/react-dom": "latest",
     "@vitejs/plugin-react": "latest",
     "batch-test-canvas": "npm:@napi-rs/canvas@^1.1.1",
+    "fake-indexeddb": "^6.2.8",
     "jsdom": "latest",
     "typescript": "latest",
     "vite": "latest",

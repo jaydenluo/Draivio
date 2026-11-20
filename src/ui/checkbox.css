@@ -1,0 +1,15 @@
+/* Fixed checkbox geometry must never inherit text-field dimensions or flex growth. */
+input.app-checkbox[type=checkbox] {
+  appearance:none; -webkit-appearance:none; box-sizing:border-box;
+  width:14px !important; height:14px !important; min-width:14px !important; min-height:14px !important;
+  max-width:14px !important; max-height:14px !important; flex:0 0 14px !important;
+  padding:0 !important; margin:0; vertical-align:middle; border:1px solid var(--faint,#69737d);
+  border-radius:3px; background:var(--ink-950,#0d1013); color:var(--ink-950,#0d1013);
+  cursor:pointer; outline:none; box-shadow:none; background-position:center; background-repeat:no-repeat;
+}
+input.app-checkbox[type=checkbox]:checked { border-color:var(--sky,#77c7ff); background-color:var(--sky,#77c7ff); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='m2.5 6 2.2 2.2 4.8-4.8' fill='none' stroke='%230d1013' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+input.app-checkbox[type=checkbox]:indeterminate { border-color:var(--sky,#77c7ff); background-color:var(--sky,#77c7ff); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M3 6h6' stroke='%230d1013' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E"); }
+input.app-checkbox[type=checkbox]:hover:not(:disabled) { border-color:var(--sky,#77c7ff); }
+input.app-checkbox[type=checkbox]:focus-visible { outline:2px solid var(--sky,#77c7ff); outline-offset:2px; box-shadow:none; }
+input.app-checkbox[type=checkbox]:disabled { opacity:.45; cursor:not-allowed; }
+@media (forced-colors:active) { input.app-checkbox[type=checkbox] { appearance:auto; -webkit-appearance:auto; background-image:none; } }

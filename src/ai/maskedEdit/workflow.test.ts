@@ -2,7 +2,7 @@ import { testMaskedIO } from './testIO'
 import { expect, it } from 'vitest'
 import { createCanvas, loadImage } from 'batch-test-canvas'
 import { Resvg } from '@resvg/resvg-js'
-import { prepareMaskedEdit, finishMaskedEdit, type MaskedEditIO } from './workflow'
+import { prepareMaskedEdit, finishMaskedEdit, fitMaskedEditToEndpoint, type MaskedEditIO } from './workflow'
 import { initialEditorState, editorReducer, type EditorState } from '../../state/editor'
 import { createSelection } from '../../canvas/selectionGeometry'
 import { encodeProject, decodeProject } from '../../document/projectFormat'
@@ -36,6 +36,35 @@ it('keeps candidates separate, supports replacement/undo, and reopens all PNG pr
  expect(restored.aiResults?.[0].request?.maskedEdit?.raw?.source).toBe(raw)
 })
 it('refuses locked targets before rendering',async()=>{const s=state();s.layers[0].locked=true;await expect(prepareMaskedEdit(s,'doc','transparent-edit',io)).rejects.toThrow('锁定')})
+
+it('object target follows rendered alpha instead of an existing rectangular selection',async()=>{
+ const s=state(12,8)
+ s.layers[0].source=io.encode({width:2,height:2,data:new Uint8ClampedArray([255,0,0,255,0,0,0,0,0,0,0,0,255,0,0,255])})
+ const prepared=await prepareMaskedEdit(s,'doc','transparent-edit',io,'object')
+ expect(prepared.mask.some(v=>v===255)).toBe(true)
+ expect(prepared.mask.some(v=>v===0)).toBe(true)
+ for(let i=0;i<prepared.mask.length;i++)expect(prepared.mask[i]).toBe(prepared.targetPixels.data[i*4+3])
+ const raw=io.encode({width:prepared.provenance.crop.width,height:prepared.provenance.crop.height,data:new Uint8ClampedArray(Array.from({length:prepared.provenance.crop.width*prepared.provenance.crop.height},()=>[0,0,255,255]).flat())})
+ const finished=await io.decode((await finishMaskedEdit(prepared,raw,io)).source)
+ for(let i=0;i<prepared.mask.length;i++)if(!prepared.mask[i])expect([...finished.data.slice(i*4,i*4+4)]).toEqual([...prepared.pixels.data.slice(i*4,i*4+4)])
+})
+
+it('document target ignores an existing selection and works without selected layers',async()=>{
+ const s={...state(),selectedLayerId:'',selectedLayerIds:[]}
+ const prepared=await prepareMaskedEdit(s,'doc','transparent-edit',io,'document')
+ expect(prepared.mask.every(v=>v===255)).toBe(true)
+})
+
+it('allows an explicitly targeted text layer but protects it in document editing',async()=>{
+ const s=state()
+ s.layers[0].kind='text'
+ const object=await prepareMaskedEdit(s,'doc','transparent-edit',io,'object')
+ expect(object.provenance.protectedLayerIds).not.toContain('target')
+ expect(object.mask.some(v=>v>0)).toBe(true)
+ const document=await prepareMaskedEdit(s,'doc','transparent-edit',io,'document')
+ expect(document.provenance.protectedLayerIds).toContain('target')
+ for(let i=0;i<object.mask.length;i++)if(object.mask[i])expect(document.mask[i]).toBe(0)
+})
 
 import { captureEditorContext } from '../context/editorContext'
 import { contextPreviewSvg } from '../context/editorPreview'
@@ -78,4 +107,31 @@ for(const change of ['lock','opacity'] as const)it(`refuses to overwrite an adop
  for(const action of [{type:'adopt-ai-result-as-layer',id:'guarded'},{type:'replace-layer-with-ai-result',targetId:'target',resultId:'guarded'}] as const){
   const rejected=editorReducer(s,action);expect(rejected.layers).toBe(s.layers);expect(rejected.undoStack).toBe(s.undoStack)
  }
+})
+
+it('uses a protected letterboxed endpoint and maps returned pixels to the original selection only',async()=>{
+ const s={...state(100,200),selection:createSelection('rectangle',{x:40,y:30,width:20,height:40})}
+ const prepared=await prepareMaskedEdit(s,'doc','transparent-edit',io,'selection')
+ const adapted=await fitMaskedEditToEndpoint(prepared,{width:128,height:128},io)
+ const frame=adapted.provenance.endpointFrame!,mask=await io.decode(adapted.endpointMask),reference=await io.decode(adapted.reference)
+ expect([reference.width,reference.height,mask.width,mask.height]).toEqual([128,128,128,128])
+ expect(frame.content.x).toBeGreaterThan(0)
+ expect(mask.data[3]).toBe(255)
+ expect(mask.data[(64*128+64)*4+3]).toBe(0)
+ const raw=io.encode({width:128,height:128,data:new Uint8ClampedArray(Array.from({length:128*128},()=>[0,0,255,255]).flat())})
+ const finished=await finishMaskedEdit(adapted,raw,io,true),result=await io.decode(finished.source)
+ expect([result.width,result.height]).toEqual([100,200])
+ for(let p=0;p<prepared.mask.length;p++)if(!prepared.mask[p])expect([...result.data.slice(p*4,p*4+4)]).toEqual([...prepared.pixels.data.slice(p*4,p*4+4)])
+ expect([...result.data.slice((100*100+50)*4,(100*100+50)*4+4)]).toEqual([0,0,255,255])
+ expect(finished.provenance.raw?.source).toBe(raw)
+})
+
+it('materializes a returned URL before reporting mapping failure so its original remains recoverable',async()=>{
+ const prepared=await fitMaskedEditToEndpoint(await prepareMaskedEdit(state(),'doc','transparent-edit',io),{width:128,height:128},io)
+ const source=io.encode({width:16,height:12,data:new Uint8ClampedArray(16*12*4).fill(255)})
+ const url='https://provider.example/result.png'
+ const remoteIO={...io,decode:(value:string)=>io.decode(value===url?source:value)}
+ const failure=await finishMaskedEdit(prepared,url,remoteIO,true).catch(e=>e)
+ expect(failure.message).toContain('比例不符')
+ expect(failure.original).toBe(source)
 })

@@ -29,7 +29,7 @@ export function negotiateGenerativeRoute(connection:ServiceConnection,input:Imag
 /** Reuses count/concurrency/shortfall semantics; explicit retry fills only missing slots. */
 export function createGenerativeBatch(count:number,strategy:'single'|'split',concurrency:number,request:(count:number,attempt:GenerationAttempt)=>Promise<(string|null)[]>,receive:(image:string,index:number,attempt:GenerationAttempt)=>unknown|Promise<unknown>,plan?:GenerationPlan){return new ImageBatch(count,strategy,concurrency,request,receive,plan)}
 
-export type GenerativeRequest={expectedCloudSession?:number;signal?:AbortSignal;model:string;prompt:string;count:number;size:string;options:ImageInput['options'];parameters?:ImageInput['parameters']} & (
+export type GenerativeRequest={expectedCloudSession?:number;signal?:AbortSignal;additionalReference?:string;model:string;prompt:string;count:number;size:string;options:ImageInput['options'];parameters?:ImageInput['parameters']} & (
  {operation:'generate';reference?:never;mask?:never}|
  {operation:'reference';reference:string;mask?:never}|
  {operation:'fill'|'remove'|'outpaint';reference:string;mask:{source:string;semantics:'transparent-edit'|'white-edit'}})

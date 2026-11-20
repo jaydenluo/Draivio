@@ -10,7 +10,7 @@
 .service-settings-row { min-height:40px; border-bottom:1px solid var(--ink-700); }
 .service-settings-row>span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .service-settings small,.service-storage-note { color:var(--muted); font-size:11px; }
-.service-settings-row input[type=checkbox] { width:13px; height:13px; margin:0 3px 0 0; accent-color:var(--sky); }
+
 .service-settings fieldset { margin:8px 0 0; padding:0; border:0; min-width:0; }
 .service-settings label { display:grid; grid-template-columns:84px minmax(0,1fr); align-items:center; margin:10px 0; font-size:13px; }
 .service-settings input:not([type=checkbox]),.service-settings select { height:34px; padding:5px 8px; border-radius:3px; font-size:13px; }
@@ -50,10 +50,13 @@
 .service-model-picker { margin:12px 0; padding:12px; border:1px solid var(--ink-700); border-radius:5px; }
 .service-model-picker>input { width:100%; }
 .service-model-list { max-height:220px; overflow:auto; overscroll-behavior:contain; }
-.service-settings .service-model-option { display:flex; align-items:center; gap:9px; margin:0; padding:8px 4px; font-size:12px; cursor:pointer; }
-.service-model-option>span { overflow-wrap:anywhere; }
-.service-model-option>input { flex-shrink:0; accent-color:var(--sky); }
-.service-settings input[type=checkbox]:not([type=range]):not(.numeric-scrubber-input) { width:14px; height:14px; padding:0; flex:0 0 14px; margin:0; accent-color:var(--sky); }
+.service-model-row { display:flex; align-items:center; gap:8px; min-height:30px; padding:3px 4px; }
+.service-settings .service-model-row .service-model-option { display:flex; flex:1; min-width:0; align-items:center; gap:9px; margin:0; font-size:12px; cursor:pointer; }
+.service-model-option>span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.service-model-usage { display:grid; grid-template-columns:90px 68px; align-items:center; gap:8px; flex:none; }
+.service-settings .service-model-usage select { width:100%; height:24px; min-height:24px; padding:0 6px; font-size:11px; }
+.service-settings .service-model-usage .service-model-vision { display:flex; align-items:center; justify-self:end; gap:5px; margin:0; color:var(--muted); font-size:11px; white-space:nowrap; }
+
 .service-settings-row>button { flex-shrink:0; white-space:nowrap; }
 
 .service-assistant-settings { flex-shrink:0; padding-bottom:12px; border-bottom:1px solid var(--ink-700); }

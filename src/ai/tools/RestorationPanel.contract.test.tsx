@@ -1,3 +1,4 @@
+import {ResultStage} from '../../creation/ResultStage'
 import {act,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,expect,it,vi} from 'vitest'
 import {RestorationPanel} from './RestorationPanel'
@@ -15,7 +16,7 @@ function Harness(){const {state,dispatch}=useEditor();current=state;return <>
  <button onClick={()=>dispatch({type:'restore-project',document:{...structuredClone(initialEditorState),documentWidth:225,documentHeight:4,layers:[{id:'photo',name:'original portrait',className:'layer-art',kind:'image',source,visible:true,opacity:100,blendMode:'正常'}],selectedLayerId:'photo',selectedLayerIds:['photo'],canvasShapes:[],canvasTexts:[],brushStrokes:[],sceneOrder:[],layerMasks:{},aiResults:[]}})}>prepare original</button>
  <button onClick={()=>dispatch({type:'rename-layer',id:'photo',name:'changed during inference'})}>change content</button>
  <button onClick={()=>dispatch({type:'undo'})}>undo adoption</button>
- <RestorationPanel/><ResultsPanel/><MessageHost/>
+ <RestorationPanel/><ResultsPanel/><ResultStage/><MessageHost/>
  </>}
 function mount(){vi.spyOn(pixelIO,'decodePixels').mockImplementation(testMaskedIO.decode);vi.spyOn(pixelIO,'encodePixels').mockImplementation(testMaskedIO.encode);render(<EditorProvider><Harness/></EditorProvider>);fireEvent.click(screen.getByText('prepare original'))}
 // These fixed RGBA responses exercise transport/tile assembly, not learned model quality.
@@ -36,10 +37,10 @@ it('runs production tiles through partial failure, manual retry, candidate previ
  const result=current!.aiResults[0],pixels=await testMaskedIO.decode(result.source!)
  expect(pixels).toMatchObject({width:450,height:8});for(let i=0;i<pixels.data.length;i+=4)expect(Array.from(pixels.data.subarray(i,i+4))).toEqual([100,60,80,255])
  expect(current!.layers).toEqual(original.layers);expect(current!.undoStack).toHaveLength(undo);expect(current!.redoStack).toEqual(redo)
- fireEvent.click(screen.getByRole('button',{name:`预览结果 ${result.id}`}));expect(screen.getByRole('dialog',{name:'AI 结果预览'})).toBeInTheDocument();fireEvent.click(screen.getByRole('button',{name:'关闭预览'}))
+ fireEvent.click(screen.getByRole('button',{name:`预览结果 ${result.id}`}));expect(screen.getByRole('region',{name:'生成结果预览'})).toBeInTheDocument();fireEvent.click(screen.getByRole('button',{name:'返回作品'}))
  const candidateProject=await encodeProject(current!,{id:'restore',name:'offline candidate'}),candidate=decodeProject(candidateProject).document
  expect(candidate.aiResults?.[0].request?.reference?.source).toBe(source);expect(candidate.aiResults?.[0].source).toBe(result.source)
- fireEvent.click(screen.getByRole('button',{name:'新增图层'}))
+ fireEvent.click(screen.getByRole('button',{name:`预览结果 ${result.id}`}));fireEvent.click(screen.getByRole('button',{name:'更多结果操作'}));fireEvent.click(screen.getByRole('menuitem',{name:'添加到当前作品'}))
  expect(current!.layers).toHaveLength(2);expect(current!.layers[0]).toMatchObject({contentWidth:450,contentHeight:8,source:result.source});expect(current!.layers.find(l=>l.id==='photo')?.source).toBe(source);expect(current!.undoStack).toHaveLength(undo+1)
  const adopted=decodeProject(await encodeProject(current!,{id:'restore',name:'offline adopted'})).document
  expect(adopted.layers[0].source).toBe(result.source);expect((await testMaskedIO.decode(adopted.layers[0].source!)).data).toEqual(pixels.data)

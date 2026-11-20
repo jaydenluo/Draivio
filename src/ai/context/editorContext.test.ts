@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest'
-import { initialEditorState, type EditorState } from '../../state/editor'
+import { editorReducer, initialEditorState, type EditorState } from '../../state/editor'
 import { captureEditorContext } from './editorContext'
 const state = () => structuredClone(initialEditorState)
+const selectedState = () => editorReducer(state(), { type: 'set-selection-rect', rect: { x: 27, y: 26, width: 46, height: 40 } })
 test('rejects missing targets, empty selections and inherited group locks', () => {
  const s=state(); s.layers=[{...s.layers[0],id:'group',locked:true,children:['child']},{...s.layers[0],id:'child',groupId:'group'}]; s.selectedLayerId='child'
  expect(()=>captureEditorContext(s,'doc','layer')).toThrow(/锁定/)
@@ -9,11 +10,11 @@ test('rejects missing targets, empty selections and inherited group locks', () =
  s.layers=state().layers; s.selectedLayerId=s.layers[0].id; s.selectionVisible=false; expect(()=>captureEditorContext(s,'doc','selection')).toThrow(/选区/)
 })
 test('freezes IDs, tree, source selection and coordinates independently of view state', () => {
- const s=state(); s.documentWidth=2000; s.documentHeight=1000
+ const s=selectedState(); s.documentWidth=2000; s.documentHeight=1000
  const a=captureEditorContext(s,'doc','selection'); const target=s.selectedLayerId
  s.selectedLayerId='different'; s.selection.rect.x=90; s.layers[0].name='changed';
  expect(a.targetLayerId).toBe(target); expect(a.selection?.rect.x).not.toBe(90); expect(a.layers[0].name).not.toBe('changed')
- const viewed={...state(),documentWidth:2000,documentHeight:1000,zoom:400,canvasRotation:90,canvasOffset:{x:99,y:33}} as EditorState
+ const viewed={...selectedState(),documentWidth:2000,documentHeight:1000,zoom:400,canvasRotation:90,canvasOffset:{x:99,y:33}} as EditorState
  const b=captureEditorContext(viewed,'doc','selection')
  expect(a.pixelBounds).toEqual(b.pixelBounds); expect(a.preview).toEqual({width:1024,height:512,scale:.512})
  expect(Object.isFrozen(a.selection?.rect)).toBe(true)

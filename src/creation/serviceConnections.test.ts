@@ -72,14 +72,11 @@ test('distinguishes a timeout from a network or CORS failure', async () => {
   vi.spyOn(globalThis, 'fetch').mockRejectedValue(new DOMException('timed out', 'TimeoutError'))
   await expect(testConnection(connection)).rejects.toThrow('模型列表请求超时')
 })
-test('browser storage never persists api keys and migrates legacy plaintext once', async () => {
+test('persists api keys in local storage for the current device', async () => {
  await saveConnections([connection])
  const stored = localStorage.getItem('draivio-service-connections-v1')!
- expect(stored).not.toContain(connection.apiKey)
- expect(JSON.parse(stored)[0].apiKey).toBe('')
- const legacy={...connection,apiKey:'legacy-secret'}
- localStorage.setItem('draivio-service-connections-v1',JSON.stringify([legacy]))
+ expect(stored).toContain(connection.apiKey)
+ expect(JSON.parse(stored)[0].apiKey).toBe(connection.apiKey)
  const loaded=await loadConnections()
- expect(loaded[0].apiKey).toBe('legacy-secret')
- expect(localStorage.getItem('draivio-service-connections-v1')).not.toContain('legacy-secret')
+ expect(loaded[0].apiKey).toBe(connection.apiKey)
 })

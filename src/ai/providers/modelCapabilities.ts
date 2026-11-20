@@ -4,11 +4,25 @@ import type { ServiceConnection } from '../../creation/serviceConnections'
 export type ModelCapabilities = { image: boolean; text: boolean; vision: boolean }
 export type AssistantSelection = { sourceId: string; model: string }
 export type AssistantModel = AssistantSelection & { label: string; vision: boolean }
-const legacyCapabilities: ModelCapabilities = { image: true, text: false, vision: false }
+const unclassified: ModelCapabilities = { image: false, text: false, vision: false }
 
-/** Capabilities are user declarations; a model-list response never grants tool permissions. */
+/** Only known model families get a default purpose; input vision is always declared separately. */
+function inferredCapabilities(model: string): ModelCapabilities {
+  const name = model.trim().toLowerCase().replace(/^models\//, '').split('/').at(-1) ?? ''
+  // Audio, embedding and ranking endpoints belong to neither of these pickers.
+  if (/(?:^|[-_.])(embedding|embed|rerank|tts|transcribe|transcription|audio|realtime|whisper|moderation)(?:[-_.]|$)/.test(name)) return { ...unclassified }
+  if (/(?:^|[-_.])image(?:[-_.]|$)/.test(name) || /^(?:dall-e|flux|seedream|imagen|ideogram|stable-diffusion|sdxl)(?:[-_.]|$)/.test(name)) return { image: true, text: false, vision: false }
+  if (/^(?:gpt-\d|chatgpt-\d|o[1-9](?:[-.]|$)|claude[-.]|deepseek[-.]|qwen(?:\d|[-.])|gemini[-.]|glm[-.])/.test(name)) return { image: false, text: true, vision: false }
+  return { ...unclassified }
+}
+
+/** Explicit per-source declarations override defaults; listing a model never grants tool permissions. */
 export function capabilitiesFor(connection: ServiceConnection, model: string): ModelCapabilities {
-  return connection.modelCapabilities?.[model] ?? { ...legacyCapabilities }
+  const declared = connection.modelCapabilities?.[model]
+  if (declared) return declared
+  if (connection.id === 'draivio-cloud') return { ...unclassified }
+  if (connection.imageCapabilities?.[model]) return { image: true, text: false, vision: false }
+  return inferredCapabilities(model)
 }
 export function validCapabilities(connection: ServiceConnection): boolean {
   const map = connection.modelCapabilities
@@ -29,7 +43,7 @@ export function selectedAssistant(connections: ServiceConnection[]): AssistantMo
 }
 /** Store the separate preference in the same native/browser source records as its account. */
 export function selectAssistant(connections: ServiceConnection[], selection: AssistantSelection | null): ServiceConnection[] {
-  if (selection && !assistantModels(connections).some(model => model.sourceId === selection.sourceId && model.model === selection.model)) throw new Error('助手模型不可用，请检查来源、密钥与文本推理能力')
+  if (selection && !assistantModels(connections).some(model => model.sourceId === selection.sourceId && model.model === selection.model)) throw new Error('推理模型不可用，请检查来源、密钥与文本推理能力')
   return connections.map(connection => {
     const { assistantModel: _previous, ...rest } = connection
     return selection?.sourceId === connection.id ? { ...rest, assistantModel: selection.model } : rest

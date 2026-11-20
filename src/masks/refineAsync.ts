@@ -1,5 +1,6 @@
 import { refineMaskAlpha, type RefineMaskParameters } from './refineMask'
-import { selectionContains, type Selection } from '../canvas/selectionGeometry'
+import type { Selection } from '../canvas/selectionGeometry'
+import { rasterizeSelectionMask } from '../canvas/selectionRaster'
 import { decontaminateFringe } from './refineMask'
 
 export type RefinementJob = { documentId: string; revision: string; cancelled: boolean; controller: AbortController }
@@ -7,11 +8,7 @@ export function createRefinementJob(documentId: string, revision: string): Refin
 export function cancelRefinementJob(job: RefinementJob) { job.cancelled = true; job.controller.abort() }
 
 export function selectionToAlpha(selection: Selection, width: number, height: number): Uint8Array {
-  const alpha = new Uint8Array(width * height)
-  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-    alpha[y * width + x] = selectionContains(selection.path, { x: (x + .5) / width * 100, y: (y + .5) / height * 100 }) ? 255 : 0
-  }
-  return alpha
+  return rasterizeSelectionMask({ ...selection, feather: 0 }, width, height)
 }
 
 export function alphaToSelection(alpha: Uint8Array, width: number, height: number, source: Selection): Selection {
@@ -56,7 +53,7 @@ export async function refineAsync(input: Uint8Array, width: number, height: numb
   return { preview, previewWidth, previewHeight, previewRgba, result: result ?? undefined, cancelled: !result }
 }
 
-async function runFullResolution(input: Uint8Array, width: number, height: number, params: RefineMaskParameters, job: RefinementJob): Promise<Uint8Array | null> {
+export async function runFullResolution(input: Uint8Array, width: number, height: number, params: RefineMaskParameters, job: RefinementJob): Promise<Uint8Array | null> {
   if (job.controller.signal.aborted) return null
   if (typeof Worker !== 'undefined') {
     return new Promise(resolve => {

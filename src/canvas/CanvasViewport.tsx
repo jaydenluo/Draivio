@@ -1,3 +1,13 @@
+import { materializeColorAdjustments } from '../render/exportImage'
+import { ObjectTransformOverlay } from './ObjectTransformOverlay'
+import { selectedObjects, objectLocked } from './objectProperties'
+import { createPortal } from 'react-dom'
+import { bucketSelection, selectionInLayer, fillShapeAt } from './bucketFill'
+import { toolCursor, isRoundBrush } from './toolCursor'
+import { toolHint, toolUnavailableReason } from '../tools/toolHelp'
+import { CanvasSelectionMenu } from './CanvasSelectionMenu'
+import { useLayerStyleEditor, withLayerStylePreview } from '../layers/LayerStyleEditor'
+import { useSmartFilterEditor } from '../layers/SmartFilterEditor'
 import { SemanticSelectionWorkspace } from '../ai/vision/SemanticSelectionWorkspace'
 import { tonalBrushPixels, tonalSourceIds, type TonalRange } from '../retouch/tonalBrush'
 import { ContentFillWorkspace, CONTENT_FILL_EVENT, type FillResult } from '../retouch/ContentFillWorkspace'
@@ -5,31 +15,32 @@ import { brushMask } from '../retouch/contentFill'
 import { contentRevision } from '../ai/context/editorContext'
 import type { PixelImage } from './rasterTools'
 import { FloatingSurface } from '../ui/FloatingSurface'
-import { effectiveLayerState } from '../state/layerHierarchy'
+import { effectiveLayerState, layerSubtreeIds } from '../state/layerHierarchy'
 import { retouchScopeSvg, retouchParentId } from './retouchScope'
 import { layerPixelScale } from '../document/documentGeometry'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
-import { useEditor, type EditorAction } from '../state/editor'
+import { useEditor, neutralAdjustments, type EditorAction } from '../state/editor'
+import { ResultStage } from '../creation/ResultStage'
 import { AIComposer } from '../creation/AIComposer'
 import { CANVAS_FIT_EVENT, TOOL_CANCEL_EVENT } from '../tools/useToolShortcuts'
 import { SelectionOverlay, maskDefinitions } from './SelectionOverlay'
-import { combineSelection, createSelection, drawSelectionRect, moveSelection, pathSelection, type Selection, type SelectionPoint } from './selectionGeometry'
+import { combineSelection, createSelection, selectionContains, drawSelectionRect, moveSelection, pathSelection, type Selection, type SelectionPoint } from './selectionGeometry'
 import { layerPoint, layerMatrix, selectionToLayer } from './layerCoordinates'
 import { addAnchor, closePath, moveControl, type EditorPath } from './pathGeometry'
 import { PathOverlay } from './PathOverlay'
 import { appendBrushPoint, createBrushStroke, type BrushStroke } from './BrushEngine'
-import { documentDeltaToParentLocal, documentPointToLayerLocal } from './layerWorldMatrix'
+import { documentPointToLayerLocal, layerWorldPixelMatrix } from './layerWorldMatrix'
 import { pointerInput } from './pointerPressure'
 import { CanvasSceneView } from './CanvasScene'
 import { TransformOverlay, type TransformDraft } from './TransformOverlay'
 import { GuideOverlay } from './GuideOverlay'
-import { RulerOverlay } from './RulerOverlay'
+import { RulerOverlay, rulerWidth } from './RulerOverlay'
 import { GuideControls } from '../components/GuideControls'
 import { TextObject, type CanvasTextObject } from './TextObject'
 import type { CanvasShape, LayerMask } from './documentTypes'
 import { canvasCloudServices } from './cloudToolServices'
 import { contiguousMagicSelection, eraseBackground, sampleCanvasColor, serializeSvg, rasterizeSvg, rasterizeSvgPixels, imageToPng, perspectiveWarp, clonePixels, smudgePixels } from './rasterTools'
-import { fillPixels, paintBrushStroke } from './rasterBrush'
+import { paintBrushStroke } from './rasterBrush'
 import { rasterizeSelectionMask } from './selectionRaster'
 import { PerspectiveOverlay, type PerspectiveQuad } from './PerspectiveOverlay'
 import { fitViewportZoom } from './viewportFit'
@@ -37,8 +48,10 @@ import { healPixels, patchPixels, repairDeltaPixels, repairCoveragePath, resolve
 import { useDocumentWorkspace } from '../document/DocumentWorkspaceProvider'
 import { removeBackground, upscalePixels } from '../imaging/enhancement'
 import { ensureModelInstalled } from '../models/modelApi'
-import type { SnapIndex, SnapHits } from '../document/snapping'
+import { snapBounds, type SnapIndex, type SnapHits } from '../document/snapping'
 import { editorSnapIndex, snapLayerTransform } from './snapTransform'
+import { useRasterHitTest } from './useRasterHitTest'
+import { chooseMoveTargets, hitMoveTarget, moveSnapIndex, moveTargetBounds, translateMoveTargets, type MoveTarget } from './moveTargets'
 import type { SelectionRefineBrushMode, SelectionRefinePreviewMode } from '../components/SelectionRefinePanel'
 
 type Point = SelectionPoint
@@ -49,7 +62,7 @@ const fullRect = { x: 0, y: 0, width: 100, height: 100 }
 const defaultTransform = (): TransformDraft => ({ kind: 'transform', rect: { ...fullRect }, rotation: 0, flipX: false, flipY: false })
 const fullQuad: PerspectiveQuad = [{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 100 }, { x: 0, y: 100 }]
 const inputTarget = (target: EventTarget | null) => target instanceof Element && !!target.closest('input,textarea,select,[contenteditable="true"],[role="textbox"]')
-type Gesture = { pointerId: number; start: Point; client: Point; previous: Selection | null; selection?: Selection; stroke?: BrushStroke; shape?: CanvasShape; offset: Point; transform?: TransformDraft; layerId?: string; snapIndex?: SnapIndex; snapHits?: SnapHits; pathIndex?: number; points: Point[]; rotation: number }
+type Gesture = { pointerId: number; start: Point; client: Point; previous: Selection | null; selection?: Selection; stroke?: BrushStroke; shape?: CanvasShape; offset: Point; transform?: TransformDraft; layerId?: string; moveTargets?: MoveTarget[]; moveBounds?: typeof fullRect; snapIndex?: SnapIndex; snapHits?: SnapHits; pathIndex?: number; points: Point[]; rotation: number }
 type RefineGesture = { pointerId: number; selection: Selection; mode: SelectionRefineBrushMode }
 type TextGesture = { pointerId: number; start: Point; object: CanvasTextObject; moved: boolean }
 
@@ -78,15 +91,34 @@ function SelectionRefinePixelPreview({ preview, mode }: { preview: { alpha: Uint
     const context = canvas.getContext('2d')
     if (!context) return
     const pixels = context.createImageData(preview.width, preview.height)
-    const color = mode === 'black' ? [255, 255, 255] : mode === 'white' ? [0, 0, 0] : [255, 77, 91]
-    for (let i = 0; i < preview.alpha.length; i++) { const a = 255 - preview.alpha[i]; const src = preview.rgba ? i * 4 : -1; pixels.data[i * 4] = src >= 0 ? preview.rgba![src] : color[0]; pixels.data[i * 4 + 1] = src >= 0 ? preview.rgba![src + 1] : color[1]; pixels.data[i * 4 + 2] = src >= 0 ? preview.rgba![src + 2] : color[2]; pixels.data[i * 4 + 3] = src >= 0 ? Math.min(220, a) : Math.min(220, a) }
+    const overlay = mode === 'overlay'
+    const color = mode === 'black' ? [5, 6, 8] : mode === 'white' ? [248, 246, 240] : [255, 77, 91]
+    for (let index = 0; index < preview.alpha.length; index++) {
+      const offset = index * 4
+      const selected = preview.alpha[index] / 255
+      const outsideColor = mode === 'transparent'
+        ? Array(3).fill((Math.floor((index % preview.width) / 8) + Math.floor(index / preview.width / 8)) % 2 ? 85 : 124)
+        : color
+      const corrected = preview.rgba && selected > 0 && selected < .98 ? preview.rgba : undefined
+      const correction = corrected ? corrected[offset + 3] / 255 * selected : 0
+      const cover = (1 - selected) * (overlay ? .46 : 1)
+      const opacity = cover + correction * (1 - cover)
+      for (let channel = 0; channel < 3; channel++) {
+        const foreground = corrected ? corrected[offset + channel] : 0
+        pixels.data[offset + channel] = opacity ? (outsideColor[channel] * cover + foreground * correction * (1 - cover)) / opacity : 0
+      }
+      pixels.data[offset + 3] = opacity * 255
+    }
     context.putImageData(pixels, 0, 0)
   }, [preview, mode])
-  return <canvas ref={ref} data-refinement-preview-pixels="true" aria-label="低清蒙版预览" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', imageRendering: 'auto' }} />
+  return <canvas ref={ref} data-refinement-preview-pixels="true" aria-label="选区精修预览" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', imageRendering: 'auto' }} />
 }
 
-export function CanvasViewport({ enhancementRequest, refineSelection, refinePreviewMode, refinePreviewAlpha, refineBrushMode, refineBrushSize = 80, onRefineSelectionChange }: { enhancementRequest?: { kind: 'cutout' | 'upscale'; nonce: number }; refineSelection?: Selection; refinePreviewMode?: SelectionRefinePreviewMode; refinePreviewAlpha?: { alpha: Uint8Array; width: number; height: number; rgba?: Uint8ClampedArray }; refineBrushMode?: SelectionRefineBrushMode; refineBrushSize?: number; onRefineSelectionChange?: (selection: Selection) => void }) {
-  const { state, dispatch, documentId, viewInitialized } = useEditor()
+export function CanvasViewport({ enhancementRequest, refineSelection, refinePreviewMode, refinePreviewAlpha, refineBrushMode, refineBrushSize = 80, onRefineSelectionChange, onOpenSelectionRefine }: { enhancementRequest?: { kind: 'cutout' | 'upscale'; nonce: number }; refineSelection?: Selection; refinePreviewMode?: SelectionRefinePreviewMode; refinePreviewAlpha?: { alpha: Uint8Array; width: number; height: number; rgba?: Uint8ClampedArray }; refineBrushMode?: SelectionRefineBrushMode; refineBrushSize?: number; onRefineSelectionChange?: (selection: Selection) => void; onOpenSelectionRefine?: () => void }) {
+  const { state, dispatch, documentId, viewInitialized, curveDraft } = useEditor()
+  const { draft: layerStyleDraft } = useLayerStyleEditor()
+  const { preview: filterPreview } = useSmartFilterEditor()
+  const sourceHit = useRasterHitTest(state)
   const { dispatchWorkspace } = useDocumentWorkspace()
   const artboardRef = useRef<HTMLDivElement>(null)
   const gesture = useRef<Gesture | null>(null)
@@ -103,6 +135,25 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
   const [textObjectPreview, setTextObjectPreview] = useState<CanvasTextObject | null>(null)
   const [selectedTextId, setSelectedTextId] = useState<string | null>(null)
   const [snapHits, setSnapHits] = useState<SnapHits>({})
+  const moveTargets = state.selectedCanvasTargets ?? []
+  const setMoveTargets = (targets:MoveTarget[]) => dispatch({type:'select-canvas-targets',targets})
+  const [movePreview, setMovePreview] = useState<{ targets: MoveTarget[]; delta: Point } | null>(null)
+  const [objectShapePreview,setObjectShapePreview]=useState<CanvasShape|null>(null)
+  const sceneState = useMemo(() => {const base=movePreview ? translateMoveTargets(state, movePreview.targets, movePreview.delta) : state;return objectShapePreview?{...base,canvasShapes:base.canvasShapes.map(s=>s.id===objectShapePreview.id?objectShapePreview:s)}:base}, [state, movePreview,objectShapePreview])
+  const editableSelection=selectedObjects(sceneState)
+  const selectedShape=editableSelection.length===1&&editableSelection[0].kind==='shape'?editableSelection[0].object:null
+  const curveSceneState = useMemo(() => curveDraft && curveDraft.layerId === state.selectedLayerId && state.curvePreviewOffLayerId !== curveDraft.layerId
+    ? { ...sceneState, layers: sceneState.layers.map(layer => layer.id === curveDraft.layerId ? { ...layer, adjustments: { ...neutralAdjustments, ...layer.adjustments, ...(curveDraft.curves ? { curves: curveDraft.curves } : {}), ...(curveDraft.levels ? { levels: curveDraft.levels } : {}) } } : layer) }
+    : sceneState, [sceneState, curveDraft, state.selectedLayerId, state.curvePreviewOffLayerId])
+  const styleSceneState = useMemo(() => withLayerStylePreview(curveSceneState, layerStyleDraft), [curveSceneState, layerStyleDraft])
+  const movingLayerId = movePreview?.targets.length === 1 && movePreview.targets[0].kind === 'layer' ? movePreview.targets[0].layerId : null
+  const displaySceneState = movingLayerId ? state : styleSceneState
+  const filterSceneState = useMemo(() => filterPreview ? {
+    ...displaySceneState,
+    layers: displaySceneState.layers.map(layer => layer.id === filterPreview.layerId
+      ? { ...layer, smartFilters: filterPreview.chain } : layer),
+  } : displaySceneState, [displaySceneState, filterPreview])
+  const movementBounds = useMemo(() => moveTargetBounds(sceneState, moveTargets), [sceneState, moveTargets])
   const [transform, setTransform] = useState<TransformDraft | null>(null)
   const transformSnapIndex = useMemo(() => editorSnapIndex(state, state.selectedLayerId), [state.layers, state.guideSettings, state.selectedLayerId, state.documentWidth, state.documentHeight])
   const [quad, setQuad] = useState<PerspectiveQuad | null>(null)
@@ -112,7 +163,10 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
   const [busy, setBusy] = useState(false)
   const [pendingRepair, setPendingRepair] = useState<Extract<EditorAction, { type: 'add-repair-layer' }> | null>(null)
   const [fillSession, setFillSession] = useState<{image:PixelImage; source:string; target:Uint8Array; revision:string; documentId:string; layerId:string; selection:Selection; parentId?:string; undoLength:number}|null>(null)
+  const canvasMenuAnchor=useRef<HTMLElement>(null)
   const [fillMenu,setFillMenu]=useState<{x:number;y:number}|null>(null)
+  const closeSelectionMenu=useCallback(()=>setFillMenu(null),[])
+  useEffect(()=>setFillMenu(null),[documentId,state.selectedLayerId,state.selection,state.selectionVisible,busy,refineSelection])
   const fillLoadAbort=useRef<AbortController|null>(null)
   const latestDocumentId=useRef(documentId); latestDocumentId.current=documentId
   const processing = useRef(false)
@@ -125,7 +179,39 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
   const crop = state.cropRect ?? fullRect
   const changePath = (next: EditorPath | null) => { pathRef.current = next; setPath(next) }
   const notice = (message: string) => dispatch({ type: 'set-notice', message })
-  const zoom = (value: number) => { autoFit.current = false; dispatch({ type: 'set-zoom', zoom: value }) }
+  const zoom = useCallback((value: number) => {
+    autoFit.current = false
+    dispatch({ type: 'set-zoom', zoom: value })
+  }, [dispatch])
+  useEffect(() => {
+    const canvas = canvasMenuAnchor.current
+    if (!canvas) return
+
+    // WebKit trackpad gestures report a scale relative to the start of the pinch.
+    let startZoom: number | null = null
+    const end = () => { startZoom = null }
+    const start = (event: Event) => {
+      end()
+      const target = event.target
+      if (!(target instanceof Element) || target.closest('.ai-composer, .zoom-control, [role="dialog"]') || inputTarget(target)) return
+      startZoom = latestState.current.zoom
+    }
+    const change = (event: Event) => {
+      const { scale } = event as Event & { scale?: number }
+      if (startZoom === null || typeof scale !== 'number' || !Number.isFinite(scale) || scale <= 0) return
+      zoom(startZoom * scale)
+    }
+    canvas.addEventListener('gesturestart', start)
+    window.addEventListener('gesturechange', change)
+    window.addEventListener('gestureend', end)
+    window.addEventListener('blur', end)
+    return () => {
+      canvas.removeEventListener('gesturestart', start)
+      window.removeEventListener('gesturechange', change)
+      window.removeEventListener('gestureend', end)
+      window.removeEventListener('blur', end)
+    }
+  }, [zoom])
   const fitToViewport = useCallback((explicit = false) => {
     const current = latestState.current
     if (!explicit && (!autoFit.current || (autoFitZoom.current !== null && Math.abs(current.zoom - autoFitZoom.current) > .1))) {
@@ -137,31 +223,37 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     const visible = current.cropRect ?? fullRect
     const composer = canvas.querySelector<HTMLElement>('.ai-composer[data-placement="floating"]')
     const composerHeight = composer?.getBoundingClientRect().height ?? 0
+    const history = composer?.querySelector<HTMLElement>('.composer-history')
+    const historyStyle = history ? getComputedStyle(history) : null
+    const editPreview = composer?.querySelector<HTMLElement>('.composer-edit-target-preview')
+    const composerHistoryHeight = (history ? history.getBoundingClientRect().height + (parseFloat(historyStyle?.marginTop ?? '') || 0) + (parseFloat(historyStyle?.marginBottom ?? '') || 0) : 0) + (editPreview ? editPreview.getBoundingClientRect().height + 8 : 0)
+    const inputHeight = Math.max(0,composerHeight-composerHistoryHeight)
     const fitted = fitViewportZoom({
       documentWidth: current.documentWidth * visible.width / 100,
       documentHeight: current.documentHeight * visible.height / 100,
       canvasWidth: canvas.clientWidth,
       canvasHeight: canvas.clientHeight,
       composerHeight,
+      composerHistoryHeight,
     })
     autoFit.current = true
     autoFitZoom.current = fitted
     dispatch({ type: 'set-zoom', zoom: fitted })
-    dispatch({ type: 'set-canvas-offset', x: 0, y: composerHeight ? -(composerHeight + 20) / 2 : 0 })
+    dispatch({ type: 'set-canvas-offset', x: 0, y: inputHeight ? -(inputHeight + 20) / 2 : 0 })
     if (explicit) dispatch({ type: 'set-canvas-rotation', rotation: 0 })
   }, [dispatch])
   const textLayerStyle = (layerId: string) => {
-    const layer = state.layers.find((item) => item.id === layerId)
+    const layer = sceneState.layers.find((item) => item.id === layerId)
     const width = layer?.contentWidth ?? state.documentWidth, height = layer?.contentHeight ?? state.documentHeight
-    const m = layerMatrix(layer?.transform ?? defaultTransform(), state.documentWidth, state.documentHeight)
-    return { position: 'absolute' as const, left: 0, top: 0, width, height, zIndex: 5, pointerEvents: 'auto' as const, transformOrigin: '0 0', transform: `matrix(${m[0] * state.documentWidth / width},${m[1] * state.documentHeight / width},${m[2] * state.documentWidth / height},${m[3] * state.documentHeight / height},${m[4] * state.documentWidth / 100},${m[5] * state.documentHeight / 100})` }
+    const m = layerWorldPixelMatrix(sceneState.layers, layerId, state.documentWidth, state.documentHeight)
+    return { position: 'absolute' as const, left: 0, top: 0, width, height, zIndex: 5, pointerEvents: 'none' as const, transformOrigin: '0 0', transform: `matrix(${m.join(',')})` }
   }
   const selectedTransform = () => state.layers.find((layer) => layer.id === state.selectedLayerId)?.transform
   const selectedLayer = state.layers.find((layer) => layer.id === state.selectedLayerId)
   const { y: sourceScaleY, mean: sourcePixelScale } = layerPixelScale(selectedLayer, state.documentWidth, state.documentHeight)
   const localSelection = (selection: Selection) => ({ ...selectionToLayer(selection, selectedTransform(), state.documentWidth, state.documentHeight), feather: selection.feather / sourcePixelScale })
   const localPoint = (point: Point) => documentPointToLayerLocal(state.layers, state.selectedLayerId, point, state.documentWidth, state.documentHeight)
-  const isLayerTool = (tool: string) => ['brush', 'pencil', 'soft-brush', 'brush-line', 'smudge', 'eraser', 'background-eraser', 'healing', 'remove-object', 'clone-stamp', 'patch', 'mask', 'mask-quick', 'mask-gradient', 'shape', 'shape-ellipse', 'shape-line', 'shape-arrow', 'gradient-fill', 'text', 'fill'].includes(tool)
+  const isLayerTool = (tool: string) => ['brush', 'gradient-brush', 'pencil', 'soft-brush', 'brush-line', 'smudge', 'eraser', 'background-eraser', 'healing', 'remove-object', 'clone-stamp', 'patch', 'mask', 'mask-quick', 'mask-gradient', 'gradient-fill', 'text', 'fill'].includes(tool)
   const option = (key: string, fallback: number) => typeof state.toolOptions[key] === 'number' ? state.toolOptions[key] as number : fallback
   const scene = () => artboardRef.current?.querySelector<SVGSVGElement>('.canvas-art') ?? null
   // Raster tools operate on the selected layer, so other layers remain editable.
@@ -220,6 +312,54 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     } catch (error) { notice(error instanceof Error ? error.message : '操作失败，请重试') }
     finally { if (processingAbort.current === controller) processingAbort.current = null; processing.current = false; setBusy(false) }
   }
+  const copySelection = () => void perform(async () => {
+    const svg = artboardRef.current?.querySelector<SVGSVGElement>('.canvas-art, .canvas-filter-preview')
+    if (!svg || !selectedLayer) throw new Error('当前图层尚未就绪')
+    const sampled = retouchScopeSvg(svg, state.layers, selectedLayer.id, 'current', layerSubtreeIds(state.layers, selectedLayer.id), true)
+    sampled.querySelectorAll('[data-editor-overlay]').forEach(node => node.remove())
+    for (const child of Array.from(sampled.children)) {
+      if (child.localName === 'rect') child.remove()
+      else if (child.hasAttribute('data-color-preview-source')) child.removeAttribute('visibility')
+    }
+
+    // React writes a plain xmlns attribute. The serializer adds its namespaced form.
+    sampled.removeAttribute('xmlns')
+    const signal = processingAbort.current?.signal
+    const source = await materializeColorAdjustments(serializeSvg(sampled).source, { signal })
+    const isolated = new DOMParser().parseFromString(source, 'image/svg+xml').documentElement as unknown as SVGSVGElement
+    const image = await rasterizeSvgPixels(isolated, signal)
+    const coverage = rasterizeSelectionMask(state.selection, image.width, image.height)
+    let hasPixels = false
+    for (let index = 0; index < coverage.length; index++) {
+      const alpha = index * 4 + 3
+      image.data[alpha] *= coverage[index] / 255
+      if (image.data[alpha]) hasPixels = true
+    }
+    if (!hasPixels) throw new Error('选区内没有可复制的图层像素')
+    return { type: 'import-image', id: freshId(), name: `${selectedLayer.name} · 选区副本`, source: imageToPng(image) }
+  }, '已将选区复制到新图层')
+
+  useEffect(() => {
+    const fill = (event:Event) => {
+      if (processing.current) return
+      const reason = toolUnavailableReason({...state, activeToolId:'fill'})
+      if (reason) return notice(reason)
+      const color = (event as CustomEvent<string>).detail === 'fillBackground' ? state.backgroundColor ?? '#ffffff' : state.brushColor
+      dispatch({type:'add-shape',shape:{id:freshId(),layerId:state.selectedLayerId,kind:'fill',rect:fullRect,color,opacity:100,strokeWidth:0,selection:state.selectionVisible?selectionInLayer(state,state.selection):undefined}})
+    }
+    window.addEventListener('draivio:solid-fill',fill)
+    return () => window.removeEventListener('draivio:solid-fill',fill)
+  }, [state,dispatch])
+  const brushRingRef = useRef<HTMLDivElement>(null)
+  const unavailable = toolUnavailableReason(state)
+  const cursor = toolCursor(state.activeToolId,!!unavailable,busy)
+  const showBrushRing = (event:React.PointerEvent<HTMLDivElement>) => {
+    const ring=brushRingRef.current
+    if(!ring)return
+    const visible=isRoundBrush(state.activeToolId)&&!unavailable&&!busy
+    ring.style.display=visible?'block':'none'
+    ring.style.left=`${event.clientX}px`;ring.style.top=`${event.clientY}px`
+  }
   const confirmRepair = () => { if (!pendingRepair) return; dispatch(pendingRepair); setPendingRepair(null) }
   const cancelRepair = () => setPendingRepair(null)
   useEffect(() => {
@@ -247,7 +387,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     return clamp ? { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) } : { x, y }
   }
   const cancel = () => {
-    setSnapHits({}); processingAbort.current?.abort()
+    setMovePreview(null); setSnapHits({}); processingAbort.current?.abort()
     const current = gesture.current
     if (current) {
       artboardRef.current?.releasePointerCapture?.(current.pointerId)
@@ -262,6 +402,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     textGesture.current = null
     gesture.current = null
     setPreview(null); setStrokePreview(null); setShapePreview(null); setTextPreview(null); setTextEditingId(null); setTextObjectPreview(null); setMaskPreview(null); setTransform(null); setQuad(null); changePath(null)
+    if (state.activeTool === 'transform') dispatch({type:'select-tool', tool:'select'})
   }
   const commitSelection = (selection: Selection) => { setPreview(null); dispatch({ type: 'commit-selection', selection }) }
   const convertPath = (mask = false) => {
@@ -272,13 +413,18 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     else commitSelection(combineSelection(state.selectionVisible ? state.selection : null, selection, state.selection.mode))
     changePath(null)
   }
+  const finishTransform = () => {
+    setTransform(null)
+    setSnapHits({})
+    if (state.activeTool === 'transform') dispatch({type:'select-tool', tool:'select'})
+  }
   const commitTransform = () => {
     if (!transform) return
     if (transform.kind === 'crop') {
       if (transform.rect.width < .2 || transform.rect.height < .2) return notice('裁剪范围太小')
       dispatch({ type: 'commit-crop', rect: transform.rect })
     } else dispatch({ type: 'commit-layer-transform', layerId: state.selectedLayerId, transform })
-    setTransform(null)
+    finishTransform()
   }
   const commitPerspective = () => void perform(async () => {
     if (!quad) throw new Error('请先指定透视范围')
@@ -299,7 +445,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
       event.preventDefault(); cancel()
     }
     const keyboard = (event: KeyboardEvent) => {
-      if (inputTarget(event.target) || inputTarget(document.activeElement) || event.isComposing || event.defaultPrevented) return
+      if (document.querySelector('.result-stage') || inputTarget(event.target) || inputTarget(document.activeElement) || event.isComposing || event.defaultPrevented) return
       if (event.key === 'Escape') { onCancel(event); return }
       if (event.key === 'Enter') {
         if (quad) { event.preventDefault(); commitPerspective() }
@@ -318,18 +464,22 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     return () => { window.removeEventListener(TOOL_CANCEL_EVENT, onCancel); window.removeEventListener('keydown', keyboard) }
   })
   useEffect(() => {
-    gesture.current = null; setPreview(null); setStrokePreview(null); setShapePreview(null); setMaskPreview(null)
+    gesture.current = null; setMovePreview(null); setSnapHits({}); setPreview(null); setStrokePreview(null); setShapePreview(null); setMaskPreview(null)
     if (state.activeTool !== 'text') { textGesture.current = null; setTextPreview(null); setTextEditingId(null) }
     setTextObjectPreview(null)
   }, [state.activeTool])
   useEffect(() => {
     if (state.activeTool === 'pan') return
     if (!['lasso-select', 'polygon-select', 'bezier-select', 'pen'].includes(state.activeTool)) changePath(null)
-    if (state.activeTool === 'transform') setTransform(state.layers.find((l) => l.id === state.selectedLayerId)?.transform ?? defaultTransform())
+    if (state.activeTool === 'transform'&&!selectedObjects(state).length) setTransform(state.layers.find((l) => l.id === state.selectedLayerId)?.transform ?? defaultTransform())
     else if (!gesture.current) setTransform(null)
     setQuad(state.activeTool === 'perspective-crop' ? fullQuad.map((p) => ({ ...p })) as PerspectiveQuad : null)
   }, [state.activeTool, state.selectedLayerId])
   useEffect(() => { setSelectedTextId(null) }, [documentId, state.activeTool])
+  useEffect(() => {
+    const ids = [...new Set(moveTargets.map(t => t.layerId))]
+    if (ids.length !== state.selectedLayerIds.length || ids.some(id => !state.selectedLayerIds.includes(id))) { setMoveTargets([]); setSelectedTextId(null) }
+  }, [state.selectedLayerIds])
   useEffect(() => {
     if (state.activeTool === 'dodge' || state.activeTool === 'burn') return () => cancel()
   }, [documentId, state.activeTool, state.selectedLayerId])
@@ -352,7 +502,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     window.addEventListener(CANVAS_FIT_EVENT, fitRequested)
     return () => { cancelAnimationFrame(frame); observer?.disconnect(); window.removeEventListener('resize', fitIfNeeded); window.removeEventListener(CANVAS_FIT_EVENT, fitRequested) }
   }, [crop.height, crop.width, fitToViewport, state.composerMinimized, state.composerPlacement, state.documentHeight, state.documentWidth])
-  const brushSettings = () => ({ size: option('size', 20) / sourcePixelScale, hardness: state.activeTool === 'pencil' ? 100 : state.activeTool === 'soft-brush' ? 0 : option('hardness', 80), opacity: option('opacity', 100), flow: option('flow', 100), smoothing: state.activeTool === 'pencil' ? 0 : option('smoothing', 15), color: state.brushColor })
+  const brushSettings = () => ({ size: option('size', 20) / sourcePixelScale, hardness: state.activeTool === 'pencil' ? 100 : state.activeTool === 'soft-brush' ? 0 : option('hardness', 80), opacity: option('opacity', 100), flow: option('flow', 100), smoothing: state.activeTool === 'pencil' ? 0 : option('smoothing', 15), color: state.brushColor, ...(state.activeTool === 'gradient-brush' ? {endColor: String(state.toolOptions.gradientEndColor ?? state.backgroundColor ?? '#ffffff')} : {}) })
   const refineBrushSelection = (point: Point) => {
     const radiusX = Math.max(.1, refineBrushSize / Math.max(1, state.documentWidth) * 100 / 2)
     const radiusY = Math.max(.1, refineBrushSize / Math.max(1, state.documentHeight) * 100 / 2)
@@ -367,7 +517,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     return { id, layerId: state.selectedLayerId, x: rect?.x ?? point.x, y: rect?.y ?? point.y, text: '', layout, width, height, fontFamily: String(state.toolOptions.fontFamily ?? 'sans-serif'), fontSize, fontWeight: String(state.toolOptions.fontWeight ?? '400'), color: String(state.toolOptions.textColor ?? state.brushColor), align: state.toolOptions.textAlign as 'left' | 'center' | 'right' || 'left', lineHeight: 1.4, letterSpacing: 0 }
   }
   const hitTextAt = (point: Point) => {
-    const candidates = [...state.canvasTexts].reverse().filter((object) => state.layers.find((layer) => layer.id === object.layerId)?.visible)
+    const candidates = [...state.canvasTexts].reverse().filter((object) => effectiveLayerState(state.layers, object.layerId).visible && !effectiveLayerState(state.layers, object.layerId).locked)
     for (const object of candidates) {
       const layer = state.layers.find((item) => item.id === object.layerId)
       const local = layerPoint(point, layer?.transform, true, state.documentWidth, state.documentHeight)
@@ -381,6 +531,19 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
       if (local.x >= object.x - paddingX && local.x <= object.x + width + paddingX && local.y >= object.y - paddingY && local.y <= object.y + height + paddingY) return object
     }
     return undefined
+  }
+  const movementDelta = (g: Gesture, event: React.PointerEvent<HTMLDivElement>): Point => {
+    const point = clientPoint(event.clientX, event.clientY, false)
+    const delta = { x: point.x - g.start.x, y: point.y - g.start.y }
+    const axis = event.shiftKey ? Math.abs(delta.x * state.documentWidth) >= Math.abs(delta.y * state.documentHeight) ? 'x' : 'y' : null
+    if (axis === 'x') delta.y = 0
+    if (axis === 'y') delta.x = 0
+    const r = g.moveBounds!
+    const proposed = { x: (r.x + delta.x) * state.documentWidth / 100, y: (r.y + delta.y) * state.documentHeight / 100, width: r.width * state.documentWidth / 100, height: r.height * state.documentHeight / 100 }
+    const snapped = snapBounds(g.snapIndex!, proposed, { zoomPercent: state.zoom, mode: 'move', altKey: event.altKey, enabled: state.guideSettings.snapEnabled, previous: g.snapHits })
+    if (axis) delete snapped.hits[axis === 'x' ? 'y' : 'x']
+    g.snapHits = snapped.hits; setSnapHits(snapped.hits)
+    return { x: delta.x + (axis === 'y' ? 0 : snapped.rect.x - proposed.x) / state.documentWidth * 100, y: delta.y + (axis === 'x' ? 0 : snapped.rect.y - proposed.y) / state.documentHeight * 100 }
   }
   const update = (event: React.PointerEvent<HTMLDivElement>) => {
     const refine = refineGesture.current
@@ -412,7 +575,11 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     if (delta.x || delta.y) g.points.push(point)
     if (tool === 'pan') dispatch({ type: 'set-canvas-offset', x: g.offset.x + event.clientX - g.client.x, y: g.offset.y + event.clientY - g.client.y })
     else if (tool === 'rotate') dispatch({ type: 'set-canvas-rotation', rotation: g.rotation + event.clientX - g.client.x })
-    else if ((tool === 'move' || tool === 'select') && g.transform) { const local = documentDeltaToParentLocal(state.layers, g.layerId ?? state.selectedLayerId, delta.x, delta.y, state.documentWidth, state.documentHeight); const proposed = { ...g.transform, rect: { ...g.transform.rect, x: g.transform.rect.x + local.x, y: g.transform.rect.y + local.y } }; const snapped = snapLayerTransform(state, g.layerId ?? state.selectedLayerId, proposed, g.snapIndex!, 'move', event.altKey, g.snapHits); g.snapHits = snapped.hits; setSnapHits(snapped.hits); setTransform(snapped.draft) }
+    else if (g.moveTargets) {
+      const moved = Math.hypot(event.clientX - g.client.x, event.clientY - g.client.y) >= 3
+      const next = moved ? movementDelta(g, event) : { x: 0, y: 0 }
+      setMovePreview({ targets: g.moveTargets, delta: next })
+    }
     else if (g.stroke) {
       const input = pointerInput(event)
       const brushPoint = { ...point, ...input }
@@ -426,7 +593,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
       let next = moveControl(pathRef.current, g.pathIndex, 'out', point)
       next = moveControl(next, g.pathIndex, 'in', { x: 2 * g.start.x - point.x, y: 2 * g.start.y - point.y }); changePath(next)
     } else if (g.shape) {
-      g.shape = { ...g.shape, rect: drawSelectionRect(g.start, point, { ratio: event.shiftKey ? 1 : null, fromCenter: event.altKey, artboardRatio: (state.layers.find((layer) => layer.id === state.selectedLayerId)?.contentWidth ?? state.documentWidth) / (state.layers.find((layer) => layer.id === state.selectedLayerId)?.contentHeight ?? state.documentHeight) }), from: g.start, to: point }; setShapePreview(g.shape)
+      g.shape = { ...g.shape, rect: drawSelectionRect(g.start, point, { ratio: event.shiftKey ? 1 : null, fromCenter: event.altKey, artboardRatio: g.shape.kind === 'gradient' ? (selectedLayer?.contentWidth ?? state.documentWidth) / (selectedLayer?.contentHeight ?? state.documentHeight) : state.documentWidth / state.documentHeight }), from: g.start, to: point }; setShapePreview(g.shape)
     } else if (['selection', 'rectangle-select', 'ellipse-select', 'crop'].includes(tool)) {
       const ratio = tool === 'crop' ? String(state.toolOptions.cropRatio ?? 'free').split(':').map(Number) : null
       const fixed = ratio && ratio[0] && ratio[1] ? ratio[0] / ratio[1] : tool === 'crop' ? null : state.selection.fixedRatio
@@ -438,6 +605,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
   const down = (event: React.PointerEvent<HTMLDivElement>) => {
     if (busy || (event.button !== 0 && event.button !== undefined)) return
     const tool = state.activeTool
+    if(tool==='transform'&&selectedObjects(state).length)return
     if (refineSelection && refineBrushMode && onRefineSelectionChange) {
       const point = clientPoint(event.clientX, event.clientY)
       const mode = event.shiftKey ? (refineBrushMode === 'add' ? 'subtract' : 'add') : refineBrushMode
@@ -447,9 +615,10 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
       event.currentTarget.setPointerCapture?.(event.pointerId)
       return
     }
-    if (event.target instanceof Element && event.target.closest('.path-actions,.transform-actions,.perspective-handle,.path-point,.selection-handle')) return
-    if (event.target instanceof Element && event.target.closest('.selection-overlay') && !['select', 'move'].includes(tool)) return
-    const documentPoint = clientPoint(event.clientX, event.clientY)
+    if (event.target instanceof Element && event.target.closest('.object-handle')) return
+    if (event.target instanceof Element && event.target.closest('.path-actions,.transform-actions,.transform-window,.perspective-handle,.path-point,.selection-handle')) return
+    if (event.target instanceof Element && event.target.closest('.selection-overlay') && !['select', 'move', 'fill'].includes(tool)) return
+    const documentPoint = clientPoint(event.clientX, event.clientY, !['select', 'move'].includes(tool))
     if ((tool === 'dodge' || tool === 'burn') && (!selectedLayer || !effectiveLayerState(state.layers, selectedLayer.id).visible || effectiveLayerState(state.layers, selectedLayer.id).locked)) return notice('目标图层不可见或已锁定，未写入色调笔触')
     if (tool === 'text') {
       const hit = hitTextAt(documentPoint)
@@ -478,36 +647,40 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
     if ((tool === 'clone-stamp' || tool === 'patch') && event.altKey) { cloneSource.current = documentPoint; cloneAlignmentOrigin.current = null; notice('已设置仿制源，拖动画布开始仿制'); return }
     if (tool === 'clone-stamp' && !cloneSource.current) return notice('请先按住 Alt 点击画布设置仿制源')
     if (tool === 'fill') {
-      const selected = state.layers.find((layer) => layer.id === state.selectedLayerId)
-      if (selected?.source && selected.source !== 'fixture' && !selected.transform) void perform(async () => {
-        const image = await rasterizeSvgPixels(layerScene())
-        const mask = state.selectionVisible ? rasterizeSelectionMask(localSelection(state.selection), image.width, image.height) : undefined
-        return { type: 'rasterize-layer', id: state.selectedLayerId, source: imageToPng(fillPixels(image, state.brushColor, mask)) }
-      }, '已填充当前图层像素，可撤销')
-      else dispatch({ type: 'add-shape', shape: { id: freshId(), layerId: state.selectedLayerId, kind: 'fill', rect: fullRect, color: state.brushColor, opacity: option('opacity', 100), strokeWidth: 0, selection: state.selectionVisible ? localSelection(state.selection) : undefined } })
-      return
-    }
-    if (tool === 'select') {
-      const textHit = hitTextAt(documentPoint)
-      if (textHit) {
-        setSelectedTextId(textHit.id)
-        dispatch({ type: 'select-layer', id: textHit.layerId })
+      const reason = toolUnavailableReason(state)
+      if (reason) return notice(reason)
+      if (state.selectionVisible && !selectionContains(state.selection.path, documentPoint)) return notice('点击位置不在当前选区内')
+      const shape = fillShapeAt(state, documentPoint)
+      if (shape) {
+        dispatch({ type:'update-shape', shape:{...shape, color:state.brushColor, strokeColor:shape.strokeColor??shape.color, fillEnabled:true} })
         return
       }
-      setSelectedTextId(null)
-      const hit = state.layers.find((layer) => {
-        const effective = effectiveLayerState(state.layers, layer.id)
-        if (!effective.visible || effective.locked) return false
-        if (layer.kind === 'text' || layer.className === 'layer-text') return false
-        if (!layer.source && layer.kind !== 'group' && !state.canvasShapes.some((shape) => shape.layerId === layer.id && !shape.hidden) && !state.brushStrokes.some((stroke) => stroke.layerId === layer.id && stroke.mode === 'paint')) return false
-        const rect = layer.transform?.rect ?? fullRect
-        return documentPoint.x >= rect.x && documentPoint.x <= rect.x + rect.width && documentPoint.y >= rect.y && documentPoint.y <= rect.y + rect.height
-      })
-      if (!hit) { notice('没有选中可编辑图层'); return }
-      if (hit.id !== state.selectedLayerId) dispatch({ type: 'select-layer', id: hit.id })
-      const hitTransform = hit.transform ?? defaultTransform()
-      gesture.current = { pointerId: event.pointerId, start: documentPoint, client: { x: event.clientX, y: event.clientY }, previous: state.selectionVisible ? state.selection : null, offset: { ...state.canvasOffset }, points: [documentPoint], rotation: state.canvasRotation, transform: hitTransform, layerId: hit.id, snapIndex: editorSnapIndex(state, hit.id) }
-      setTransform(hitTransform)
+      void perform(async () => {
+        const svg = scene()
+        if (!svg) throw new Error('画布尚未就绪')
+        const ids = state.toolOptions.fillSampleScope === 'all' ? state.layers.filter(l=>effectiveLayerState(state.layers,l.id).visible).map(l=>l.id) : [state.selectedLayerId]
+        const sampled = retouchScopeSvg(svg,state.layers,state.selectedLayerId,'current',ids)
+        // The document background is not paint on a sampled layer.
+        Array.from(sampled.children).filter(node=>node.tagName.toLowerCase()==='rect').forEach(node=>node.remove())
+        const image = await rasterizeSvgPixels(sampled, processingAbort.current?.signal)
+        const region = bucketSelection(image, documentPoint, option('fillTolerance',32), state.toolOptions.fillContiguous !== false, state.selectionVisible ? state.selection : undefined)
+        if (!region.rect.width || !region.rect.height) throw new Error('点击区域没有可填充内容')
+        return { type:'add-shape', shape:{ id:freshId(), layerId:state.selectedLayerId, kind:'fill', rect:fullRect, color:state.brushColor, opacity:option('opacity',100), strokeWidth:0, selection:selectionInLayer(state,region) } }
+      }, '已填充点击区域，可撤销')
+      return
+    }
+    if (tool === 'select' || tool === 'move') {
+      const hit = hitMoveTarget(state, documentPoint, sourceHit)
+      if (!hit) { setMoveTargets([]); setSelectedTextId(null); dispatch({ type: 'select-layers', ids: [] }); return }
+      const targets = chooseMoveTargets(state, moveTargets, hit, event.shiftKey)
+      setMoveTargets(targets)
+      setSelectedTextId(targets.length === 1 && targets[0].kind === 'text' ? targets[0].id : null)
+
+      // Shift-click toggles selection; dragging begins only on a still-selected target.
+      if (!targets.length || event.shiftKey) return
+      const bounds = moveTargetBounds(state, targets)
+      if (!bounds) return
+      gesture.current = { pointerId: event.pointerId, start: documentPoint, client: { x: event.clientX, y: event.clientY }, previous: state.selectionVisible ? state.selection : null, offset: { ...state.canvasOffset }, points: [documentPoint], rotation: state.canvasRotation, moveTargets: targets, moveBounds: bounds, snapIndex: moveSnapIndex(state, targets) }
       event.currentTarget.setPointerCapture?.(event.pointerId)
       return
     }
@@ -517,7 +690,6 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
       if (tool === 'mask' || tool === 'mask-quick') setMaskPreview({ ...(state.layerMasks[state.selectedLayerId] ?? { strokes: [], inverted: false, applied: false }), applied: false, strokes: [...(state.layerMasks[state.selectedLayerId]?.strokes ?? []), g.stroke] })
       else if (tool !== 'dodge' && tool !== 'burn') setStrokePreview(g.stroke)
     }
-    if (tool === 'move') { g.transform = state.layers.find((l) => l.id === state.selectedLayerId)?.transform ?? defaultTransform(); g.layerId = state.selectedLayerId; g.snapIndex = transformSnapIndex; setTransform(g.transform) }
     if (tool === 'lasso-select') changePath(addAnchor({ kind: 'freehand', anchors: [], closed: false }, point))
     if (['polygon-select', 'bezier-select', 'pen'].includes(tool)) {
       const previous = pathRef.current?.closed ? null : pathRef.current
@@ -525,7 +697,9 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
       changePath(next); g.pathIndex = next.anchors.length - 1
     }
     if (['shape', 'shape-ellipse', 'shape-line', 'shape-arrow', 'gradient-fill'].includes(tool)) {
-      g.shape = { id: freshId(), layerId: state.selectedLayerId, kind: tool === 'shape-ellipse' ? 'ellipse' : tool === 'shape-line' ? 'line' : tool === 'shape-arrow' ? 'arrow' : tool === 'gradient-fill' ? 'gradient' : 'rectangle', rect: { ...point, width: 0, height: 0 }, color: state.brushColor, opacity: option('opacity', 100), endColor: String(state.toolOptions.gradientEndColor ?? '#ffffff'), strokeWidth: option('shapeStrokeWidth', 3) / sourcePixelScale, selection: state.selectionVisible && tool === 'gradient-fill' ? localSelection(state.selection) : undefined }
+      const gradient = tool === 'gradient-fill'
+      if (unavailable || state.rasterPreviewOnly) return notice(unavailable ?? '当前文档为只读预览')
+      g.shape = { id: freshId(), layerId: gradient ? state.selectedLayerId : freshId(), kind: tool === 'shape-ellipse' ? 'ellipse' : tool === 'shape-line' ? 'line' : tool === 'shape-arrow' ? 'arrow' : tool === 'gradient-fill' ? 'gradient' : 'rectangle', rect: { ...point, width: 0, height: 0 }, color: state.brushColor, opacity: option('opacity', 100), endColor: String(state.toolOptions.gradientEndColor ?? state.backgroundColor ?? '#ffffff'), strokeWidth: option('shapeStrokeWidth', 3) / (gradient ? sourcePixelScale : 1), strokeColor:String(state.toolOptions.shapeStrokeColor??state.brushColor), fillEnabled:state.toolOptions.shapeFillEnabled!==false, cornerRadii:tool==='shape'?[0,1,2,3].map(()=>option('shapeCornerRadius',0)) as [number,number,number,number]:undefined, selection: state.selectionVisible && tool === 'gradient-fill' ? localSelection(state.selection) : undefined }
     }
     gesture.current = g; event.currentTarget.setPointerCapture?.(event.pointerId)
   }
@@ -612,7 +786,7 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
         const result = tool === 'clone-stamp' ? clonePixels(image, g.points, cloneSource.current!, g.stroke!.size, { opacity: g.stroke!.opacity, hardness: g.stroke!.hardness, aligned: Boolean(state.toolOptions.cloneAligned ?? true), alignmentOrigin: cloneAlignmentOrigin.current ?? undefined }) : smudgePixels(image, g.points, g.stroke!.size, g.stroke!.opacity)
         return { type: 'add-repair-layer', baseLayerId: state.selectedLayerId, baseUndoLength: state.undoStack.length, name: tool === 'clone-stamp' ? '仿制修复结果' : '涂抹修复结果', ...repairOutput(image, result) }
       })
-      else if (['brush', 'pencil', 'soft-brush', 'brush-line', 'eraser'].includes(tool) && state.layers.find((layer) => layer.id === state.selectedLayerId)?.source && state.layers.find((layer) => layer.id === state.selectedLayerId)?.source !== 'fixture' && !state.layers.find((layer) => layer.id === state.selectedLayerId)?.transform) {
+      else if (['brush', 'gradient-brush', 'pencil', 'soft-brush', 'brush-line', 'eraser'].includes(tool) && state.layers.find((layer) => layer.id === state.selectedLayerId)?.source && state.layers.find((layer) => layer.id === state.selectedLayerId)?.source !== 'fixture' && !state.layers.find((layer) => layer.id === state.selectedLayerId)?.transform) {
         const stroke = g.stroke
         void perform(async () => {
           const image = await rasterizeSvgPixels(layerScene(), processingAbort.current?.signal)
@@ -628,54 +802,58 @@ export function CanvasViewport({ enhancementRequest, refineSelection, refinePrev
       if (closed.closed) commitSelection(combineSelection(g.previous, pathSelection(closed, state.selection), state.selection.mode))
       changePath(null)
     }
-    if (g.shape && (g.shape.rect.width > .1 || g.shape.rect.height > .1)) {
-      if (g.shape.kind === 'gradient') g.shape.rect = fullRect
-      dispatch({ type: 'add-shape', shape: g.shape }); setShapePreview(null)
+    if (g.shape) {
+      setShapePreview(null)
+      if (g.shape.rect.width > .1 || g.shape.rect.height > .1) {
+        if (g.shape.kind === 'gradient') dispatch({ type: 'add-shape', shape: { ...g.shape, rect: fullRect } })
+        else dispatch({ type: 'create-shape-layer', shape: g.shape })
+      }
     }
-    if ((tool === 'move' || tool === 'select') && g.transform) {
-      const point = clientPoint(event.clientX, event.clientY)
-      const moved = Math.abs(point.x - g.start.x) > .01 || Math.abs(point.y - g.start.y) > .01
-      const local = documentDeltaToParentLocal(state.layers, g.layerId ?? state.selectedLayerId, point.x - g.start.x, point.y - g.start.y, state.documentWidth, state.documentHeight)
-      const proposed = { ...g.transform, rect: { ...g.transform.rect, x: g.transform.rect.x + local.x, y: g.transform.rect.y + local.y } }
-      const final = snapLayerTransform(state, g.layerId ?? state.selectedLayerId, proposed, g.snapIndex!, 'move', event.altKey, g.snapHits)
-      dispatch({ type: 'commit-layer-transform', layerId: g.layerId ?? state.selectedLayerId, transform: final.draft }); setSnapHits({}); setTransform(null)
-      if (moved) notice('已移动图层，可撤销')
+    if (g.moveTargets) {
+      const moved = Math.hypot(event.clientX - g.client.x, event.clientY - g.client.y) >= 3
+      if (moved) dispatch({ type: 'move-canvas-targets', targets: g.moveTargets, delta: movementDelta(g, event) })
+      setMovePreview(null); setSnapHits({})
     }
   }
-  return <section onContextMenu={event=>{if(state.selectionVisible){event.preventDefault();setFillMenu({x:event.clientX,y:event.clientY})}}} className="canvas-area" aria-label="主画布" aria-busy={busy} onWheel={(event) => { if (event.ctrlKey) { event.preventDefault(); zoom(state.zoom * Math.exp(-event.deltaY * .003)) } }} onTouchStart={(event) => { if (event.touches.length === 2) { cancel(); pinchStart.current = { distance: distance(event.touches), zoom: state.zoom } } }} onTouchMove={(event) => { if (pinchStart.current && event.touches.length === 2) { event.preventDefault(); zoom(pinchStart.current.zoom * distance(event.touches) / pinchStart.current.distance) } }} onTouchEnd={() => { pinchStart.current = null }} onTouchCancel={() => { pinchStart.current = null }}>
-    {fillMenu ? <div role="menu" aria-label="选区操作" style={{position:'fixed',left:fillMenu.x,top:fillMenu.y,zIndex:200}}><button role="menuitem" onClick={()=>void launchContentFill()}>内容识别填充</button><button role="menuitem" onClick={()=>setFillMenu(null)}>关闭菜单</button></div> : null}
+  return <section ref={canvasMenuAnchor} data-canvas-context-menu onContextMenu={event=>{if((event.target as Element).closest('input,textarea,select,[contenteditable="true"],[role="textbox"],button,[role="menu"],.ai-composer')&&!(event.target as Element).closest('.selection-overlay')){setFillMenu(null);return}if(!busy&&!refineSelection){event.preventDefault();event.stopPropagation();setFillMenu({x:event.clientX,y:event.clientY})}}} className="canvas-area" aria-label="主画布" aria-busy={busy} onWheel={(event) => { if (event.ctrlKey) { event.preventDefault(); zoom(state.zoom * Math.exp(-event.deltaY * .003)) } }} onTouchStart={(event) => { if (event.touches.length === 2) { cancel(); pinchStart.current = { distance: distance(event.touches), zoom: state.zoom } } }} onTouchMove={(event) => { if (pinchStart.current && event.touches.length === 2) { event.preventDefault(); zoom(pinchStart.current.zoom * distance(event.touches) / pinchStart.current.distance) } }} onTouchEnd={() => { pinchStart.current = null }} onTouchCancel={() => { pinchStart.current = null }}>
+    {fillMenu ? <CanvasSelectionMenu anchor={canvasMenuAnchor.current} x={fillMenu.x} y={fillMenu.y} onClose={closeSelectionMenu} onContentFill={()=>void launchContentFill()} onCopySelection={copySelection} onRefine={onOpenSelectionRefine}/> : null}
     <SemanticSelectionWorkspace />
     {fillSession ? <ContentFillWorkspace key={`${fillSession.documentId}-${fillSession.revision}`} image={fillSession.image} source={fillSession.source} initialTarget={fillSession.target} onConfirm={confirmContentFill} onCancel={()=>setFillSession(null)}/> : null}
+    {isRoundBrush(state.activeToolId) && !unavailable && !busy ? createPortal(<div ref={brushRingRef} className="brush-cursor-ring" style={{width:Math.max(1,option('size',20)*state.zoom/100),height:Math.max(1,option('size',20)*state.zoom/100)}}/>,document.body):null}
     <div className="canvas-grid" />
-    {state.guideSettings.rulersVisible ? <RulerOverlay anchorRef={artboardRef} width={state.documentWidth} height={state.documentHeight} zoom={state.zoom} toPoint={(x, y) => clientPoint(x, y, false)} onCreate={(axis, position) => dispatch({ type: 'update-guide-settings', action: { type: 'add', guide: { id: freshId(), axis, position, locked: false } } })} /> : null}
-    <div ref={artboardRef} className="artboard" data-active-tool={state.activeTool} style={{ width: state.documentWidth * crop.width / 100, maxWidth: 'none', flexShrink: 0, aspectRatio: `${state.documentWidth * crop.width}/${state.documentHeight * crop.height}`, transform: `translate(${state.canvasOffset.x}px,${state.canvasOffset.y}px) scale(${state.zoom / 100}) rotate(${state.canvasRotation}deg)` }} onPointerDown={down} onPointerMove={update} onPointerUp={up} onPointerCancel={cancel} onDoubleClick={() => { if (pathRef.current) changePath(closePath(pathRef.current)) }}>
+    {state.guideSettings.rulersVisible ? <RulerOverlay offset={state.canvasOffset} anchorRef={artboardRef} width={state.documentWidth} height={state.documentHeight} zoom={state.zoom} toPoint={(x, y) => clientPoint(x, y, false)} onCreate={(axis, position) => dispatch({ type: 'update-guide-settings', action: { type: 'add', guide: { id: freshId(), axis, position, locked: false } } })} /> : null}
+    <div ref={artboardRef} className="artboard" data-active-tool={state.activeTool} style={{ width: state.documentWidth * crop.width / 100, maxWidth: 'none', flexShrink: 0, aspectRatio: `${state.documentWidth * crop.width}/${state.documentHeight * crop.height}`, transform: `translate(${state.canvasOffset.x}px,${state.canvasOffset.y}px) scale(${state.zoom / 100}) rotate(${state.canvasRotation}deg)` }} onPointerDown={down} onPointerMove={event=>{showBrushRing(event);update(event)}} onPointerLeave={()=>{if(brushRingRef.current)brushRingRef.current.style.display='none'}} onPointerUp={up} onPointerCancel={cancel} onDoubleClick={() => { if (pathRef.current) changePath(closePath(pathRef.current)) }}>
       <div className="canvas-crop-window"><div className="canvas-document" style={{ width: `${10000 / crop.width}%`, height: `${10000 / crop.height}%`, left: `${-crop.x / crop.width * 100}%`, top: `${-crop.y / crop.height * 100}%` }}>
-        <CanvasSceneView state={state} strokePreview={strokePreview} shapePreview={shapePreview} maskPreview={maskPreview} editingTextId={textEditingId} textObjectPreview={textObjectPreview} transformPreview={transform?.kind === 'transform' ? { layerId: state.selectedLayerId, draft: transform } : null} />
+        {filterPreview ? <div hidden><CanvasSceneView state={state} serializationOnly /></div> : null}
+        <CanvasSceneView renderStatusTarget={canvasMenuAnchor} filterPreview={!!filterPreview} curveDraftBase={curveDraft ? { layerId: curveDraft.layerId, adjustments: { ...neutralAdjustments, ...state.layers.find(layer=>layer.id === curveDraft.layerId)?.adjustments } } : undefined} state={filterSceneState} strokePreview={strokePreview} shapePreview={shapePreview} maskPreview={maskPreview} editingTextId={textEditingId} textObjectPreview={textObjectPreview} transformPreview={movingLayerId ? { layerId: movingLayerId, draft: sceneState.layers.find(l => l.id === movingLayerId)!.transform ?? defaultTransform() } : transform?.kind === 'transform' ? { layerId: state.selectedLayerId, draft: transform } : null} />
         <div className="artboard-label-overlay" data-artboard-overlay="true" data-editor-overlay="true" style={{position:'absolute',inset:0,border:'1px dashed #7c8cff',pointerEvents:'none'}}><span style={{position:'absolute',left:8,bottom:'100%',color:'#7c8cff',fontSize:12,whiteSpace:'nowrap'}}>{state.artboards.find(board => board.id === state.activeArtboardId)?.name ?? '画板'} · {state.documentWidth}×{state.documentHeight}</span></div>
-        {refineSelection && refinePreviewMode ? <SelectionRefinePreview selection={refineSelection} mode={refinePreviewMode} /> : null}
+        {refineSelection && refinePreviewMode && !refinePreviewAlpha ? <SelectionRefinePreview selection={refineSelection} mode={refinePreviewMode} /> : null}
         {refinePreviewAlpha && refinePreviewMode ? <SelectionRefinePixelPreview preview={refinePreviewAlpha} mode={refinePreviewMode} /> : null}
-        <div className="canvas-interaction" aria-label="画布交互层" />
+        <div className="canvas-interaction" aria-label="画布交互层" style={{cursor}} />
         {!path && !transform && !quad && state.activeTool !== 'text' && !textEditingId && (state.selectionVisible || preview) ? <SelectionOverlay selection={preview ?? state.selection} clientPoint={clientPoint} onPreview={setPreview} onCommit={commitSelection} onCancel={() => setPreview(null)} interactive={selectionInteractive && !refineSelection} movable={state.selection.mode === 'new'} /> : null}
         {path ? <PathOverlay path={path} onChange={changePath} toPoint={clientPoint} onConvert={() => convertPath()} onMask={() => convertPath(true)} /> : null}
         {Object.keys(snapHits).length ? <div aria-label="吸附辅助线" data-export-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 24 }}>{(['x','y'] as const).map(axis => { const hit = snapHits[axis]; return hit ? <div key={axis} style={{ position: 'absolute', ...(axis === 'x' ? { left: `${hit.position / state.documentWidth * 100}%`, top: 0, bottom: 0, borderLeft: '1px solid #ed77ff' } : { top: `${hit.position / state.documentHeight * 100}%`, left: 0, right: 0, borderTop: '1px solid #ed77ff' }) }}><span style={{ color: '#ed77ff', fontSize: 10 }}>{Math.abs(hit.correction).toFixed(1)} px</span></div> : null })}</div> : null}
         <GuideOverlay settings={state.guideSettings} width={state.documentWidth} height={state.documentHeight} toPoint={(x, y) => clientPoint(x, y, false)} onMove={(id, position) => dispatch({ type: 'update-guide-settings', action: { type: 'move', id, position } })} onDelete={(id) => dispatch({ type: 'update-guide-settings', action: { type: 'delete', id } })} />
-        {transform ? <TransformOverlay draft={transform} onChange={setTransform} onCommit={commitTransform} onCancel={() => setTransform(null)} toPoint={clientPoint} artboardRatio={state.documentWidth / state.documentHeight} snapDraft={(draft, handle, altKey, previous) => { const result = snapLayerTransform(state, state.selectedLayerId, draft, transformSnapIndex, handle, altKey, previous); setSnapHits(result.hits); return result }} onGestureEnd={() => setSnapHits({})} /> : null}
+        {['select', 'move'].includes(state.activeTool) && movementBounds && !textEditingId && !selectedShape ? <div data-editor-overlay="true" aria-label="已选对象边框" style={{ position: 'absolute', pointerEvents: 'none', left: `${movementBounds.x}%`, top: `${movementBounds.y}%`, width: `${movementBounds.width}%`, height: `${movementBounds.height}%`, border: '1px solid #a79bff', zIndex: 4 }} /> : null}
+        {transform ? <TransformOverlay draft={transform} interactive={!['select','move'].includes(state.activeTool)} onChange={setTransform} onCommit={commitTransform} onCancel={finishTransform} toPoint={clientPoint} artboardRatio={state.documentWidth / state.documentHeight} snapDraft={(draft, handle, altKey, previous) => { const result = snapLayerTransform(state, state.selectedLayerId, draft, transformSnapIndex, handle, altKey, previous); setSnapHits(result.hits); return result }} onGestureEnd={() => setSnapHits({})} /> : null}
         {quad ? <PerspectiveOverlay quad={quad} onChange={setQuad} toPoint={clientPoint} onCommit={commitPerspective} onCancel={() => setQuad(null)} /> : null}
-        {['text', 'select'].includes(state.activeTool) ? state.canvasTexts.filter((object) => object.id !== textPreview?.id && state.layers.find((layer) => layer.id === object.layerId)?.visible).map((object) => <div key={object.id} style={textLayerStyle(object.layerId)}><TextObject object={object} selected={selectedTextId === object.id} autoEdit={textEditingId === object.id} editOnClick allowMoveOnSelect onPreview={setTextObjectPreview} onEditStart={() => setTextEditingId(object.id)} onEditEnd={() => setTextEditingId(null)} onSelect={() => { setSelectedTextId(object.id); dispatch({ type: 'select-layer', id: object.layerId }) }} onCommit={(next) => dispatch({ type: 'upsert-text', object: next })} toPoint={clientPoint} documentWidth={state.documentWidth} documentHeight={state.documentHeight} /></div>) : null}
+        {selectedShape&&!objectLocked(state,selectedShape.layerId)&&['select','move','shape','shape-ellipse','shape-line','shape-arrow','pen','transform'].includes(state.activeTool)&&!transform?<div style={textLayerStyle(selectedShape.layerId)}><ObjectTransformOverlay key={`${documentId}-${selectedShape.id}`} shape={selectedShape} width={state.layers.find(l=>l.id===selectedShape.layerId)?.contentWidth??state.documentWidth} height={state.layers.find(l=>l.id===selectedShape.layerId)?.contentHeight??state.documentHeight} zoom={state.zoom} toPoint={(x,y)=>documentPointToLayerLocal(state.layers,selectedShape.layerId,clientPoint(x,y,false),state.documentWidth,state.documentHeight)} onPreview={setObjectShapePreview} onCommit={shape=>dispatch({type:'update-canvas-objects',shapes:[shape]})} editPath={state.activeTool==='pen'}/></div>:null}
+        {['text', 'select', 'move','transform'].includes(state.activeTool) ? sceneState.canvasTexts.filter((object) => object.id !== textPreview?.id && effectiveLayerState(state.layers, object.layerId).visible && !effectiveLayerState(state.layers, object.layerId).locked).map((object) => <div key={object.id} style={textLayerStyle(object.layerId)}><TextObject delegateMove={state.activeTool !== 'text'} moving={!!movePreview && movePreview.targets.some(t => t.kind === 'text' && t.id === object.id) && Math.abs(movePreview.delta.x) + Math.abs(movePreview.delta.y) > .01} object={object} selected={selectedTextId === object.id || editableSelection.length===1&&editableSelection[0].kind==='text'&&editableSelection[0].object.id===object.id} autoEdit={textEditingId === object.id} editOnClick={state.activeTool !== 'move' && moveTargets.length <= 1} allowMoveOnSelect onPreview={setTextObjectPreview} onEditStart={() => {setTextEditingId(object.id);setMoveTargets([{kind:'text',id:object.id,layerId:object.layerId}])}} onEditEnd={() => setTextEditingId(null)} onSelect={() => { setSelectedTextId(object.id); setMoveTargets([{ kind: 'text', id: object.id, layerId: object.layerId }]) }} onCommit={(next) => dispatch({ type: 'upsert-text', object: next })} toPoint={(x, y) => documentPointToLayerLocal(sceneState.layers, object.layerId, clientPoint(x, y, false), state.documentWidth, state.documentHeight)} documentWidth={state.layers.find(l => l.id === object.layerId)?.contentWidth ?? state.documentWidth} documentHeight={state.layers.find(l => l.id === object.layerId)?.contentHeight ?? state.documentHeight} /></div>) : null}
         {textPreview ? <div className="canvas-text-preview" style={textLayerStyle(textPreview.layerId)}><TextObject key={textPreview.id} object={textPreview} selected autoEdit={textEditingId === textPreview.id} onCommit={(object) => { if (object.text.trim()) dispatch({ type: 'create-text-layer', object }) }} onEditEnd={() => { setTextPreview((current) => current?.id === textPreview.id ? null : current); setTextEditingId((current) => current === textPreview.id ? null : current) }} toPoint={clientPoint} documentWidth={state.documentWidth} documentHeight={state.documentHeight} /></div> : null}
       </div></div>
     </div>
+    <ResultStage />
     {state.composerPlacement === 'floating' ? <AIComposer /> : null}
-    <div className="canvas-hint">{busy ? '正在处理画布…' : '长按工具切换　Space 平移　⌘ / Ctrl + Z 撤销　双指缩放画布'}</div>{pendingRepair ? <FloatingSurface className="retouch-confirm" role="dialog" aria-label="确认修复结果" title="确认修复结果" onClose={cancelRepair}><span>{pendingRepair.name}已准备好，确认加入独立修复层？</span><button type="button" onClick={confirmRepair}>确认</button><button type="button" onClick={cancelRepair}>取消</button></FloatingSurface> : null}
+    <div className="canvas-hint" style={{left:state.guideSettings.rulersVisible?rulerWidth+12:18}}>{busy ? '正在处理画布…' : toolHint(state)}</div>{pendingRepair ? <FloatingSurface className="retouch-confirm" role="dialog" aria-label="确认修复结果" title="确认修复结果" onClose={cancelRepair}><span>{pendingRepair.name}已准备好，确认加入独立修复层？</span><button type="button" onClick={confirmRepair}>确认</button><button type="button" onClick={cancelRepair}>取消</button></FloatingSurface> : null}
     <div className={`zoom-control ${state.activeTool === 'rotate' ? 'is-rotate-control' : ''}`}>
-      <GuideControls />
+      <GuideControls disabled={busy} />
       {state.activeTool === 'rotate' ? <>
         <span className="canvas-rotation-readout">画布旋转 {Math.round(state.canvasRotation)}°</span>
         <button disabled={busy} aria-label="逆时针旋转 15°" onClick={() => dispatch({ type: 'set-canvas-rotation', rotation: state.canvasRotation - 15 })}>↺</button>
         <button disabled={busy} aria-label="顺时针旋转 15°" onClick={() => dispatch({ type: 'set-canvas-rotation', rotation: state.canvasRotation + 15 })}>↻</button>
         <button disabled={busy} aria-label="重置画布旋转" onClick={() => dispatch({ type: 'set-canvas-rotation', rotation: 0 })}>重置</button>
       </> : null}
-      <button disabled={busy} className="canvas-action-button" aria-label="撤销" onClick={() => { cancel(); dispatch({ type: 'undo' }) }}>↶</button><button disabled={busy} className="canvas-action-button" aria-label="重做" onClick={() => { cancel(); dispatch({ type: 'redo' }) }}>↷</button><button disabled={busy} aria-label="切换参考线" aria-pressed={state.guideSettings.guidesVisible} onClick={() => dispatch({ type: 'update-guide-settings', action: { type: 'settings', patch: { guidesVisible: !state.guideSettings.guidesVisible } } })}>参考线</button><button disabled={busy} aria-label="切换网格" aria-pressed={state.guideSettings.grid.enabled} onClick={() => dispatch({ type: 'update-guide-settings', action: { type: 'settings', patch: { grid: { ...state.guideSettings.grid, enabled: !state.guideSettings.grid.enabled } } } })}>网格</button><button disabled={busy} aria-label="切换吸附" aria-pressed={state.guideSettings.snapEnabled} onClick={() => dispatch({ type: 'update-guide-settings', action: { type: 'settings', patch: { snapEnabled: !state.guideSettings.snapEnabled } } })}>吸附</button><span className="zoom-divider" aria-hidden="true" /><button disabled={busy} aria-label="缩小" onClick={() => zoom(state.zoom - 10)}>−</button><span>{Math.round(state.zoom)}%</span><button disabled={busy} aria-label="放大" onClick={() => zoom(state.zoom + 10)}>＋</button><button disabled={busy} aria-label="适应画布" onClick={() => fitToViewport(true)}>适应</button>
+      <button disabled={busy} className="canvas-action-button" aria-label="撤销" onClick={() => { cancel(); dispatch({ type: 'undo' }) }}>↶</button><button disabled={busy} className="canvas-action-button" aria-label="重做" onClick={() => { cancel(); dispatch({ type: 'redo' }) }}>↷</button><span className="zoom-divider" aria-hidden="true" /><button disabled={busy} aria-label="缩小" onClick={() => zoom(state.zoom - 10)}>−</button><span>{Math.round(state.zoom)}%</span><button disabled={busy} aria-label="放大" onClick={() => zoom(state.zoom + 10)}>＋</button><button disabled={busy} aria-label="适应画布" onClick={() => fitToViewport(true)}>适应</button>
     </div>
   </section>
 }

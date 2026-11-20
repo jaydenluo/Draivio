@@ -60,6 +60,9 @@ export function AppContextMenu() {
   useEffect(() => {
     const handleContextMenu = (event: MouseEvent) => {
       event.preventDefault()
+      const target=event.target instanceof Element?event.target:null
+      if(target?.closest('[data-canvas-context-menu],[role="menu"]')&&!target.closest('input,textarea,[contenteditable="true"],[role="textbox"]')) { setMenu(null); return }
+      if ((event.target as Element)?.closest?.('[data-layer-row]') && !(event.target as Element)?.closest?.('input,textarea,[contenteditable="true"]')) { setMenu(null); return }
       const text = getSelectedText(event.target)
       if (!text) {
         setMenu(null)

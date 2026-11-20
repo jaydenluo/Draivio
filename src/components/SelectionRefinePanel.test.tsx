@@ -11,8 +11,6 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof SelectionRef
     previewMode: 'overlay',
     brushMode: 'add',
     brushSize: 80,
-    documentWidth: 500,
-    documentHeight: 625,
     onSelectionChange: vi.fn(),
     onPreviewModeChange: vi.fn(),
     onBrushModeChange: vi.fn(),
@@ -32,7 +30,7 @@ describe('SelectionRefinePanel', () => {
     fireEvent.click(screen.getByRole('button', { name: '黑底预览' }))
 
     expect(onPreviewModeChange).toHaveBeenCalledWith('black')
-    expect(screen.getByRole('heading', { name: '选择并遮住' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: '选择并遮住工作区' })).toBeInTheDocument()
   })
 
   it('applies the refined selection as a layer mask', () => {
@@ -67,4 +65,13 @@ describe('SelectionRefinePanel', () => {
     expect(onCancel).toHaveBeenCalledTimes(1)
     expect(onApply).not.toHaveBeenCalled()
   })
+})
+
+it('keeps advanced options collapsed and sends their draft changes for preview', () => {
+ const onParametersChange = vi.fn()
+ renderPanel({ onParametersChange })
+ expect(screen.queryByRole('slider', { name: '平滑' })).toBeNull()
+ screen.getByText('高级边缘调整').closest('details')!.open = true
+ fireEvent.change(screen.getByRole('slider', { name: '平滑' }), { target: { value: '5' } })
+ expect(onParametersChange).toHaveBeenLastCalledWith(expect.objectContaining({ smooth: 5 }))
 })

@@ -23,7 +23,7 @@ export async function saveUniqueBrowserOutput(dir:BrowserDirectory,name:string,b
 }
 export async function writeBatchOutput(dir:BatchDirectory,name:string,blob:Blob){if(dir.token)return invokeCommand<string>('batch_write_output',{token:dir.token,name,bytes:Array.from(new Uint8Array(await blob.arrayBuffer()))});if(dir.handle)return saveUniqueBrowserOutput(dir.handle,name,blob);throw new Error('请重新选择输出目录')}
 /** Parse codec headers before a browser decoder may allocate a large bitmap. */
-export function imageHeaderSize(bytes:Uint8Array){
+export function imageHeaderSize(bytes:Uint8Array,maxPixels=MAX_BATCH_PIXELS){
   const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);let width=0,height=0
   const ascii=(offset:number,size:number)=>String.fromCharCode(...bytes.subarray(offset,offset+size))
   if(bytes.length>=24&&ascii(1,3)==='PNG'){width=view.getUint32(16);height=view.getUint32(20)}
@@ -34,6 +34,6 @@ export function imageHeaderSize(bytes:Uint8Array){
     else if(kind==='VP8L'){const bits=view.getUint32(21,true);width=(bits&0x3fff)+1;height=((bits>>>14)&0x3fff)+1}
   }else if(bytes[0]===255&&bytes[1]===216){let offset=2;while(offset+4<bytes.length){if(bytes[offset]!==255)break;const marker=bytes[offset+1];if(marker===217||marker===218)break;if(marker===216||marker===1||marker>=208&&marker<=215){offset+=2;continue}const length=view.getUint16(offset+2);if(length<2||offset+2+length>bytes.length)break;if([192,193,194,195,197,198,199,201,202,203,205,206,207].includes(marker)&&length>=7){height=view.getUint16(offset+5);width=view.getUint16(offset+7);break}offset+=2+length}}
   if(!width||!height)throw new Error('文件损坏或格式不支持（PNG、JPEG、WebP）')
-  if(width*height>MAX_BATCH_PIXELS)throw new Error('输入图片超过 8MP，请先缩小')
+  if(width*height>maxPixels)throw new Error(`输入图片超过 ${Math.round(maxPixels/1_000_000)}MP，请先缩小`)
   return {width,height}
 }

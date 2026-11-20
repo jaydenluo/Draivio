@@ -11,6 +11,7 @@ type NumericScrubberProps = {
   onChange: (value: number) => void
   className?: string
   disabled?: boolean
+  mixed?: boolean
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
@@ -21,14 +22,14 @@ const decimalPlaces = (value: number) => {
 }
 const formatValue = (value: number, step: number) => Number(value.toFixed(decimalPlaces(step))).toString()
 
-export function NumericScrubber({ label, value, min = 0, max = 100, step = 1, unit, ariaLabel, onChange, className = '', disabled = false }: NumericScrubberProps) {
+export function NumericScrubber({ label, value, min = 0, max = 100, step = 1, unit, ariaLabel, onChange, className = '', disabled = false, mixed = false }: NumericScrubberProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const dragRef = useRef<{ pointerId: number; startX: number; startValue: number } | null>(null)
-  const [draft, setDraft] = useState(() => formatValue(value, step))
+  const [draft, setDraft] = useState(() => mixed ? '' : formatValue(value, step))
 
   useEffect(() => {
-    if (!dragRef.current && document.activeElement !== inputRef.current) setDraft(formatValue(value, step))
-  }, [value, step])
+    if (!dragRef.current && document.activeElement !== inputRef.current) setDraft(mixed ? '' : formatValue(value, step))
+  }, [value, step, mixed])
 
   const emit = (next: number, syncDraft = true) => {
     const clamped = clamp(next, min, max)
@@ -49,6 +50,7 @@ export function NumericScrubber({ label, value, min = 0, max = 100, step = 1, un
     }
   }
   const commitInput = () => {
+    if (draft.trim() === '') { setDraft(mixed ? '' : formatValue(value, step)); return }
     const parsed = Number(draft)
     emit(Number.isFinite(parsed) ? parsed : value)
   }
@@ -89,9 +91,9 @@ export function NumericScrubber({ label, value, min = 0, max = 100, step = 1, un
   return <div className={`numeric-scrubber ${className}`.trim()}>
     <button type="button" className="numeric-scrubber-label" aria-label={`拖动调整${label}`} title={`拖动调整${label}`} disabled={disabled} onPointerDown={handleScrubDown} onPointerMove={handleScrubMove} onPointerUp={handleScrubUp} onPointerCancel={handleScrubUp}>{label}</button>
     <span className="numeric-scrubber-control">
-      <input ref={inputRef} className="numeric-scrubber-input" type="number" aria-label={ariaLabel ?? label} min={min} max={max} step={step} value={draft} disabled={disabled} onChange={handleInput} onBlur={commitInput} onKeyDown={handleKeyDown} onWheel={handleWheel} />
+      <input ref={inputRef} className="numeric-scrubber-input" type="number" aria-label={ariaLabel ?? label} min={min} max={max} step={step} value={draft} placeholder={mixed ? '混合' : undefined} disabled={disabled} onChange={handleInput} onBlur={commitInput} onKeyDown={handleKeyDown} onWheel={handleWheel} />
       <span className="numeric-scrubber-stepper"><button type="button" aria-label={`增加${label}`} tabIndex={-1} disabled={disabled} onClick={() => nudge(1)}>＋</button><button type="button" aria-label={`减少${label}`} tabIndex={-1} disabled={disabled} onClick={() => nudge(-1)}>−</button></span>
     </span>
-    {unit ? <small className="numeric-scrubber-unit">{unit}</small> : null}
+    {unit && unit !== '°' ? <small className="numeric-scrubber-unit">{unit}</small> : null}
   </div>
 }

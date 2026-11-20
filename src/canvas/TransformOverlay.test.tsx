@@ -52,3 +52,23 @@ test('Shift corner resizing responds to vertical movement', () => {
   fireEvent.pointerMove(corner, { pointerId: 1, clientX: 0, clientY: 10, shiftKey: true })
   expect(change.mock.lastCall?.[0].rect).toEqual({ x: 10, y: 10, width: 80, height: 80 })
 })
+
+test('crop actions remain a draggable portal window and closing cancels', () => {
+  const cancel = vi.fn(), change = vi.fn()
+  const view = render(<TransformOverlay draft={{...draft, kind:'crop'}} onChange={change} onCommit={vi.fn()} onCancel={cancel} toPoint={(x,y)=>({x,y})} />)
+  const window = screen.getByRole('dialog', {name:'变换参数'})
+  expect(view.container).not.toContainElement(window)
+  expect(document.body).toContainElement(window)
+  vi.spyOn(window, 'getBoundingClientRect').mockReturnValue({left:200, top:100, width:330, height:140, right:530, bottom:240, x:200, y:100, toJSON(){}})
+  const header = window.querySelector('header')!
+  fireEvent.pointerDown(header, {pointerId:10, button:0, clientX:230, clientY:120})
+  fireEvent.pointerMove(globalThis.window, {pointerId:10, clientX:280, clientY:150})
+  fireEvent.pointerUp(globalThis.window, {pointerId:10})
+  expect(window.style.translate).toBe('50px 30px')
+  fireEvent.pointerDown(screen.getByLabelText('变换旋转角度'), {pointerId:11, button:0, clientX:280, clientY:180})
+  fireEvent.pointerMove(globalThis.window, {pointerId:11, clientX:350, clientY:210})
+  fireEvent.pointerUp(globalThis.window, {pointerId:11})
+  expect(window.style.translate).toBe('50px 30px')
+  fireEvent.click(screen.getByRole('button', {name:'关闭变换参数'}))
+  expect(cancel).toHaveBeenCalledOnce()
+})

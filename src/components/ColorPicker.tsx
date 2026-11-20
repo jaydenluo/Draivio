@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { DialogTitlebar } from '../ui/DialogTitlebar'
 import { useDraggableDialog } from '../ui/useDraggableDialog'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -111,6 +112,7 @@ export function ColorPicker({ label, ariaLabel = label, value, recentColors = []
       setPanelPosition({ left: Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - width - 8)), top: rect.bottom + gap + height <= window.innerHeight ? rect.bottom + gap : Math.max(8, rect.top - height - gap) })
     }
     updatePosition()
+    panelRef.current?.querySelector<HTMLElement>('button')?.focus({preventScroll:true})
     window.addEventListener('resize', updatePosition)
     return () => window.removeEventListener('resize', updatePosition)
   }, [open])
@@ -162,12 +164,12 @@ export function ColorPicker({ label, ariaLabel = label, value, recentColors = []
       </button>
       <input className="color-picker-native-input" type="color" aria-label={ariaLabel} value={normalizeHex(value)} onChange={(event) => onChange(event.currentTarget.value)} />
     </div>
-    {open ? <div ref={panelRef} className="color-picker-popover" role="dialog" aria-label={`${label}颜色选择器`} style={{ top: panelPosition.top, left: panelPosition.left, ...draggable.style }} onPointerDown={(event) => { draggable.onPointerDown(event); event.stopPropagation() }}>
+    {open ? createPortal(<div ref={panelRef} className="color-picker-popover" role="dialog" aria-label={`${label}颜色选择器`} style={{ top: panelPosition.top, left: panelPosition.left,zIndex:180, ...draggable.style }} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();setOpen(false)}else if(event.key==='Tab'){const items=Array.from(panelRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),[tabindex="0"]')??[]).filter(el=>el.getClientRects().length>0);if(event.shiftKey&&document.activeElement===items[0]){event.preventDefault();items.at(-1)?.focus()}else if(!event.shiftKey&&document.activeElement===items.at(-1)){event.preventDefault();items[0]?.focus()}}}} onPointerDown={(event) => { draggable.onPointerDown(event); event.stopPropagation() }}>
       <DialogTitlebar title={label} closeLabel={`关闭${label}颜色选择器`} onClose={() => setOpen(false)} /><div className="color-picker-heading"><small>{swatchLabel}</small><button type="button" className="color-picker-eyedropper" aria-label="吸管取色" title="吸管取色" onClick={() => void pickWithEyeDropper()}><PipetteIcon /></button></div>
       <div className="color-picker-color-row"><div ref={satRef} className="color-picker-saturation" style={{ backgroundColor: `hsl(${hsv.h} 100% 50%)` }} onPointerDown={pointerControl('sat')} onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) updateFromPoint(event, 'sat') }}><span className="color-picker-cursor" style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%` }} /></div><div ref={hueRef} className="color-picker-hue" onPointerDown={pointerControl('hue')} onPointerMove={(event) => { if (event.currentTarget.hasPointerCapture(event.pointerId)) updateFromPoint(event, 'hue') }}><span className="color-picker-cursor color-picker-hue-cursor" style={{ top: `${(hsv.h / 360) * 100}%` }} /></div></div>
       <div className="color-picker-fields"><label>HEX<input aria-label={`${label} HEX`} value={draft} onChange={(event) => { setDraft(event.currentTarget.value); const next = normalizeHex(event.currentTarget.value, ''); if (next) emit(hexToRgb(next)) }} onBlur={() => setDraft(normalizeHex(draft, normalizeHex(value)))} /></label><div className="color-picker-rgb">{(['r', 'g', 'b'] as const).map((channel) => <label key={channel}>{channel.toUpperCase()}<input aria-label={`${label} ${channel.toUpperCase()}`} inputMode="numeric" value={rgb[channel]} onChange={(event) => updateChannel(channel, event.currentTarget.value)} /></label>)}</div></div>
       <div className="color-picker-recent"><div className="color-picker-section-label">最近使用</div>{recentColors.length ? <div className="color-picker-recent-grid">{recentColors.map((color) => <button key={color} type="button" aria-label={`最近颜色 ${color}`} title={color} style={{ backgroundColor: color }} onClick={() => { onRecentSelect?.(color); onChange(color); setOpen(false) }} />)}</div> : <small>取色后会保留最近 20 个颜色</small>}</div>
       <div className="color-picker-curated"><div className="color-picker-section-label">高级色 · 按当前色系推荐</div><div className="color-picker-curated-grid">{recommendedColors.map((color) => <button key={color.hex} type="button" aria-label={`推荐颜色 ${color.name} ${color.hex}`} title={`${color.name} ${color.hex}`} style={{ backgroundColor: color.hex }} onClick={() => { onChange(color.hex); setOpen(false) }} />)}</div></div>
-    </div> : null}
+    </div>,document.body) : null}
   </>
 }

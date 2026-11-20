@@ -39,3 +39,6 @@ base64 = "0.22"
 image = { version = "0.25.10", default-features = false, features = ["png", "tiff", "exr"] }
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
+
+getrandom = "0.3"
+zip = { version = "=9.6.0", default-features = false }

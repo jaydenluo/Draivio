@@ -1,3 +1,4 @@
+import {ResultStage} from '../../creation/ResultStage'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
 import { EditorProvider, useEditor } from '../../state/editor'
@@ -9,7 +10,7 @@ import { EditRunSummary } from '../ui/EditRunSummary'
 import { recordConversationRun } from '../conversation/session'
 import { createEditPreview } from '../execution/preview'
 
-function Probe(){ const {state,dispatch}=useEditor(); return <><ResultsPanel/><EditRunSummary state={null} runs={state.conversationRuns}/><output data-testid="state">{JSON.stringify({generating:state.isGenerating,layers:state.layers.length,undo:state.undoStack.length})}</output><button onClick={()=>dispatch({type:'undo'})}>撤销采用</button></> }
+function Probe(){ const {state,dispatch}=useEditor(); return <><ResultsPanel/><ResultStage/><EditRunSummary state={null} runs={state.conversationRuns}/><output data-testid="state">{JSON.stringify({generating:state.isGenerating,layers:state.layers.length,undo:state.undoStack.length})}</output><button onClick={()=>dispatch({type:'undo'})}>撤销采用</button></> }
 afterEach(()=>{localStorage.removeItem(WORKSPACE_RECOVERY_KEY);vi.restoreAllMocks()})
 it('restores interrupted generation in the real provider without requests, adopts downloaded results and undoes only adoption',async()=>{
  const state=structuredClone(initialEditorState)
@@ -22,10 +23,10 @@ it('restores interrupted generation in the real provider without requests, adopt
  expect(screen.getByText(/上次 Image Pro 任务已中断/)).toBeInTheDocument()
  expect(screen.getByTestId('state')).toHaveTextContent('"generating":false')
  expect(screen.getByTestId('state')).toHaveTextContent('"undo":0')
- fireEvent.click(screen.getByRole('button',{name:'新增图层'}))
- await waitFor(()=>expect(screen.getByTestId('state')).toHaveTextContent('"layers":4'))
+ fireEvent.click(screen.getByRole('button',{name:'预览结果 offline'}));fireEvent.click(screen.getByRole('button',{name:'更多结果操作'}));fireEvent.click(screen.getByRole('menuitem',{name:'添加到当前作品'}))
+ await waitFor(()=>expect(screen.getByTestId('state')).toHaveTextContent(`"layers":${initialEditorState.layers.length+1}`))
  fireEvent.click(screen.getByText('撤销采用'))
- expect(screen.getByTestId('state')).toHaveTextContent('"layers":3')
+ expect(screen.getByTestId('state')).toHaveTextContent(`"layers":${initialEditorState.layers.length}`)
  expect(fetcher).not.toHaveBeenCalled()
 })
 it('shows the persisted tool version and resolved parameters after reopening',async()=>{

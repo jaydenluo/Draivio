@@ -3,11 +3,18 @@
     "windows": [
       {
         "title": "",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true,
+        "center": true,
         "decorations": true,
+        "theme": "Dark",
         "titleBarStyle": "Overlay",
         "trafficLightPosition": {
           "x": 14,
-          "y": 22
+          "y": 28
         },
         "backgroundColor": "#0d1013"
       }

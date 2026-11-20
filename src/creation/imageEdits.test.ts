@@ -14,6 +14,23 @@ test('edit contract carries reference image, normalized size and supported quali
   expect(form.get('size')).toBe('1024x1024')
 })
 
+test('keeps the target as the first image and sends an additional reference separately', () => {
+  const form=imageEditFormData({...input,mask:input.reference,additionalReference:input.reference})
+  expect(form.getAll('image[]')).toHaveLength(2)
+  expect(form.get('mask')).toBeInstanceOf(File)
+  expect(form.get('additional_reference')).toBeNull()
+})
+
+test('sends target and reference in order for JSON edit contracts', async () => {
+ const fetcher=vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({data:[{b64_json:'aGVsbG8='}]})))
+ const connection={id:'one',provider:'OpenAI',name:'test',baseUrl:'https://example.com/v1',apiKey:'test-only',protocol:'openai_compatible',enabled:true,models:['custom'],imageCapabilities:{custom:{generate:true,edit:true,reference:true,encoding:'base64-json'}}} as ServiceConnection
+ await generateOpenAIImages(connection,{...input,model:'custom',intent:'reference',additionalReference:input.reference})
+ const body=JSON.parse(fetcher.mock.calls[0][1]!.body as string)
+ expect(body.image).toEqual([input.reference,input.reference])
+ expect(body).not.toHaveProperty('additional_reference')
+ vi.restoreAllMocks()
+})
+
 test('unsupported controls are filtered from both display contract and request', () => {
   const capabilities = { generate: true, edit: true, reference: true, encoding: 'multipart' as const, sizes: ['1024x1024'], quality: ['low'] as const, supportsSteps: false, supportsGuidance: false }
   expect(filterImageParameters({ size: '2048 × 2048', quality: 'high', steps: 30, guidance: 5, strength: 0.4 }, capabilities)).toEqual({})
@@ -24,6 +41,11 @@ test('protocol defaults allow documented OpenAI-compatible edit while unknown pr
   const connection = { protocol: 'openai_compatible' } as any
   expect(imageSupports(imageCapabilitiesFor(connection, 'gpt-image-1'), 'edit')).toBe(true)
   expect(imageSupports({ generate: true, edit: false, reference: false, encoding: 'base64-json' }, 'edit')).toBe(false)
+})
+
+test('uses built-in presets for common provider image models', () => {
+  expect(imageCapabilitiesFor({ protocol: 'openai_compatible' } as any, 'gpt-image-2.5-flare')).toMatchObject({ generate: true, edit: true, reference: true, encoding: 'multipart' })
+  expect(imageCapabilitiesFor({ protocol: 'volcengine' } as any, 'doubao-seedream-5.0')).toMatchObject({ generate: true, edit: true, reference: true, encoding: 'base64-json' })
 })
 
 test('multipart capability uses FormData at the documented edit endpoint', async () => {

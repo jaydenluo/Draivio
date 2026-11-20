@@ -3,6 +3,7 @@ export type FilterMaterializeDependencies={decodeSvg:(source:string)=>Promise<{i
 /** Shared awaited pixel path for editor preview and export. Derived PNGs never replace document sources. */
 export async function materializeSmartFilters(source:string,deps:FilterMaterializeDependencies,options:FilterRenderOptions={}):Promise<string>{
  const doc=new DOMParser().parseFromString(source,'image/svg+xml'),root=doc.documentElement
+ if(doc.querySelector('parsererror')||root.localName!=='svg')throw new Error('无法处理画布的 SVG 内容')
  for(const marker of [...root.querySelectorAll('[data-cpu-smart-filters]')].reverse()){
   if(options.signal?.aborted)throw new Error('智能滤镜渲染已取消')
   const chain=validateSmartFilters(JSON.parse(marker.getAttribute('data-cpu-smart-filters')!)),w=Math.ceil(Number(marker.getAttribute('data-filter-width'))),h=Math.ceil(Number(marker.getAttribute('data-filter-height')))

@@ -22,16 +22,13 @@ it('actual account UI offers login without fabricated balance or recharge packag
 
 it('keeps file controls outside overflow tools and allows cancelling a document-size edit',()=>{
  render(<EditorProvider><TopBar/></EditorProvider>)
- const more=screen.getByText('更多工具').closest('details')!
  expect(screen.getByRole('button',{name:'新建'}).closest('details')).toBeNull()
  expect(screen.getByRole('button',{name:'打开'}).closest('details')).toBeNull()
- expect(more).not.toHaveAttribute('open')
- fireEvent.click(screen.getByText('更多工具'))
- expect(more).toHaveAttribute('open')
- fireEvent.click(screen.getByRole('button',{name:'文档尺寸'}))
+ fireEvent.click(screen.getByRole('menuitem',{name:'图像'}))
+ fireEvent.click(screen.getByRole('menuitem',{name:'画布大小'}))
  fireEvent.change(screen.getByLabelText('文档宽度'),{target:{value:'777'}})
  fireEvent.click(screen.getByRole('button',{name:'取消'}))
  expect(screen.queryByRole('dialog',{name:'文档尺寸设置'})).not.toBeInTheDocument()
- fireEvent.click(screen.getByRole('button',{name:'文档尺寸'}))
+ fireEvent.click(screen.getByRole('menuitem',{name:'图像'}));fireEvent.click(screen.getByRole('menuitem',{name:'画布大小'}))
  expect(screen.getByLabelText('文档宽度')).not.toHaveValue(777)
 })

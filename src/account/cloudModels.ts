@@ -16,3 +16,9 @@ export function getOfficialCloudConnection():ServiceConnection|undefined{
  const models=state.models.filter(model=>officialModel(model.code,'image')||officialModel(model.code,'text'))
  return {id:OFFICIAL_CLOUD_ID,provider:'Draivio 云端',name:'官方账户积分',baseUrl:'official-cloud-session',apiKey:'',protocol:'openai_compatible',enabled:true,models:models.map(m=>m.code),modelCapabilities:Object.fromEntries(models.map(m=>[m.code,{image:!!officialModel(m.code,'image'),text:!!officialModel(m.code,'text'),vision:m.constraints.supportsImageInput===true}])),imageCapabilities:Object.fromEntries(models.filter(m=>m.modality==='image').map(m=>[m.code,officialImageCapabilities(m)])),generation:{multiImage:'split',concurrency:1,sendSize:true,quality:'omit'}}
 }
+
+/** Respect the catalog default within one output modality, skipping unavailable offers. */
+export function officialDefaultModel(kind: 'image' | 'text'): CloudModel | undefined {
+ const models = cloudAccount.getSnapshot().models.filter(model => !!officialModel(model.code, kind))
+ return models.find(model => model.isDefault === true) ?? models[0]
+}

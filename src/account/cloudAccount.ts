@@ -4,7 +4,7 @@ import {requestJson, type JsonOptions, type JsonResponse} from '../lib/http'
 
 export type CloudModel = {
   id:string; code:string; displayName:string; modality:string; capabilities:string[]; constraints:Record<string,unknown>
-  availability?:{available:boolean; reason?:string}; estimatedCredits?:number; pricing?:Record<string,unknown>
+  isDefault?:boolean; availability?:{available:boolean; reason?:string}; estimatedCredits?:number; pricing?:Record<string,unknown>
 }
 export type CloudAccountSnapshot = {authenticated:boolean; user:{email:string}|null; balance:number|null; models:CloudModel[]}
 export type AuthPurpose = 'login'|'register'|'password_reset'
@@ -12,7 +12,7 @@ export class CloudAccountError extends Error {
   constructor(public code:string, public status=0) {super(code);this.name='CloudAccountError'}
 }
 const publicPaths=new Set(['/api/auth/me','/api/account/overview','/api/account/payment-methods','/api/account/vouchers/redeem','/api/account/payment-orders','/api/model-gateway/v1/models','/api/model-gateway/v1/balance','/api/model-gateway/v1/quotes','/api/model-gateway/v1/images/generations','/api/model-gateway/v1/images/edits','/api/model-gateway/v1/chat/completions'])
-const authPaths=new Set(['/api/auth/email-codes','/api/auth/email-codes/verify','/api/auth/password-login','/api/auth/password-reset','/api/auth/password-reset/codes','/api/auth/refresh','/api/auth/logout'])
+const authPaths=new Set(['/api/auth/email-codes','/api/auth/email-codes/verify','/api/auth/password-login','/api/auth/register','/api/auth/password-reset','/api/auth/password-reset/codes','/api/auth/refresh','/api/auth/logout'])
 function object(value:unknown):Record<string,unknown>{return value!==null&&typeof value==='object'&&!Array.isArray(value)?value as Record<string,unknown>:{}}
 function codeFor(body:unknown,status:number){const data=object(body);const code=data.code??object(data.error).code;return typeof code==='string'&&/^[a-zA-Z0-9_.-]{1,64}$/.test(code)?code:`HTTP_${status}`}
 function checked(response:JsonResponse){if(response.status<200||response.status>=300)throw new CloudAccountError(codeFor(response.body,response.status),response.status);return object(response.body)}
@@ -36,7 +36,7 @@ function modelsFrom(body:Record<string,unknown>):CloudModel[]{
     if(typeof data.code!=='string'&&typeof data.id==='string')data.code=data.id
     if(typeof data.id!=='string'||typeof data.code!=='string'||typeof data.displayName!=='string'||typeof data.modality!=='string'||!Array.isArray(data.capabilities)||!data.capabilities.every(x=>typeof x==='string'))throw new CloudAccountError('INVALID_MODEL_CATALOG')
     const available=object(data.availability)
-    return {id:data.id,code:data.code,displayName:data.displayName,modality:data.modality,capabilities:[...data.capabilities] as string[],constraints:object(data.constraints),...(typeof available.available==='boolean'?{availability:{available:available.available,...(typeof available.reason==='string'?{reason:available.reason}:{})}}:{}),...(typeof data.estimatedCredits==='number'&&Number.isFinite(data.estimatedCredits)?{estimatedCredits:data.estimatedCredits}:{}),...(data.pricing?{pricing:object(data.pricing)}:{})}
+    return {id:data.id,code:data.code,displayName:data.displayName,modality:data.modality,capabilities:[...data.capabilities] as string[],constraints:object(data.constraints),...(typeof data.isDefault==='boolean'?{isDefault:data.isDefault}:{}),...(typeof available.available==='boolean'?{availability:{available:available.available,...(typeof available.reason==='string'?{reason:available.reason}:{})}}:{}),...(typeof data.estimatedCredits==='number'&&Number.isFinite(data.estimatedCredits)?{estimatedCredits:data.estimatedCredits}:{}),...(data.pricing?{pricing:object(data.pricing)}:{})}
   })
 }
 const empty=():CloudAccountSnapshot=>({authenticated:false,user:null,balance:null,models:[]})
@@ -120,13 +120,14 @@ export function createCloudAccount(config:{origin:string}){
     codeLogin:(email:string,code:string)=>authenticate('/api/auth/email-codes/verify',{email,code,purpose:'login'}),
     passwordLogin:(email:string,password:string)=>authenticate('/api/auth/password-login',{email,password}),
     register:(email:string,code:string,password:string)=>authenticate('/api/auth/email-codes/verify',{email,code,password,purpose:'register'}),
+    registerWithoutCode:(email:string,password:string)=>authenticate('/api/auth/register',{email,password}),
     resetPassword:async(email:string,code:string,password:string)=>{checked(await transport('/api/auth/password-reset',{method:'POST',body:{email:email.trim().toLowerCase(),code,password}}))},
     logout:async()=>{const token=refreshToken;epoch++;authEpoch++;clear();if(token)checked(await transport('/api/auth/logout',{method:'POST',body:{refreshToken:token}}))},
     refreshAccount:async()=>{const session=epoch;const next=await readAccount(p=>request(p));assertCurrent(session);publish(next);return snapshot},
     request,
   }
 }
-export const DEFAULT_CLOUD_ORIGIN=import.meta.env.VITE_CLOUD_API_ORIGIN||'https://www.moviviz.com'
-function configuredOrigin(){try{return originValue(localStorage.getItem('draivio-cloud-origin')||DEFAULT_CLOUD_ORIGIN)}catch{return DEFAULT_CLOUD_ORIGIN}}
+export const DEFAULT_CLOUD_ORIGIN=import.meta.env.VITE_CLOUD_API_ORIGIN
+function configuredOrigin(){try{return originValue(localStorage.getItem('draivio-cloud-origin')||DEFAULT_CLOUD_ORIGIN)}catch{return originValue(DEFAULT_CLOUD_ORIGIN)}}
 export const cloudAccount=createCloudAccount({origin:configuredOrigin()})
 export function configureCloudOrigin(value:string){cloudAccount.configureOrigin(value);try{localStorage.setItem('draivio-cloud-origin',cloudAccount.getOrigin())}catch{/* Address stays session-only if storage is disabled. */}}

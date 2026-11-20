@@ -1,3 +1,4 @@
+import { Checkbox } from '../../ui/Checkbox'
 import {useEffect,useRef,useState} from 'react'
 import {useEditor,type EditorState,type Layer} from '../../state/editor'
 import {CanvasScene} from '../../canvas/CanvasScene'
@@ -59,7 +60,7 @@ export function PosterRecipeWorkspace(){
   <label>标题<textarea aria-label="海报标题" value={title} onChange={event=>{cancel();setTitle(event.target.value)}}/></label>
   <label>正文<textarea aria-label="海报正文" value={body} onChange={event=>{cancel();setBody(event.target.value)}}/></label>
   <label>字体<input aria-label="海报字体" value={font} onChange={event=>{cancel();setFont(event.target.value)}}/></label>
-  {font!=='sans-serif'?<label><input type="checkbox" aria-label="确认字体可能回退" checked={fontAck} onChange={event=>{setPlan(null);setCandidate(null);setFontAck(event.target.checked)}}/>字体未验证，可能回退为系统字体</label>:null}
+  {font!=='sans-serif'?<label><Checkbox aria-label="确认字体可能回退" checked={fontAck} onChange={event=>{setPlan(null);setCandidate(null);setFontAck(event.target.checked)}}/>字体未验证，可能回退为系统字体</label>:null}
   <label>宽度<input type="number" aria-label="海报宽度" value={width} onChange={event=>{cancel();setWidth(Number(event.target.value))}}/></label>
   <label>高度<input type="number" aria-label="海报高度" value={height} onChange={event=>{cancel();setHeight(Number(event.target.value))}}/></label>
   <label>安全边距<input type="number" aria-label="海报安全边距" value={safeMargin} onChange={event=>{cancel();setSafeMargin(Number(event.target.value))}}/></label>

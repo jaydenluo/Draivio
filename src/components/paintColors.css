@@ -1,0 +1,14 @@
+.paint-colors { position:relative; flex-shrink:0; width:32px; height:36px; margin:2px auto 0; border-top:1px solid var(--line); padding-top:2px; }
+.paint-color-foreground,.paint-color-background { position:absolute; }
+.paint-color-foreground { left:1px; top:5px; z-index:2; }
+.paint-color-background { left:10px; top:13px; z-index:1; }
+.paint-colors .color-picker-anchor { margin:0; padding:0; }
+.paint-colors .color-picker-label,.paint-colors .color-picker-value,.paint-colors .color-picker-chevron { display:none; }
+.paint-colors .color-picker-trigger { min-width:0; width:16px; height:16px; padding:1px; border:1px solid #777c87; border-radius:2px; background:#242730; box-shadow:0 1px 3px #0006; }
+.paint-colors .color-picker-swatch { width:100%; height:100%; border-radius:1px; border:0; }
+.paint-colors-swap,.paint-colors-reset { position:absolute; width:14px; height:14px; padding:0; background:transparent; border:0; color:var(--muted); cursor:pointer; }
+.paint-colors-swap { right:0; top:1px; }
+.paint-colors-swap svg { display:block; width:12px; height:12px; }
+.paint-colors-reset { left:1px; bottom:0; }
+.paint-colors-reset i { position:absolute; width:6px; height:6px; border:1px solid #aaa; background:#fff; left:6px; top:6px; }
+.paint-colors-reset i:first-child { background:#000; left:3px; top:3px; z-index:1; }

@@ -13,3 +13,5 @@
 .update-button:hover:not(:disabled) { border-color: #667386; background: #2a323e; }
 .update-button--primary { border-color: #ff875e; background: #ff875e; color: #171b21; font-weight: 700; }
 .update-button:disabled { cursor: wait; opacity: .7; }
+.update-dialog{box-sizing:border-box;max-height:calc(100dvh - 16px);overflow:auto;overscroll-behavior:contain}
+.update-dialog>.dialog-titlebar{margin-bottom:12px}

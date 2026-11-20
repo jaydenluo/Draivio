@@ -1,6 +1,115 @@
-import {useState} from 'react'
-import {fireEvent,render,screen} from '@testing-library/react'
-import {expect,it} from 'vitest'
-import {LayerEffectsPanel} from './LayerEffectsPanel'
-import type {LayerEffects} from '../render/layerEffects'
-it('adds toggles resets copies and pastes real styles',()=>{function Harness(){const[e,set]=useState<LayerEffects>({version:1,items:[]});return <><LayerEffectsPanel effects={e} disabled={false} onChange={set}/><output>{JSON.stringify(e)}</output></>};render(<Harness/>);fireEvent.click(screen.getByText('添加效果'));expect(screen.getByLabelText('投影启用')).toBeChecked();fireEvent.click(screen.getByText('复制样式'));fireEvent.click(screen.getByText('删除投影'));expect(screen.queryByLabelText('投影启用')).toBeNull();fireEvent.click(screen.getByText('粘贴样式'));fireEvent.click(screen.getByLabelText('投影启用'));expect(screen.getByLabelText('投影启用')).not.toBeChecked();fireEvent.click(screen.getByText('重置投影'));expect(screen.getByLabelText('投影启用')).toBeChecked()})
+import { fireEvent, render, screen, within } from '@testing-library/react'
+import { expect, it, vi } from 'vitest'
+import { useLayerStyleEditor } from './LayerStyleEditor'
+import { LayerEffectsPanel } from './LayerEffectsPanel'
+import { EditorProvider, useEditor } from '../state/editor'
+
+function Harness(){const {state,dispatch}=useEditor();const {draft:layerStyleDraft}=useLayerStyleEditor();return <><LayerEffectsPanel layerId="art" effects={state.layers[0].effects} disabled={!!state.layers[0].locked}/><output data-testid="styles">{JSON.stringify({effects:state.layers[0].effects,draft:layerStyleDraft,undo:state.undoStack.length})}</output><button onClick={()=>dispatch({type:'undo'})}>撤销测试</button><button onClick={()=>dispatch({type:'select-layer',id:'original'})}>切换图层测试</button></>}
+const value=()=>JSON.parse(screen.getByTestId('styles').textContent!)
+const open=()=>fireEvent.click(screen.getByRole('button',{name:'编辑图层样式'}))
+it('edits in a portaled window, previews drafts and commits only once with undo',()=>{
+ const view=render(<EditorProvider><Harness/></EditorProvider>);open()
+ const dialog=screen.getByRole('dialog',{name:'图层样式'})
+ expect(view.container.contains(dialog)).toBe(false)
+ fireEvent.click(within(dialog).getByRole('checkbox',{name:'投影启用'}))
+ fireEvent.change(within(dialog).getByLabelText('投影距离'),{target:{value:'12'}})
+ expect(value().effects).toBeUndefined();expect(value().undo).toBe(0)
+ expect(value().draft.effects.items[0].distance).toBe(12)
+ fireEvent.click(within(dialog).getByRole('checkbox',{name:'预览图层样式'}))
+ expect(value().draft).toBeNull()
+ fireEvent.click(within(dialog).getByRole('button',{name:'描边'}))
+ fireEvent.click(within(dialog).getByRole('checkbox',{name:'描边启用'}))
+ fireEvent.change(within(dialog).getByLabelText('描边宽度'),{target:{value:'7'}})
+ fireEvent.click(within(dialog).getByRole('button',{name:'确定'}))
+ expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+ expect(value().effects.items).toHaveLength(2);expect(value().undo).toBe(1)
+ expect(value().draft).toBeNull()
+ fireEvent.click(screen.getByText('撤销测试'));expect(value().effects).toBeUndefined()
+})
+it.each(['取消','关闭图层样式','Escape'])('discards draft on %s',method=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open()
+ fireEvent.click(screen.getByRole('checkbox',{name:'投影启用'}))
+ if(method==='Escape')fireEvent.keyDown(screen.getByRole('dialog'),{key:'Escape'})
+ else if(method==='切换图层')fireEvent.click(screen.getByText('切换图层测试'))
+ else fireEvent.click(screen.getByRole('button',{name:method}))
+ if(method!=='取消')fireEvent.click(screen.getByRole('button',{name:'放弃修改'}))
+ expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+ expect(value().effects).toBeUndefined();expect(value().undo).toBe(0);expect(value().draft).toBeNull()
+})
+it('drags only by title, constrains bounds and keeps body controls stationary',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open()
+ const dialog=screen.getByRole('dialog'),header=dialog.querySelector('header')!
+ vi.spyOn(dialog,'getBoundingClientRect').mockReturnValue({left:200,top:100,right:800,bottom:500,width:600,height:400,x:200,y:100,toJSON:()=>({})})
+ fireEvent.pointerDown(header,{pointerId:1,button:0,clientX:240,clientY:120});fireEvent.pointerMove(window,{pointerId:1,clientX:280,clientY:150});fireEvent.pointerUp(window,{pointerId:1})
+ expect(dialog.style.translate).toBe('40px 30px')
+ fireEvent.pointerDown(screen.getByRole('checkbox',{name:'投影启用'}),{pointerId:2,button:0,clientX:300,clientY:250});fireEvent.pointerMove(window,{pointerId:2,clientX:600,clientY:450});fireEvent.pointerUp(window,{pointerId:2})
+ expect(dialog.style.translate).toBe('40px 30px')
+ fireEvent.pointerDown(header,{pointerId:3,button:0,clientX:280,clientY:150});fireEvent.pointerMove(window,{pointerId:3,clientX:-1000,clientY:-1000});fireEvent.pointerUp(window,{pointerId:3})
+ expect(dialog.style.translate).toBe('-152px -62px')
+})
+it('restores opening styles and clears the draft without committing history',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open()
+ fireEvent.click(screen.getByRole('checkbox',{name:'投影启用'}))
+ fireEvent.change(screen.getByLabelText('投影距离'),{target:{value:'24'}})
+ fireEvent.click(screen.getByRole('button',{name:'恢复打开时状态'}))
+ expect(screen.getByRole('checkbox',{name:'投影启用'})).not.toBeChecked()
+ fireEvent.click(screen.getByRole('checkbox',{name:'描边启用'}))
+ fireEvent.click(screen.getByRole('button',{name:'清除全部样式'}))
+ expect(value().draft.effects.items).toEqual([]);expect(value().undo).toBe(0)
+})
+it('asks before discarding dirty draft from title close and keeps edits when continuing',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open()
+ fireEvent.click(screen.getByRole('checkbox',{name:'投影启用'}))
+ fireEvent.click(screen.getByRole('button',{name:'关闭图层样式'}))
+ expect(screen.getByRole('button',{name:'继续编辑'})).toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'继续编辑'}))
+ expect(screen.getByRole('checkbox',{name:'投影启用'})).toBeChecked()
+ fireEvent.click(screen.getByRole('button',{name:'关闭图层样式'}))
+ fireEvent.click(screen.getByRole('button',{name:'放弃修改'}))
+ expect(screen.queryByRole('dialog')).not.toBeInTheDocument();expect(value().effects).toBeUndefined()
+})
+
+it('pins the editing target if selection changes externally instead of losing draft',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open();fireEvent.click(screen.getByRole('checkbox',{name:'投影启用'}))
+ fireEvent.click(screen.getByText('切换图层测试'))
+ expect(screen.getByRole('dialog',{name:'图层样式'})).toBeInTheDocument();expect(value().draft.layerId).toBe('art')
+ fireEvent.click(screen.getByRole('button',{name:'确定'}));expect(value().effects.items[0].kind).toBe('shadow')
+})
+function ConflictFixture(){const {dispatch}=useEditor();return <button onClick={()=>dispatch({type:'set-layer-effects',id:'art',effects:{version:1,items:[{kind:'stroke',enabled:true,color:'#ff0000',opacity:100,distance:0,angle:0,blur:0,width:3,position:'outside',stops:[{offset:0,color:'#000000',opacity:100},{offset:1,color:'#ffffff',opacity:100}]}]}})}>模拟其他操作修改样式</button>}
+it('retains drafts on conflict and can reload the actual target styles',()=>{
+ render(<EditorProvider><Harness/><ConflictFixture/></EditorProvider>);open();fireEvent.click(screen.getByRole('checkbox',{name:'投影启用'}))
+ fireEvent.click(screen.getByText('模拟其他操作修改样式'));fireEvent.click(screen.getByRole('button',{name:'确定'}))
+ expect(screen.getByRole('alert')).toHaveTextContent(/已被其他操作修改/)
+ expect(screen.getByRole('dialog',{name:'图层样式'})).toBeInTheDocument()
+ expect(value().draft.effects.items[0].kind).toBe('shadow');expect(value().effects.items[0].kind).toBe('stroke')
+ fireEvent.click(screen.getByRole('button',{name:'载入当前图层样式'}))
+ expect(within(screen.getByRole('dialog',{name:'图层样式'})).getByRole('checkbox',{name:'描边启用'})).toBeChecked();expect(within(screen.getByRole('dialog',{name:'图层样式'})).getByRole('checkbox',{name:'投影启用'})).not.toBeChecked()
+})
+it('keeps a child color picker independent from parent title dragging and Escape',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open();fireEvent.click(screen.getByRole('checkbox',{name:'投影启用'}))
+ const parent=screen.getByRole('dialog',{name:'图层样式'})
+ fireEvent.click(screen.getByRole('button',{name:'打开颜色选择器：投影颜色'}))
+ const child=screen.getByRole('dialog',{name:'投影颜色颜色选择器'});expect(parent.contains(child)).toBe(false)
+ fireEvent.keyDown(child,{key:'Escape'})
+ expect(screen.queryByRole('dialog',{name:'投影颜色颜色选择器'})).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'继续编辑'})).not.toBeInTheDocument()
+ expect(parent).toBeInTheDocument()
+})
+it('shares global light while keeping per-effect angles when unlinked',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open();fireEvent.click(screen.getByRole('checkbox',{name:'投影启用'}));fireEvent.click(screen.getByLabelText('投影使用全局光'))
+ fireEvent.change(screen.getByLabelText('投影角度'),{target:{value:'90'}})
+ fireEvent.click(screen.getByRole('checkbox',{name:'内阴影启用'}));fireEvent.click(screen.getByLabelText('内阴影使用全局光'))
+ expect(screen.getByLabelText('内阴影角度')).toHaveValue(90)
+ fireEvent.click(screen.getByRole('button',{name:'确定'}));expect(value().effects.globalLightAngle).toBe(90)
+})
+it('resets extended effect fields as well as the original parameters',()=>{
+ render(<EditorProvider><Harness/></EditorProvider>);open()
+ fireEvent.click(screen.getByRole('checkbox',{name:'渐变叠加启用'}))
+ fireEvent.click(screen.getByLabelText('反向渐变'))
+ fireEvent.change(screen.getByLabelText('渐变类型'),{target:{value:'radial'}})
+ fireEvent.change(screen.getByLabelText('渐变缩放'),{target:{value:'160'}})
+ fireEvent.click(screen.getByRole('button',{name:'重置渐变叠加'}))
+ expect(screen.getByLabelText('反向渐变')).not.toBeChecked()
+ expect(screen.getByLabelText('渐变类型')).toHaveValue('linear')
+ expect(screen.getByLabelText('渐变缩放')).toHaveValue(100)
+})

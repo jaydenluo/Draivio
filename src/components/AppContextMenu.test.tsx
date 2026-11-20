@@ -71,3 +71,11 @@ test('closes the custom menu on escape and outside pointer down', () => {
   expect(screen.queryByRole('menu')).toBeNull()
   host.remove()
 })
+
+test('keeps text copying available while renaming a layer', () => {
+  render(<><AppContextMenu /><div data-layer-row="a"><input aria-label="图层名称" defaultValue="海报标题" /></div></>)
+  const input = screen.getByRole('textbox', { name: '图层名称' }) as HTMLInputElement
+  input.focus(); input.setSelectionRange(0, 2)
+  fireEvent.contextMenu(input, { clientX: 20, clientY: 18 })
+  expect(screen.getByRole('menuitem', { name: '复制' })).toBeInTheDocument()
+})

@@ -58,14 +58,14 @@ export function getConnections(): ServiceConnection[] {
   }
   return connections
 }
-export function getAvailableSources(): ModelSource[] {
+export function getAvailableSources(kind: 'image' | 'text' = 'image'): ModelSource[] {
   const account=cloudAccount.getSnapshot()
-  const official={...modelSources[0],enabled:account.authenticated,summary:account.authenticated?'Draivio 云端 · 官方账户积分':'Draivio 云端 · 请先登录',models:account.authenticated?account.models.filter(m=>!!officialModel(m.code,'image')).map(m=>({code:m.code,displayName:m.displayName})):[]}
+  const official={...modelSources[0],enabled:account.authenticated,summary:account.authenticated?'Draivio 云端 · 官方账户积分':'Draivio 云端 · 请先登录',models:account.authenticated?account.models.filter(m=>!!officialModel(m.code,kind)).map(m=>({code:m.code,displayName:m.displayName})):[]}
   return [official, ...getConnections().map((connection) => ({
     id: connection.id, providerName: connection.provider, summary: `${connection.provider} · ${connection.name}`,
     billingMode: 'provider' as const, billingLabel: `由 ${connection.name} 计费`,
     protocolLabel: getImageProtocol(connection.protocol).label,
-    models: connection.models.filter(code => capabilitiesFor(connection, code).image).map((code) => ({ code, displayName: code })), enabled: connection.enabled,
+    models: connection.models.filter(code => capabilitiesFor(connection, code)[kind]).map((code) => ({ code, displayName: code })), enabled: connection.enabled && (kind === 'image' || !!connection.apiKey.trim() && ['openai_compatible', 'volcengine'].includes(connection.protocol)),
   }))]
 }
 export function isSourceUsable(sourceId: string, modelName: string) {
@@ -78,10 +78,10 @@ export async function updateConnections(next: ServiceConnection[]) {
   loadError = ''
   notify()
 }
-export function useServiceSources() {
+export function useServiceSources(kind: 'image' | 'text' = 'image') {
   useSyncExternalStore((listener) => { listeners.add(listener); return () => { listeners.delete(listener) } }, () => revision)
   useEffect(() => {
-    const unsubscribeCloud=cloudAccount.subscribe(notify)
+    const unsubscribeCloud=cloudAccount.subscribe(() => notify())
     if (!initialized) initialized = loadConnections().then((value) => { connections = value; ready = true; loadError = ''; notify() }).catch(() => { loadError = '无法读取服务来源，请检查本地存储'; notify() })
     const storageChanged = () => notify()
     window.addEventListener('storage', storageChanged)
@@ -89,7 +89,7 @@ export function useServiceSources() {
   }, [])
   let error = loadError
   if (!isTauri()) { try { getBrowserConnections(true); error = '' } catch { error = '无法读取服务来源，请检查本地存储' } }
-  return { connections: getConnections(), sources: getAvailableSources(), error, ready }
+  return { connections: getConnections(), sources: getAvailableSources(kind), error, ready }
 }
 
 export function getModelsForSource(sourceId: string): SourceModel[] {

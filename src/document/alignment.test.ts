@@ -14,6 +14,13 @@ describe('layer alignment geometry', () => {
     expect(alignRects(rects, 'left', { x: 0, y: 0, width: 100, height: 100 }).map((r) => r.x)).toEqual([0, 0, 0])
     expect(alignRects(rects, 'center-horizontal', { x: 0, y: 0, width: 100, height: 100 }).map((r) => r.x)).toEqual([40, 45, 42.5])
   })
+  it('places a rectangle in each canvas corner without changing its size', () => {
+    const reference = { x: 0, y: 0, width: 100, height: 80 }
+    expect(alignRects([rects[0]], 'top-left', reference)[0]).toEqual({ x: 0, y: 0, width: 20, height: 10 })
+    expect(alignRects([rects[0]], 'top-right', reference)[0]).toEqual({ x: 80, y: 0, width: 20, height: 10 })
+    expect(alignRects([rects[0]], 'bottom-left', reference)[0]).toEqual({ x: 0, y: 70, width: 20, height: 10 })
+    expect(alignRects([rects[0]], 'bottom-right', reference)[0]).toEqual({ x: 80, y: 70, width: 20, height: 10 })
+  })
   it('distributes by centers without changing outer bounds', () => {
     const output = distributeRects(rects, 'horizontal')
     expect(output.map((r) => r.x)).toEqual([10, 45, 70])

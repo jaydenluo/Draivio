@@ -1,0 +1,23 @@
+.selection-refine-panel.anchored-window { z-index:125; display:flex; flex-direction:column; gap:6px; overflow:hidden; }
+.selection-refine-panel.anchored-window > .dialog-titlebar { margin-bottom:2px; }
+.selection-refine-main { display:grid; gap:10px; min-width:0; min-height:0; margin:0; padding:0 2px 0 0; border:0; overflow:auto; }
+.selection-refine-section { display:grid; gap:6px; }
+.selection-refine-section-heading,.selection-refine-range > span { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+.selection-refine-section-heading h3,.selection-refine-section-heading span,.selection-refine-help { margin:0; font-size:11px; }
+.selection-refine-help,.selection-refine-section-heading span,.selection-refine-range output,.selection-refine-radio small { color:var(--muted); font-size:10px; }
+.selection-refine-preview-grid,.selection-refine-segmented,.selection-refine-footer > div { display:flex; gap:5px; flex-wrap:wrap; }
+.selection-refine-panel button:not(.dialog-close) { padding:4px 7px; min-height:23px; border-radius:4px; border:1px solid var(--ink-700); background:var(--ink-800); color:var(--text); font-size:11px; }
+.selection-refine-panel button[aria-pressed=true] { border-color:var(--sky); color:var(--sky); }
+.selection-refine-preview-swatch { display:inline-block; width:9px; height:9px; margin-inline-end:4px; border:1px solid var(--ink-650); border-radius:2px; }
+.selection-refine-range { display:grid; gap:3px; }
+.selection-refine-range input[type=range] { width:100%; margin:0; accent-color:var(--sky); }
+.selection-refine-advanced { padding:5px 0; }
+.selection-refine-advanced summary { cursor:pointer; color:var(--muted); }
+.selection-refine-advanced[open] > label { margin-block-start:6px; }
+.selection-refine-radio { display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+.selection-refine-radio input[type=radio] { margin:0; accent-color:var(--sky); }
+.selection-refine-footer { flex-shrink:0; border-top:1px solid var(--ink-700); padding-block-start:8px; }
+.selection-refine-footer > div { justify-content:end; }
+.selection-refine-panel .selection-refine-apply:not(.dialog-close) { background:var(--sky); color:var(--ink-950); }
+.selection-refine-preview { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.selection-refine-advanced:not([open]) > :not(summary) { display:none; }

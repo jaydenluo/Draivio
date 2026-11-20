@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { DialogTitlebar } from '../ui/DialogTitlebar'
+import { useDraggableDialog } from '../ui/useDraggableDialog'
 import { isTauri } from '@tauri-apps/api/core'
 import { check } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
@@ -21,6 +23,8 @@ function defaultController(): UpdateController {
 type Props = { controller?: UpdateController; delayMs?: number }
 
 export function UpdateManager({ controller, delayMs = 1800 }: Props) {
+  const root = useRef<HTMLElement>(null)
+  const draggable = useDraggableDialog(root)
   const updateController = useMemo(() => controller ?? defaultController(), [controller])
   const [update, setUpdate] = useState<UpdateLike | null>(null)
   const [dismissed, setDismissed] = useState(false)
@@ -56,9 +60,9 @@ export function UpdateManager({ controller, delayMs = 1800 }: Props) {
   }
   const percent = progress?.totalBytes ? Math.min(100, Math.round(progress.downloadedBytes / progress.totalBytes * 100)) : undefined
   return <div className="update-backdrop" role="presentation">
-    <section className="update-dialog" role="dialog" aria-modal="true" aria-labelledby="update-title" aria-label="发现新版本">
+    <section ref={root} style={draggable.style} onPointerDown={draggable.onPointerDown} className="update-dialog" role="dialog" aria-modal="true" aria-labelledby="update-title" aria-label="发现新版本">
+      <DialogTitlebar title={<span id="update-title">发现新版本 v{update.version}</span>} closeLabel="关闭更新提示" onClose={dismiss} disabled={status === 'downloading' || status === 'ready'} />
       <div className="update-dialog__eyebrow">DRAIVIO UPDATE</div>
-      <h2 id="update-title">发现新版本 v{update.version}</h2>
       {update.body ? <p className="update-dialog__body">{update.body}</p> : <p className="update-dialog__body">新版本已经准备好，更新后即可使用最新功能。</p>}
       {status === 'downloading' ? <div className="update-progress" role="status"><div className="update-progress__label">正在下载更新…{percent === undefined ? '' : ` ${percent}%`}</div><div className="update-progress__track"><span style={{ width: `${percent ?? 35}%` }} /></div></div> : null}
       {status === 'ready' ? <p className="update-dialog__body">更新已安装，应用将重启以完成更新。</p> : null}

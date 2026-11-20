@@ -48,15 +48,20 @@ export function readImageFile(file: File): Promise<string> {
 }
 
 /** Decode natural pixel dimensions rather than CSS/display dimensions. */
-export function readImageMetadata(source: string): Promise<{ width: number; height: number }> {
+export function readImageMetadata(source: string, signal?: AbortSignal): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
     const image = new Image()
+    const cleanup = () => { image.onload = null; image.onerror = null; signal?.removeEventListener('abort', abort) }
+    const abort = () => { cleanup(); image.src = ''; reject(new DOMException('导入已取消', 'AbortError')) }
     image.onload = () => {
       const width = image.naturalWidth, height = image.naturalHeight
+      cleanup()
       if (![width, height].every((value) => Number.isInteger(value) && value > 0)) return reject(new Error('无法读取图片像素尺寸'))
       resolve({ width, height })
     }
-    image.onerror = () => reject(new Error('图片文件无法解码'))
+    image.onerror = () => { cleanup(); reject(new Error('图片文件无法解码')) }
+    if(signal?.aborted) { abort(); return }
+    signal?.addEventListener('abort',abort,{once:true})
     image.src = source
   })
 }

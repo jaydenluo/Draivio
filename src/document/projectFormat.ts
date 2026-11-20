@@ -1,3 +1,5 @@
+import { savedContentIdentity } from './contentIdentity'
+import {collectRasterReferences} from '../assets/imageAssetStore'
 import { validateRawSourceRecord } from '../raw/rawPipeline'
 import { validateProductRecord } from '../ai/recipes/product'
 import { contentRevision, contextCanCommit } from '../ai/context/editorContext'
@@ -77,12 +79,13 @@ export function assertPrecisionProjectBudget(value: unknown) {
   if (!Number.isFinite(rawBytes) || rawBytes * 4 + stringUnits * 8 > 512 * 1024 * 1024) throw new Error('高精度项目序列化超出 512 MiB 保守内存预算；原始资源保留')
 }
 
-function serializableDocument(state: ProjectState): ProjectDocument {
+export function serializableDocument(state: ProjectState): ProjectDocument {
   const document = { ...state } as Partial<EditorState> & Record<string, unknown>
   if (state.colorManagement) document.colorManagement = { ...state.colorManagement, profile: { ...state.colorManagement.profile, bytes: Array.from(state.colorManagement.profile.bytes) as unknown as Uint8Array } }
   if (state.proofSettings?.targetProfile) document.proofSettings = { ...state.proofSettings, targetProfile: { ...state.proofSettings.targetProfile, bytes: Array.from(state.proofSettings.targetProfile.bytes) as unknown as Uint8Array } }
   const cmykProfile = document.cmykProfile as CmykProfile | undefined
   if (cmykProfile && cmykProfile.iccBytes instanceof Uint8Array) document.cmykProfile = { ...cmykProfile, iccBytes: Array.from(cmykProfile.iccBytes) as unknown as Uint8Array }
+  delete document.rasterPreviewOnly
   delete document.curvePreviewOffLayerId
   delete document.activeTool
   delete document.activeToolGroup
@@ -149,7 +152,20 @@ function restoreProofBytes(settings: SoftProofSettings): SoftProofSettings {
   return { ...settings, targetProfile: { ...target, bytes: new Uint8Array(target.bytes) } }
 }
 
-function validateDocument(document: ProjectDocument) {
+/** Shared v3/v4 runtime restoration. On disk profile bytes are plain JSON
+ * arrays; existing proof/render backends require actual typed byte arrays. */
+export function restoreProjectProfileBytes(document: ProjectDocument): ProjectDocument {
+  if (document.proofSettings) document.proofSettings = restoreProofBytes(document.proofSettings)
+  if (document.cmykProfile?.iccBytes && Array.isArray(document.cmykProfile.iccBytes)) {
+    const bytes=document.cmykProfile.iccBytes
+    if(bytes.length>16*1024*1024||bytes.some(byte=>!Number.isInteger(byte)||byte<0||byte>255))throw new Error('CMYK ICC 字节无效')
+    document.cmykProfile={...document.cmykProfile,iccBytes:new Uint8Array(bytes)}
+  }
+  document.colorManagement=normalizeColorManagement(document.colorManagement)
+  return document
+}
+
+export function validateProjectDocument(document: ProjectDocument, allowRasterReferences = false) {
   if (!document || !Array.isArray(document.layers)) throw new Error('项目文档结构无效')
   if (document.pixelFormat !== undefined && !['rgba8', 'rgba16', 'rgba32f'].includes(document.pixelFormat)) throw new Error('项目文档结构无效：pixelFormat')
   if (document.colorModel !== undefined && !['rgb', 'cmyk'].includes(document.colorModel)) throw new Error('项目文档结构无效：colorModel')
@@ -160,12 +176,13 @@ function validateDocument(document: ProjectDocument) {
     if (profile.iccBytes !== undefined && !Array.isArray(profile.iccBytes) && !(profile.iccBytes instanceof Uint8Array)) throw new Error('项目文档结构无效：cmykProfile.iccBytes')
   }
   if (document.adjustmentPresets !== undefined) { if (!Array.isArray(document.adjustmentPresets) || document.adjustmentPresets.length > 100) throw new Error('项目预设无效'); document.adjustmentPresets = document.adjustmentPresets.map((preset) => normalizePreset(preset)) as unknown as Array<Record<string, unknown>> }
-  if (document.cmykRaster !== undefined) { validateCmykRaster(document.cmykRaster); if (document.cmykRaster.sourceDocument) validateDocument(document.cmykRaster.sourceDocument as ProjectDocument) }
+  if (document.cmykRaster !== undefined) { validateCmykRaster(document.cmykRaster); if (document.cmykRaster.sourceDocument) validateProjectDocument(document.cmykRaster.sourceDocument as ProjectDocument, allowRasterReferences) }
   if (document.colorModel === 'cmyk' && !document.cmykRaster) throw new Error('CMYK 文档缺少原始四通道像素')
   if (document.aiRecovery !== undefined) validateAIRecovery(document.aiRecovery)
   if (document.savedRecipes !== undefined) validateSavedRecipes(document.savedRecipes)
   if (document.conversationRuns !== undefined) validateConversationRuns(document.conversationRuns)
   const ids = new Set<string>()
+  if(collectRasterReferences(document).length && !allowRasterReferences)throw new Error('持久原件需要 v4 二进制项目格式')
   for (const layer of document.layers) {
     if (!layer.id || ids.has(layer.id)) throw new Error(`项目图层 ID 重复：${layer.id || '空值'}`)
     ids.add(layer.id)
@@ -196,6 +213,7 @@ function validateDocument(document: ProjectDocument) {
 }
 
 export async function encodeProject(state: ProjectState, metadata: ProjectMetadata, fetchAsset: FetchAsset = defaultFetchAsset): Promise<string> {
+  if(collectRasterReferences(state).length)throw new Error('持久原件需要 v4 二进制项目格式；原件保留，不能使用旧 JSON 保存或恢复')
   const sources = state.smartObjectSources
   if (sources) for (const sourceId of Object.keys(sources)) validateSmartObjectGraph(sources, sourceId)
   const assets: Record<string, string> = {}
@@ -211,6 +229,7 @@ export async function encodeProject(state: ProjectState, metadata: ProjectMetada
   // Refresh only candidates whose captured context was valid before saving;
   // stale candidates must remain stale after a round trip.
   const offline = restoreSources(document, assets) as EditorState
+  restoreProjectProfileBytes(offline)
   for (const result of document.aiResults ?? []) {
     const context = result.request?.context
     const original = state.aiResults?.find(item => item.id === result.id)?.request?.context
@@ -219,12 +238,12 @@ export async function encodeProject(state: ProjectState, metadata: ProjectMetada
     context.revision = revision
     for (const layer of document.layers) if (layer.aiOperation?.context?.requestId === context.requestId) layer.aiOperation.context.revision = revision
   }
-  validateDocument(document)
+  validateProjectDocument(document)
   const file: ProjectFile = { format: PROJECT_FORMAT, schemaVersion: PROJECT_SCHEMA_VERSION, metadata: { ...redactProjectCredentials(metadata), updatedAt: metadata.updatedAt ?? new Date().toISOString() }, assets, document }
   return JSON.stringify(file)
 }
 
-export function decodeProject(serialized: string): { metadata: ProjectMetadata; document: ProjectDocument } {
+export function decodeProject(serialized: string, allowRasterReferences = false): { metadata: ProjectMetadata; document: ProjectDocument } {
   if (serialized.length * 8 > 512 * 1024 * 1024) throw new Error('项目解析超出 512 MiB 保守内存预算')
   let raw: ProjectFile & { document?: ProjectDocument }
   try { raw = JSON.parse(serialized) as ProjectFile & { document?: ProjectDocument } } catch { throw new Error('无法读取项目文件：JSON 损坏') }
@@ -246,22 +265,20 @@ export function decodeProject(serialized: string): { metadata: ProjectMetadata; 
     legacy.colorManagement = normalizeColorManagement(legacy.colorManagement)
     if (legacy.proofSettings) legacy.proofSettings = restoreProofBytes(legacy.proofSettings)
     legacy.pixelFormat ??= 'rgba8'
-    legacy.guideSettings = legacy.guideSettings ? validateGuideSettings(legacy.guideSettings) : defaultGuideSettings(); legacy.documentWidth ??= 500; legacy.documentHeight ??= 625; validateDocument(legacy)
+    legacy.guideSettings = legacy.guideSettings ? validateGuideSettings(legacy.guideSettings) : defaultGuideSettings(); legacy.documentWidth ??= 500; legacy.documentHeight ??= 625; validateProjectDocument(legacy, allowRasterReferences)
     return { metadata: raw.metadata, document: legacy }
   }
   if (!raw.assets || typeof raw.assets !== 'object') throw new Error('无法读取项目文件：资源索引无效')
   for (const source of Object.values(raw.assets)) if (typeof source !== 'string' || !/^data:image\//i.test(source)) throw new Error('无法读取项目文件：离线资源数据无效')
   const document = restoreSources(raw.document, raw.assets) as ProjectDocument
-  if (document.proofSettings) document.proofSettings = restoreProofBytes(document.proofSettings)
-  if (document.cmykProfile?.iccBytes && Array.isArray(document.cmykProfile.iccBytes)) document.cmykProfile = { ...document.cmykProfile, iccBytes: new Uint8Array(document.cmykProfile.iccBytes) }
+  restoreProjectProfileBytes(document)
   document.guideSettings = document.guideSettings ? validateGuideSettings(document.guideSettings) : defaultGuideSettings()
   document.colorManagement = normalizeColorManagement(document.colorManagement)
   if (document.proofSettings === undefined) document.proofSettings = { enabled: false, renderingIntent: 'relative-colorimetric', blackPointCompensation: true, simulatePaperWhite: false, simulateBlackInk: false, totalInkLimit: 3 }
-  validateDocument(document)
+  validateProjectDocument(document, allowRasterReferences)
   return { metadata: raw.metadata, document }
 }
 
 export function projectFingerprint(state: ProjectState): string {
-  const document = serializableDocument(state)
-  return JSON.stringify(document)
+  return savedContentIdentity(state as EditorState)
 }

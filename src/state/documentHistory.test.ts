@@ -15,8 +15,9 @@ test('document undo restores whole strokes and preserves tool and view choices',
   expect(editorReducer(undo, { type: 'redo' }).brushStrokes).toEqual([stroke])
 })
 test('mask creation, inversion, application and clearing are reversible', () => {
-  let state = editorReducer(initialEditorState, { type: 'selection-to-mask' })
-  expect(state.layerMasks.art.selection).toEqual(initialEditorState.selection)
+  const selected = editorReducer(initialEditorState, { type: 'set-selection-rect', rect: {x:20,y:20,width:40,height:40} })
+  let state = editorReducer(selected, { type: 'selection-to-mask' })
+  expect(state.layerMasks.art.selection).toEqual(selected.selection)
   state = editorReducer(state, { type: 'invert-mask' })
   expect(state.layerMasks.art.inverted).toBe(true)
   state = editorReducer(state, { type: 'apply-mask' })

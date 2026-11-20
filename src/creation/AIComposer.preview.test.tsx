@@ -13,7 +13,7 @@ function Observe() {
  const { newDocument, workspace } = useDocumentWorkspace()
  return <><span data-testid="document-count">{workspace.documents.length}</span><button onClick={()=>newDocument()}>切换文档测试</button><CanvasScene state={state}/><button onClick={()=>dispatch({type:'redo'})}>重做测试</button><button onClick={()=>dispatch({type:'set-layer-opacity',id:'art',opacity:45})}>外部修改测试</button></>
 }
-function mount() { render(<EditorProvider><AIComposer/><Observe/></EditorProvider>); fireEvent.click(screen.getByRole('button',{name:'一句话编辑'})); fireEvent.change(screen.getByRole('textbox',{name:'AI 操作'}),{target:{value:'向右10像素然后旋转15度'}}); fireEvent.click(screen.getByRole('button',{name:'执行 AI 操作'})); }
+function mount() { render(<EditorProvider><AIComposer/><Observe/></EditorProvider>); fireEvent.click(screen.getByRole('button',{name:'编辑画布'})); fireEvent.change(screen.getByRole('textbox',{name:'AI 操作'}),{target:{value:'向右10像素然后旋转15度'}}); fireEvent.click(screen.getByRole('button',{name:'执行 AI 操作'})); }
 async function candidate() { fireEvent.click(screen.getByRole('button',{name:'确认执行计划'})); return await screen.findByRole('region',{name:'编辑效果预览'}) }
 function pixels(svg: SVGSVGElement) {
  Object.defineProperty(svg,'viewBox',{configurable:true,value:{baseVal:{x:0,y:0,width:500,height:625}}})
@@ -47,23 +47,22 @@ describe('real temporary edit preview',()=>{
   expect(within(panel).getByText(/文档已更改/)).toBeInTheDocument();expect(latest).toBe(changed)
  })
  it('cancels during execution without writes and ignores duplicate confirmation',async()=>{
-  mount();const original=latest;const confirm=screen.getByRole('button',{name:'确认执行计划'});fireEvent.click(confirm);fireEvent.click(screen.getByRole('button',{name:'执行 AI 操作'}))
-  fireEvent.click(screen.getByRole('button',{name:'取消'}));await waitFor(()=>expect(screen.getByText('已取消')).toBeInTheDocument())
+  mount();const original=latest;const confirm=screen.getByRole('button',{name:'确认执行计划'});fireEvent.click(confirm);fireEvent.keyDown(screen.getByRole('textbox',{name:'AI 操作'}),{key:'Enter'})
+  fireEvent.click(screen.getByRole('button',{name:'停止当前任务'}));await waitFor(()=>expect(screen.getByText('已取消')).toBeInTheDocument())
   expect(latest.layers).toBe(original.layers);expect(latest.undoStack).toBe(original.undoStack);expect(screen.queryByRole('region',{name:'编辑效果预览'})).not.toBeInTheDocument()
  })
  it('ignores repeated execute while building a candidate and adopts only once',async()=>{
-  mount();const original=latest;fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}));fireEvent.click(screen.getByRole('button',{name:'执行 AI 操作'}));fireEvent.click(screen.getByRole('button',{name:'执行 AI 操作'}))
+  mount();const original=latest;fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}));fireEvent.keyDown(screen.getByRole('textbox',{name:'AI 操作'}),{key:'Enter'});fireEvent.keyDown(screen.getByRole('textbox',{name:'AI 操作'}),{key:'Enter'})
   const panel=await screen.findByRole('region',{name:'编辑效果预览'});expect(latest).toBe(original)
   expect(panel.querySelectorAll('[data-layer-transform="art"]')).toHaveLength(1)
   const adopt=within(panel).getByRole('button',{name:'采用预览'});fireEvent.click(adopt);fireEvent.click(adopt)
   expect(latest.layers.find(l=>l.id==='art')?.transform?.rotation).toBe(15);expect(latest.undoStack).toHaveLength(original.undoStack.length+1)
  })
- it.each(['mode','minimize','prompt','scope'] as const)('does not publish a late candidate after %s abandons a running preview',async path=>{
+ it.each(['mode','minimize','prompt'] as const)('does not publish a late candidate after %s abandons a running preview',async path=>{
   mount();const original=latest;fireEvent.click(screen.getByRole('button',{name:'确认执行计划'}))
-  if(path==='mode')fireEvent.click(screen.getByRole('button',{name:'一句话编辑'}))
+  if(path==='mode')fireEvent.click(screen.getByRole('button',{name:'编辑画布'}))
   if(path==='minimize')fireEvent.click(screen.getByRole('button',{name:'最小化 AI 对话框'}))
   if(path==='prompt')fireEvent.change(screen.getByRole('textbox',{name:'AI 操作'}),{target:{value:'向左20像素'}})
-  if(path==='scope')fireEvent.change(screen.getByRole('combobox',{name:'一句话编辑范围'}),{target:{value:'document'}})
   const afterInteraction=latest
   await act(async()=>{await new Promise(resolve=>setTimeout(resolve,20))})
   expect(latest.layers).toBe(original.layers);expect(latest.undoStack).toBe(afterInteraction.undoStack);expect(screen.queryByRole('region',{name:'编辑效果预览'})).not.toBeInTheDocument()

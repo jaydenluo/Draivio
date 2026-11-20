@@ -13,6 +13,7 @@ describe('ModelSourcePicker', () => {
   it('opens the configured custom models in their original order while signed out', () => {
     render(<ModelSourcePicker sourceId="openai-custom" modelCode="image-last" onSourceChange={vi.fn()} onModelChange={vi.fn()} />)
     fireEvent.click(screen.getByRole('button', { name: /选择模型：image-last/ }))
+    expect(screen.getByRole('dialog', { name: '选择模型' }).closest('.composer-anchored-popover')?.parentElement).toBe(document.body)
     expect(screen.getByRole('searchbox', { name: '搜索模型或服务来源' })).toHaveFocus()
     const names = screen.getAllByRole('button').filter(button => button.hasAttribute('data-model-option')).map(button => button.getAttribute('aria-label'))
     expect(names).toEqual(['image-first · OpenAI · 个人', 'shared-image · OpenAI · 个人', 'image-last · OpenAI · 个人', 'shared-image · 火山引擎 · 工作'])

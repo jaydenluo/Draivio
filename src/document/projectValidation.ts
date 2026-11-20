@@ -16,6 +16,7 @@ import { smartObjectState, validateSmartObjectGraph, type SmartObjectSource } fr
 import { validateRawSourceRecord } from '../raw/rawPipeline'
 import { validateGeometryCommand } from '../ai/tools/geometryTools'
 import { validateArtboard } from '../canvas/artboards'
+import {validateRasterReference} from '../assets/imageAssetStore'
 
 type RecordValue = Record<string, unknown>
 function fail(path: string): never { throw new Error(`项目文档结构无效：${path}`) }
@@ -57,12 +58,14 @@ function operation(value: unknown, path: string) {
 function parameters(value: unknown, path: string) { const v = object(value, path); for (const key of ['model', 'size', 'ratio', 'count', 'strength']) string(v[key], `${path}.${key}`) }
 function stroke(value: unknown, path: string, layerIds: Set<string>) {
   const v = object(value, path); string(v.id, path, true); if (!layerIds.has(v.layerId as string)) fail(`${path}.layerId`)
+  if (v.endColor !== undefined && (typeof v.endColor !== 'string' || !/^#[0-9a-f]{6}$/i.test(v.endColor))) fail(`${path}.endColor`)
   choice(v.mode, ['paint', 'erase', 'mask'], path); string(v.color, path); number(v.size, path, 0)
   for (const key of ['hardness', 'opacity', 'flow', 'smoothing']) number(v[key], `${path}.${key}`, 0, 100)
   array(v.points, path).forEach(p => { point(p, path); const q = object(p, path); for (const key of ['pressure', 'tiltX', 'tiltY']) if (q[key] !== undefined) number(q[key], path) })
 }
 function validateLayer(value: unknown, path: string) {
   const layer = object(value, path)
+  if(layer.rasterRef!==undefined)validateRasterReference(layer.rasterRef)
   if (layer.posterProtection !== undefined) { const protection = object(layer.posterProtection, `${path}.posterProtection`); choice(protection.reason, ['logo-protected','source-protected'], `${path}.posterProtection.reason`); string(protection.sourceLayerId, `${path}.posterProtection.sourceLayerId`, true) }
   if (layer.highPrecision !== undefined) validatePrecisionAsset(layer.highPrecision)
   if (layer.warpRecipe !== undefined) { const recipe = object(layer.warpRecipe, `${path}.warpRecipe`); if (recipe.kind === 'perspective') validateGeometryCommand({ op: 'geometry', kind: 'perspective', quad: recipe.quad as never }); else if (recipe.kind === 'radial') validateGeometryCommand({ op: 'geometry', kind: 'radial', distortion: recipe.distortion as number, center: recipe.center as never }); else if (recipe.kind === 'mesh') validateGeometryCommand({ op: 'geometry', kind: 'mesh', controls: recipe.controls as never }); else fail(`${path}.warpRecipe.kind`) }
@@ -77,6 +80,7 @@ function validateLayer(value: unknown, path: string) {
   for (const key of ['locked', 'collapsed', 'documentSpace']) if (layer[key] !== undefined) bool(layer[key], `layer.${key}`)
   for (const key of ['source', 'thumbnail', 'repairCoverage']) if (layer[key] !== undefined) string(layer[key], `layer.${key}`, true)
   for (const key of ['contentWidth', 'contentHeight']) if (layer[key] !== undefined) number(layer[key], `layer.${key}`, Number.MIN_VALUE, 16384)
+  if (layer.sourceOffset !== undefined) point(layer.sourceOffset, 'layer.sourceOffset')
   if (layer.transform !== undefined) { const t = object(layer.transform, 'transform'); choice(t.kind, ['crop', 'transform'], 'transform.kind'); rect(t.rect, 'transform.rect'); number(t.rotation, 'transform.rotation'); bool(t.flipX, 'flipX'); bool(t.flipY, 'flipY'); if(t.affine!==undefined){const m=array(t.affine,'transform.affine');if(m.length!==6)fail('transform.affine');m.forEach(n=>number(n,'transform.affine'));if(Math.abs((m[0] as number)*(m[3] as number)-(m[1] as number)*(m[2] as number))<1e-8)fail('transform.affine不可逆')}  }
   if (layer.adjustmentsEnabled !== undefined) bool(layer.adjustmentsEnabled, 'layer.adjustmentsEnabled')
   if (layer.adjustments !== undefined) { const a = object(layer.adjustments, 'adjustments'); for (const key of ['brightness', 'contrast', 'saturation', 'temperature', 'sharpness', 'blur', 'shadows', 'highlights']) number(a[key], `adjustments.${key}`); if (a.tint !== undefined) number(a.tint, 'adjustments.tint', -100, 100); if (a.exposureEV !== undefined) number(a.exposureEV, 'adjustments.exposureEV', -24, 24); if (a.whiteBalance !== undefined) { const wb = object(a.whiteBalance, 'adjustments.whiteBalance'); for (const key of ['r','g','b']) number(wb[key], `adjustments.whiteBalance.${key}`, 0.01, 100) } if (a.curves !== undefined) validateCurves(a.curves); if (a.levels !== undefined) validateLevels(a.levels) }
@@ -105,6 +109,8 @@ export function validateCanvasText(value:unknown){
   number(o.fontSize, 'fontSize', Number.MIN_VALUE); choice(o.align, ['left', 'center', 'right'], 'align')
   if (o.layout !== undefined) choice(o.layout, ['point', 'paragraph'], `${key}.layout`)
   for (const field of ['width', 'height']) if (o[field] !== undefined) number(o[field], `${key}.${field}`, Number.MIN_VALUE)
+  if(o.opacity!==undefined)number(o.opacity,`${key}.opacity`,0,100)
+  for(const field of ['flipX','flipY'])if(o[field]!==undefined)bool(o[field],`${key}.${field}`)
   for (const field of ['lineHeight']) if (o[field] !== undefined) number(o[field], `${key}.${field}`, 0.1, 20)
   if (o.letterSpacing !== undefined) number(o.letterSpacing, `${key}.letterSpacing`, -100, 100)
   if (o.rotation !== undefined) number(o.rotation, `${key}.rotation`, -360, 360)
@@ -120,7 +126,10 @@ export function validateCanvasShape(value:unknown){
  const o=object(value,'canvasShapes')
  choice(o.kind, ['rectangle', 'ellipse', 'line', 'arrow', 'fill', 'gradient', 'path', 'boolean'], 'shape.kind'); rect(o.rect, 'shape.rect'); string(o.color, 'shape.color'); number(o.strokeWidth, 'strokeWidth', 0); if (o.endColor !== undefined) string(o.endColor, 'endColor'); if (o.opacity !== undefined) number(o.opacity, 'opacity', 0, 100); for (const field of ['from', 'to']) if (o[field] !== undefined) point(o[field], field); if (o.selection !== undefined) selection(o.selection, 'shape.selection'); if (o.kind === 'path') vectorPath(o.path, 'shape.path'); if (o.kind === 'boolean') { const b = object(o.boolean, 'shape.boolean'); choice(b.mode, ['union','difference','intersect','exclude'], 'boolean.mode'); vectorPath(b.left, 'boolean.left'); vectorPath(b.right, 'boolean.right'); if(b.sourceIds!==undefined) { strings(b.sourceIds,'boolean.sourceIds'); if((b.sourceIds as string[]).length!==2 || (b.sourceIds as string[])[0]===(b.sourceIds as string[])[1]) fail('boolean.sourceIds') } }
  for(const field of ['strokeColor','dashArray'])if(o[field]!==undefined)string(o[field],`shape.${field}`)
- for(const field of ['hidden','fillEnabled','scaleStroke'])if(o[field]!==undefined)bool(o[field],`shape.${field}`)
+ if(o.rotation!==undefined)number(o.rotation,'shape.rotation')
+ for(const field of ['arrowLength','arrowWidth'])if(o[field]!==undefined)number(o[field],`shape.${field}`,0,10000)
+ if(o.cornerRadii!==undefined){const radii=array(o.cornerRadii,'shape.cornerRadii');if(radii.length!==4)fail('shape.cornerRadii');radii.forEach(r=>number(r,'shape.cornerRadii',0,10000))}
+ for(const field of ['hidden','fillEnabled','scaleStroke','flipX','flipY','arrowStart','arrowEnd'])if(o[field]!==undefined)bool(o[field],`shape.${field}`)
  if(o.strokeLineCap!==undefined)choice(o.strokeLineCap,['butt','round','square'],'shape.strokeLineCap')
  if(o.strokeLineJoin!==undefined)choice(o.strokeLineJoin,['miter','round','bevel'],'shape.strokeLineJoin')
 }
@@ -164,7 +173,7 @@ export function validateDocument(value: unknown) {
     if(key==='canvasTexts')validateCanvasText(o)
     if(key==='canvasShapes')validateCanvasShape(o)
   })
-  for (const [id, mask] of Object.entries(object(v.layerMasks, 'layerMasks'))) { if (!ids.has(id)) fail('layerMasks.layerId'); const m = object(mask, 'mask'); bool(m.inverted, 'mask.inverted'); bool(m.applied, 'mask.applied'); array(m.strokes, 'mask.strokes').forEach(s => stroke(s, 'mask.stroke', ids)); if (m.selection !== undefined) selection(m.selection, 'mask.selection'); if (m.gradient !== undefined) { const g = object(m.gradient, 'mask.gradient'); point(g.from, 'from'); point(g.to, 'to') } if (m.refinement !== undefined) { const r = object(m.refinement, 'mask.refinement'); for (const key of ['smooth', 'shift', 'feather']) number(r[key], `mask.refinement.${key}`, -100, 100); number(r.density, 'mask.refinement.density', 0, 200); number(r.decontaminate, 'mask.refinement.decontaminate', 0, 100); bool(r.colorCorrection, 'mask.refinement.colorCorrection') } }
+  for (const [id, mask] of Object.entries(object(v.layerMasks, 'layerMasks'))) { if (!ids.has(id)) fail('layerMasks.layerId'); const m = object(mask, 'mask'); bool(m.inverted, 'mask.inverted'); bool(m.applied, 'mask.applied'); if (m.disabled !== undefined) bool(m.disabled, 'mask.disabled'); array(m.strokes, 'mask.strokes').forEach(s => stroke(s, 'mask.stroke', ids)); if (m.selection !== undefined) selection(m.selection, 'mask.selection'); if (m.gradient !== undefined) { const g = object(m.gradient, 'mask.gradient'); point(g.from, 'from'); point(g.to, 'to') } if (m.refinement !== undefined) { const r = object(m.refinement, 'mask.refinement'); for (const key of ['smooth', 'shift', 'feather']) number(r[key], `mask.refinement.${key}`, -100, 100); number(r.density, 'mask.refinement.density', 0, 200); number(r.decontaminate, 'mask.refinement.decontaminate', 0, 100); bool(r.colorCorrection, 'mask.refinement.colorCorrection') } }
   array(v.aiResults, 'aiResults').forEach(result => { const r = object(result, 'aiResult'); for (const key of ['id', 'prompt', 'model', 'provider', 'size', 'createdAt']) string(r[key], `aiResult.${key}`); choice(r.status, ['loading', 'success', 'partial-failure', 'error'], 'aiResult.status'); bool(r.favorite, 'favorite'); bool(r.adopted, 'adopted'); for (const key of ['source', 'thumbnail', 'error']) if (r[key] !== undefined) string(r[key], key); if (r.request !== undefined) operation(r.request, 'request')
     if (r.batchId !== undefined) string(r.batchId, 'aiResult.batchId', true)
     if (r.adoptions !== undefined) array(r.adoptions, 'aiResult.adoptions').forEach(value => {

@@ -5,7 +5,7 @@ type Position = { x: number; y: number }
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(Math.max(min, max), value))
 
 /** Shared header-only dragging. CSS translate preserves existing centering transforms. */
-export function useDraggableDialog(root: RefObject<HTMLElement | null>, resetKey: unknown = true) {
+export function useDraggableDialog(root: RefObject<HTMLElement | null>, resetKey: unknown = true, reanchorOnResize = false) {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 })
   const positionRef = useRef(position)
   const drag = useRef<{ pointerId: number; pointerX: number; pointerY: number; x: number; y: number; left: number; top: number; width: number; height: number } | null>(null)
@@ -24,6 +24,10 @@ export function useDraggableDialog(root: RefObject<HTMLElement | null>, resetKey
     const blur = () => { drag.current = null }
     const resize = () => {
       drag.current = null
+      if (reanchorOnResize) {
+        change({ x: 0, y: 0 })
+        return
+      }
       const rect = root.current?.getBoundingClientRect()
       if (!rect) return
       const current = positionRef.current
@@ -35,7 +39,7 @@ export function useDraggableDialog(root: RefObject<HTMLElement | null>, resetKey
     window.addEventListener('blur', blur)
     window.addEventListener('resize', resize)
     return () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', stop); window.removeEventListener('pointercancel', stop); window.removeEventListener('blur', blur); window.removeEventListener('resize', resize) }
-  }, [root])
+  }, [root, reanchorOnResize])
 
   const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
     if (event.button !== 0 || !(event.target instanceof Element) || drag.current) return

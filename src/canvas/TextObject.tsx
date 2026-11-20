@@ -11,12 +11,12 @@ export type CanvasTextObject = {
   id: string; layerId: string; x: number; y: number; text: string
   layout?: 'point' | 'paragraph'; width?: number; height?: number
   fontFamily: string; fontSize: number; fontWeight: string; color: string; align: 'left' | 'center' | 'right'
-  lineHeight?: number; letterSpacing?: number; rotation?: number; runs?: TextStyleRun[]
+  opacity?: number; flipX?: boolean; flipY?: boolean; lineHeight?: number; letterSpacing?: number; rotation?: number; runs?: TextStyleRun[]
 }
 
 type TextTransformGesture = { handle: string; start: SelectionPoint; startClient: { x: number; y: number }; object: CanvasTextObject; bounds: DOMRect | null; size: { width: number; height: number }; moved: boolean; target: HTMLElement; pointerId: number }
 
-export function TextObject({ object, onCommit, selected, onSelect, autoEdit = false, editOnClick = false, allowMoveOnSelect = false, onPreview, onEditStart, onEditEnd, toPoint, documentWidth = 500, documentHeight = 625 }: { object: CanvasTextObject; onCommit: (object: CanvasTextObject) => void; selected: boolean; onSelect?: () => void; autoEdit?: boolean; editOnClick?: boolean; allowMoveOnSelect?: boolean; onPreview?: (object: CanvasTextObject | null) => void; onEditStart?: () => void; onEditEnd?: () => void; toPoint?: (x: number, y: number) => SelectionPoint; documentWidth?: number; documentHeight?: number }) {
+export function TextObject({ object, onCommit, selected, onSelect, autoEdit = false, delegateMove = false, moving = false, editOnClick = false, allowMoveOnSelect = false, onPreview, onEditStart, onEditEnd, toPoint, documentWidth = 500, documentHeight = 625 }: { object: CanvasTextObject; onCommit: (object: CanvasTextObject) => void; selected: boolean; onSelect?: () => void; autoEdit?: boolean; delegateMove?: boolean; moving?: boolean; editOnClick?: boolean; allowMoveOnSelect?: boolean; onPreview?: (object: CanvasTextObject | null) => void; onEditStart?: () => void; onEditEnd?: () => void; toPoint?: (x: number, y: number) => SelectionPoint; documentWidth?: number; documentHeight?: number }) {
   const [editing, setEditing] = useState(false)
   const [overflow, setOverflow] = useState(false)
   const [draft, setDraft] = useState(object.text)
@@ -27,6 +27,7 @@ export function TextObject({ object, onCommit, selected, onSelect, autoEdit = fa
   const root = useRef<HTMLDivElement>(null)
   const transformGesture = useRef<TextTransformGesture | null>(null)
   const movedTransform = useRef(false)
+  if (moving) movedTransform.current = true
   const selectAllOnFocus = useRef(false)
   const composing = useRef(false)
   const finished = useRef(false)
@@ -146,9 +147,9 @@ export function TextObject({ object, onCommit, selected, onSelect, autoEdit = fa
   const layout = display.layout ?? 'point'
   const lineHeight = display.lineHeight ?? 1.4
   const previewText = layout === 'paragraph' ? wrapParagraphLines(display.text, display.width ?? 240, display.fontSize, display.letterSpacing ?? 0, display).join('\n') : display.text
-  const style = { left: `${display.x}%`, top: `${display.y}%`, width: layout === 'paragraph' ? `${display.width ?? 240}px` : 'max-content', minHeight: layout === 'paragraph' ? `${display.height ?? display.fontSize * 1.5}px` : undefined, fontFamily: normalizeFontFamily(display.fontFamily), fontSize: display.fontSize, fontWeight: display.fontWeight, color: display.color, textAlign: display.align, lineHeight, letterSpacing: `${display.letterSpacing ?? 0}px`, transform: `rotate(${display.rotation ?? 0}deg)`, transformOrigin: '0 0' }
+  const style = { left: `${display.x}%`, top: `${display.y}%`, width: layout === 'paragraph' ? `${display.width ?? 240}px` : 'max-content', minHeight: layout === 'paragraph' ? `${display.height ?? display.fontSize * 1.5}px` : undefined, fontFamily: normalizeFontFamily(display.fontFamily), fontSize: display.fontSize, fontWeight: display.fontWeight, color: display.color, textAlign: display.align, lineHeight, letterSpacing: `${display.letterSpacing ?? 0}px`, opacity:(display.opacity??100)/100, transform: `rotate(${display.rotation ?? 0}deg) scale(${display.flipX?-1:1},${display.flipY?-1:1})`, transformOrigin: '0 0' }
   const startEditing = (selectAll = false) => { if (editing) return; finished.current = false; selectAllOnFocus.current = selectAll; setDraft(object.text); onEditStart?.(); setEditing(true) }
-  return <div ref={root} data-text-overflow={overflow ? 'true' : undefined} title={overflow ? '文字超出文本框范围' : undefined} className={`canvas-text-object canvas-text-layout-${layout} ${selected ? 'selected' : ''} ${transforming ? 'is-transforming' : ''}`} style={style} onPointerDown={(event) => { movedTransform.current = false; if (!editing && (selected || allowMoveOnSelect)) down('move', allowMoveOnSelect)(event); else event.stopPropagation() }} onPointerMove={move} onPointerUp={up} onPointerCancel={cancelTransform} onClick={(event) => { onSelect?.(); if (editOnClick && !movedTransform.current && !(event.target instanceof Element && event.target.closest('button'))) startEditing(); movedTransform.current = false }} onDoubleClick={() => startEditing(false)}>
+  return <div ref={root} data-text-overflow={overflow ? 'true' : undefined} title={overflow ? '文字超出文本框范围' : undefined} className={`canvas-text-object canvas-text-layout-${layout} ${selected ? 'selected' : ''} ${transforming || moving ? 'is-transforming' : ''}`} style={style} onPointerDown={(event) => { movedTransform.current = false; if (delegateMove && !editing) return; if (!editing && (selected || allowMoveOnSelect)) down('move', allowMoveOnSelect)(event); else event.stopPropagation() }} onPointerMove={move} onPointerUp={up} onPointerCancel={cancelTransform} onClick={(event) => { if (delegateMove && (!selected || !editOnClick || event.shiftKey || movedTransform.current)) { movedTransform.current = false; return }; onSelect?.(); if (editOnClick && !movedTransform.current && !(event.target instanceof Element && event.target.closest('button'))) startEditing(); movedTransform.current = false }} onDoubleClick={() => { if (!delegateMove || selected) startEditing(false) }}>
     {editing ? <><span className="canvas-text canvas-text-edit-preview" aria-hidden="true">{draft || '\u200b'}</span><textarea ref={input} rows={1} className="canvas-text-editor" aria-label="编辑画布文字" value={draft} onCompositionStart={() => { composing.current = true }} onCompositionEnd={(event) => { composing.current = false; setDraft(event.currentTarget.value) }} onChange={(event) => setDraft(event.target.value)} onBlur={() => finish(true)} onKeyDown={(event) => {
       event.stopPropagation()
       if (event.key === 'Escape') { event.preventDefault(); finish(false) }

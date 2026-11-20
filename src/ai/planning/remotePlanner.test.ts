@@ -29,3 +29,14 @@ it('rejects visual upload for text-only/disabled models and drops aborted comple
  await expect(requestRemotePlan({...connection,enabled:false},'vision',state(),'d','move',['art'],{signal:new AbortController().signal})).rejects.toThrow(/不可用/)
  const c=new AbortController();c.abort();await expect(requestRemotePlan(connection,'vision',state(),'d','move',['art'],{signal:c.signal})).rejects.toThrow(/取消/);expect(fetcher).not.toHaveBeenCalled()
 })
+
+it('lets a recognized GPT text model plan without requiring extra capability metadata',async()=>{
+ const fetcher=vi.spyOn(globalThis,'fetch').mockResolvedValue(new Response(JSON.stringify({choices:[{message:{content:JSON.stringify(valid)}}]})))
+ const legacy={...connection,models:['gpt-6.5-sol'],modelCapabilities:undefined}
+ const result=await requestRemotePlan(legacy,'gpt-6.5-sol',state(),'doc','复杂排版规划',['art'],{signal:new AbortController().signal})
+ expect(result.steps).toHaveLength(1)
+ expect(JSON.parse(fetcher.mock.calls[0][1]!.body as string).model).toBe('gpt-6.5-sol')
+ expect(legacy.modelCapabilities).toBeUndefined()
+ await expect(requestRemotePlan(legacy,'gpt-6.5-sol',state(),'doc','查看参考图',['art'],{signal:new AbortController().signal,reference:{source:'data:image/png;base64,aGVsbG8=',name:'x'}})).rejects.toThrow(/视觉/)
+ expect(fetcher).toHaveBeenCalledTimes(1)
+})

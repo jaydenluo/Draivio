@@ -132,3 +132,11 @@ it('applies preset in one undoable transaction and resets predictably', () => {
   const reset = editorReducer(changed, { type: 'reset-layer-adjustments', id: 'photo' })
   expect(reset.layers[0].adjustments?.brightness).toBe(0)
 })
+
+it('round trips a disabled attached mask without changing its contents',async()=>{
+ const original=editorReducer(structuredClone(initialEditorState),{type:'add-layer-mask',id:'art'})
+ const disabled=editorReducer(original,{type:'update-layer-mask',id:'art',operation:'toggle'})
+ const loaded=decodeProject(await encodeProject(disabled,{id:'mask-state',name:'蒙版状态'}))
+ expect(loaded.document.layerMasks!.art).toEqual(disabled.layerMasks.art)
+ expect(loaded.document.layerMasks!.art.disabled).toBe(true)
+})

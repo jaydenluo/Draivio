@@ -1,0 +1,40 @@
+.dock-workspace { display:flex; flex-direction:column; flex:1 1 0; min-height:0; overflow:auto; position:relative; }
+.dock-group { position:relative; display:flex; flex-direction:column; flex-basis:var(--dock-header-height); flex-shrink:0; min-height:110px; min-width:0; overflow:hidden; background:var(--ink-900); }
+.dock-group.is-collapsed { flex:0 0 var(--dock-header-height); min-height:var(--dock-header-height); }
+.dock-header { display:flex; align-items:center; gap:4px; flex:0 0 var(--dock-header-height); height:var(--dock-header-height); padding:0 6px 0 8px; min-width:0; border-bottom:1px solid var(--ink-700); cursor:grab; touch-action:none; }
+.dock-header .dock-tabs.inspector-tabs { display:flex; flex:0 1 auto; gap:0; padding:0; margin:0; min-width:0; min-height:0; height:100%; border:0; overflow-x:auto; scrollbar-width:none; }
+.dock-header .dock-tabs::-webkit-scrollbar { display:none; }
+.dock-header .dock-tabs > button.property-tab { position:relative; flex:0 0 auto; min-width:0; padding:0 8px; margin:0; background:transparent; color:var(--muted); font-size:11px; border:0; user-select:none; touch-action:none; cursor:grab; white-space:nowrap; }
+.dock-header .dock-tabs > button.active { color:var(--text); }
+.dock-header .dock-tabs > button.active::after { content:''; position:absolute; bottom:0; height:2px; left:8px; right:8px; background:var(--coral); }
+.dock-group.is-single .dock-tabs > button { font-weight:600; }
+.dock-group.is-single .dock-tabs > button.active::after { display:none; }
+.dock-header-context { display:flex; align-items:center; flex:1 1 0; min-width:0; height:100%; }
+.dock-panel-header-tools { display:flex; align-items:center; justify-content:flex-end; gap:3px; min-width:0; width:100%; }
+.dock-panel-header-content { display:flex; align-items:center; justify-content:flex-end; flex:1; gap:3px; min-width:0; height:100%; }
+.dock-panel-header-tools[hidden] { display:none; }
+.dock-panel-header-tools .panel-header-caption,.dock-panel-header-tools .layers-board-name { display:block; flex:1 1 0; min-width:0; max-width:none; margin-left:auto; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--faint); font-size:10px; font-weight:400; }
+.dock-panel-header-tools .layers-icon-button { width:24px; height:24px; flex-basis:24px; }
+.dock-tabs > button:focus-visible { outline:1px solid var(--sky); outline-offset:-3px; }
+.dock-workspace.is-dragging,.dock-workspace.is-dragging .dock-header,.dock-workspace.is-dragging .dock-tabs > button { cursor:grabbing; user-select:none; }
+.dock-group-body { flex:1 1 0; min-height:0; overflow:hidden; }
+.dock-group-body[hidden],.dock-panel-host[hidden] { display:none; }
+.dock-panel-host,.dock-panel-host > .inspector-panel-content { height:100%; min-height:0; overflow:hidden; }
+.dock-panel-host > .inspector-panel-content > .inspector-panel { min-height:100%; box-sizing:border-box; }
+.dock-panel-host .inspector-panel { height:100%; scrollbar-width:none; }
+.dock-panel-host .inspector-panel::-webkit-scrollbar { display:none; }
+.dock-panel-host .layers-panel { padding-top:8px; }
+.panel-add-feature { padding:5px 2px; margin:4px 0; font-size:11px; color:var(--muted); background:transparent; cursor:pointer; }
+.panel-add-feature:hover { color:var(--text); }
+.dock-header .layers-icon-button:focus-visible { outline:1px solid var(--sky); outline-offset:-1px; }
+.dock-workspace .dock-tabs > button:focus-visible { outline:1px solid var(--sky); outline-offset:-3px; }
+.dock-splitter { flex:0 0 7px; position:relative; background:var(--ink-900); border-block:1px solid var(--ink-700); cursor:row-resize; touch-action:none; }
+.dock-splitter::after { content:''; position:absolute; left:calc(50% - 16px); top:2px; width:32px; height:1px; background:var(--faint); }
+.dock-splitter:hover,.dock-splitter:focus-visible,.is-resizing-panels .dock-splitter { background:var(--ink-800); outline:0; border-color:var(--coral); }
+.dock-splitter[aria-disabled=true] { cursor:default; }
+.dock-drop-indicator { position:absolute; z-index:30; left:3px; right:3px; pointer-events:none; border:2px solid var(--coral); background:rgba(255,118,95,.09); border-radius:3px; display:grid; place-items:center; }
+.dock-drop-indicator > span { padding:4px 8px; border-radius:4px; background:var(--ink-900); color:var(--coral-light); font-size:11px; }
+.dock-drop-before { top:2px; height:34px; }
+.dock-drop-after { bottom:2px; height:34px; }
+.dock-drop-merge { top:var(--dock-header-height); bottom:3px; }
+.dock-group.is-collapsed .dock-drop-merge { top:2px; }

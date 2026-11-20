@@ -20,10 +20,11 @@ it('protects locked layers and rejects unsupported blend values without history'
  expect(editorReducer(s,{type:'create-clipping',id:'top'}).undoStack).toHaveLength(0)
  expect(editorReducer(state(),{type:'set-layer-blend',id:'top',blendMode:'not-a-mode'}).undoStack).toHaveLength(0)
 })
-it('reorder and grouping release interrupted chains; a locked dependent blocks implicit release',()=>{
+it('reorder releases interrupted chains, grouping requires a complete chain, and locks block implicit release',()=>{
  let s=editorReducer(state(),{type:'create-clipping',id:'middle'});s=editorReducer(s,{type:'create-clipping',id:'top'})
  const reordered=editorReducer(s,{type:'reorder-layer',id:'base',direction:'up'});expect(reordered.layers.find(l=>l.id==='middle')?.clipBaseId).toBeUndefined();expect(reordered.layers.find(l=>l.id==='top')?.clipBaseId).toBe('base')
- const grouped=editorReducer(s,{type:'group-layers',ids:['base','extra']});expect(grouped.layers.every(l=>!l.clipBaseId)).toBe(true)
+ const grouped=editorReducer(s,{type:'group-layers',ids:['base','extra']});expect(grouped.layers).toBe(s.layers);expect(grouped.notice).toContain('完整的剪贴链')
+ const fullGroup=editorReducer(s,{type:'group-layers',ids:['top','middle','base']});expect(fullGroup.layers.find(l=>l.id==='top')?.clipBaseId).toBe('base');expect(()=>validateClipping(fullGroup.layers)).not.toThrow()
  s={...s,layers:s.layers.map(l=>l.id==='top'?{...l,locked:true}:l)}
  const blocked=editorReducer(s,{type:'delete-layer',id:'base'});expect(blocked.layers).toBe(s.layers);expect(blocked.undoStack).toBe(s.undoStack);expect(blocked.notice).toMatch(/锁定/)
 })

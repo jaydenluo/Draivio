@@ -1,7 +1,11 @@
 import { useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import { rulerTicks } from '../document/rulers'
+import './rulerOverlay.css'
 
-export function RulerOverlay({ width, height, zoom, anchorRef, toPoint, onCreate }: { width: number; height: number; zoom: number; anchorRef: RefObject<HTMLElement | null>; toPoint?: (x: number, y: number) => { x: number; y: number }; onCreate?: (axis: 'x' | 'y', position: number) => void }) {
+export const rulerHeight = 18
+export const rulerWidth = 20
+
+export function RulerOverlay({ width, height, zoom, anchorRef, offset, toPoint, onCreate }: { width: number; height: number; zoom: number; anchorRef: RefObject<HTMLElement | null>; offset?: {x:number;y:number}; toPoint?: (x: number, y: number) => { x: number; y: number }; onCreate?: (axis: 'x' | 'y', position: number) => void }) {
   const drag = useRef<'x' | 'y' | null>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
   const [anchor, setAnchor] = useState({ left: 0, top: 0, viewportWidth: 1, viewportHeight: 1 })
@@ -25,13 +29,13 @@ export function RulerOverlay({ width, height, zoom, anchorRef, toPoint, onCreate
     if (viewportRef.current) observer?.observe(viewportRef.current)
     window.addEventListener('resize', measure)
     return () => { observer?.disconnect(); window.removeEventListener('resize', measure) }
-  }, [anchorRef, width, height, zoom])
+  }, [anchorRef, width, height, zoom, offset?.x, offset?.y])
   const handlers = (axis: 'x' | 'y') => ({ onPointerDown: (event: React.PointerEvent) => { event.preventDefault(); event.stopPropagation(); drag.current = axis; (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId) }, onPointerMove: (event: React.PointerEvent) => { if (drag.current) event.stopPropagation() }, onPointerUp: (event: React.PointerEvent) => { event.stopPropagation(); if (drag.current && toPoint) { const p = toPoint(event.clientX, event.clientY); onCreate?.(drag.current, p[drag.current] * (drag.current === 'x' ? width : height) / 100) }; drag.current = null }, onPointerCancel: () => { drag.current = null } })
   const x = rulerTicks({ zoomPercent: Math.max(zoom, 1), originPx: anchor.left, viewportPx: anchor.viewportWidth })
   const y = rulerTicks({ zoomPercent: Math.max(zoom, 1), originPx: anchor.top, viewportPx: anchor.viewportHeight })
-  return <div ref={viewportRef} aria-label="像素标尺" data-export-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 22 }}>
-    <div aria-label="标尺交汇角" style={{ pointerEvents: 'none', position: 'absolute', left: 0, top: 0, width: 26, height: 20, background: '#171b21', borderRight: '1px solid #343b46', borderBottom: '1px solid #343b46' }} />
-    <div aria-label="拖出水平参考线" {...handlers('y')} style={{ pointerEvents: 'auto', position: 'absolute', top: 0, left: 26, right: 0, height: 20, background: '#1c2128', fontSize: 9, color: '#b5bbc4', overflow: 'hidden' }}>{x.filter(t => t.major && t.screen >= 26).map(t => <span key={t.value} style={{ position: 'absolute', left: t.screen, borderLeft: '1px solid #667080', paddingLeft: 2, height: 20 }}>{t.value}</span>)}</div>
-    <div aria-label="拖出垂直参考线" {...handlers('x')} style={{ pointerEvents: 'auto', position: 'absolute', top: 20, left: 0, bottom: 0, width: 26, background: '#1c2128', fontSize: 9, color: '#b5bbc4', overflow: 'hidden' }}>{y.filter(t => t.major && t.screen >= 20).map(t => <span key={t.value} style={{ position: 'absolute', top: t.screen, borderTop: '1px solid #667080', width: 26 }}>{t.value}</span>)}</div>
+  return <div ref={viewportRef} className="ruler-overlay" aria-label="像素标尺" data-export-hidden="true">
+    <div aria-label="标尺交汇角" className="ruler-corner" style={{width:rulerWidth,height:rulerHeight}} />
+    <div aria-label="拖出水平参考线" className="ruler-axis ruler-horizontal" {...handlers('y')} style={{left:rulerWidth,height:rulerHeight}}>{x.filter(t=>t.screen>=rulerWidth).map(t=><span key={t.value} data-ruler-tick={t.value} className={`ruler-tick${t.major?' major':''}`} style={{left:t.screen-rulerWidth}}><i aria-hidden="true"/>{t.major?<span className="ruler-number">{t.value}</span>:null}</span>)}</div>
+    <div aria-label="拖出垂直参考线" className="ruler-axis ruler-vertical" {...handlers('x')} style={{top:rulerHeight,width:rulerWidth}}>{y.filter(t=>t.screen>=rulerHeight).map(t=><span key={t.value} data-ruler-tick={t.value} className={`ruler-tick${t.major?' major':''}`} style={{top:t.screen-rulerHeight}}><i aria-hidden="true"/>{t.major?<span className="ruler-number">{t.value}</span>:null}</span>)}</div>
   </div>
 }

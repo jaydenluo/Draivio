@@ -10,3 +10,4 @@ beforeEach(() => window.localStorage.removeItem('draivio-generation-count'))
 beforeEach(() => window.localStorage.removeItem('draivio-composer-preferences-v1'))
 
 beforeEach(() => window.localStorage.removeItem('draivio-service-connections-v1'))
+beforeEach(() => window.localStorage.removeItem('draivio-assistant-selection-v1'))

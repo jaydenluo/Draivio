@@ -15,10 +15,23 @@ export type ImageModelCapabilities = {
   supportsStrength?: boolean
 }
 
+/** Built-in capabilities for the image models supported by the shipped adapters. */
+function presetCapabilities(connection: ServiceConnection, model: string): ImageModelCapabilities | undefined {
+  const normalized = model.trim().toLowerCase()
+  if (connection.protocol === 'openai_compatible' && /^gpt-image(?:-[\w.]+)*$/.test(normalized)) {
+    return { generate: true, edit: true, reference: true, encoding: 'multipart', sizes: ['auto', '1024x1024', '1536x1024', '1024x1536'], quality: ['auto', 'low', 'medium', 'high'], maskedEdit: { semantics: 'transparent-edit' } }
+  }
+  if (connection.protocol === 'volcengine' && /(?:^|[-_])seedream(?:[-_.\w]+)?$/.test(normalized)) {
+    return { generate: true, edit: true, reference: true, encoding: 'base64-json' }
+  }
+  return undefined
+}
+
 export function imageCapabilitiesFor(connection: ServiceConnection, model: string): ImageModelCapabilities {
   const declared = connection.imageCapabilities?.[model]
   if (declared) return declared
-  if(connection.protocol==='openai_compatible' && /^gpt-image(?:-[\w.]+)?$/.test(model))return {generate:true,edit:true,reference:true,encoding:'multipart',sizes:['auto','1024x1024','1536x1024','1024x1536'],quality:['auto','low','medium','high'],maskedEdit:{semantics:'transparent-edit'}}
+  const preset = presetCapabilities(connection, model)
+  if (preset) return preset
   return { generate: ['openai_compatible','volcengine'].includes(connection.protocol), edit:false, reference:false, encoding:'base64-json' }
 }
 export function imageSupports(capabilities: ImageModelCapabilities, intent: 'generate' | 'edit' | 'reference') {

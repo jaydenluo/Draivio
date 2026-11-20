@@ -1,3 +1,4 @@
+import { drawTestSelection } from '../test/selectionFixture'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 import { EditorProvider, editorReducer, initialEditorState, useEditor } from '../state/editor'
@@ -78,7 +79,7 @@ test('selection tool in new mode can move the interior of a combined selection',
 })
 
 test('moves the interior, adjusts edges, nudges with arrows and ignores input keys', () => {
-  setup(); tool(/矩形选框/)
+  setup(); drawTestSelection()
   const before = state().selection.rect
   drag(screen.getByLabelText('移动选区'), [150, 200], [175, 225])
   expect(state().selection.rect.x).toBeCloseTo(before.x + 5)
