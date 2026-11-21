@@ -145,3 +145,64 @@ it.each(['http://public.test','https://user:pass@cloud.test','https://cloud.test
  expect(()=>account.configureOrigin(origin)).toThrow('INVALID_CLOUD_ORIGIN')
  expect(account.getOrigin()).toBe('https://cloud.test');expect(account.getSnapshot().authenticated).toBe(true)
 })
+
+it('refreshes only the catalog, shares simultaneous requests, and keeps the last good models on failure', async () => {
+ const {account,calls,setHandler}=setup()
+ await account.passwordLogin('member@example.test','password-value')
+ calls.length=0
+ const next={...model,code:'new-image'}
+ let respond!:(response:Response)=>void
+ setHandler(()=>new Promise(resolve=>{respond=resolve}))
+ const first=account.refreshModels(), second=account.refreshModels()
+ expect(account.getSnapshot().models).toEqual([model])
+ expect(calls.map(call=>call.path)).toEqual(['/api/model-gateway/v1/models'])
+ respond(response({data:[next]}))
+ await Promise.all([first,second])
+ expect(account.getSnapshot()).toMatchObject({balance:42,models:[next]})
+ setHandler(()=>response({},503))
+ await expect(account.refreshModels()).rejects.toMatchObject({status:503})
+ expect(account.getSnapshot().models).toEqual([next])
+})
+
+it('ignores a catalog response that completes after signing out', async () => {
+ const {account,setHandler}=setup()
+ await account.passwordLogin('member@example.test','password-value')
+ let respond!:(response:Response)=>void
+ setHandler(path=>path.endsWith('/models')?new Promise(resolve=>{respond=resolve}):response({},204))
+ const pending=account.refreshModels()
+ await account.logout()
+ respond(response({data:[model]}))
+ await expect(pending).rejects.toMatchObject({code:'SESSION_CHANGED'})
+ expect(account.getSnapshot().models).toEqual([])
+})
+
+it('keeps the newer catalog when a slow account refresh completes later', async () => {
+ const {account,setHandler}=setup()
+ await account.passwordLogin('member@example.test','password-value')
+ let finishBalance!:(response:Response)=>void
+ let catalogs=0
+ const stale={...model,code:'stale-image'}
+ const latest={...model,code:'latest-image'}
+ setHandler(path=>{
+  if(path.endsWith('/me')) return response({email:'member@example.test'})
+  if(path.endsWith('/balance')) return new Promise(resolve=>{finishBalance=resolve})
+  return response({data:[++catalogs===1?stale:latest]})
+ })
+ const pending=account.refreshAccount()
+ await account.refreshModels()
+ finishBalance(response({balance:51}))
+ await pending
+ expect(account.getSnapshot()).toMatchObject({models:[latest],balance:51})
+ expect(vi.mocked(fetch).mock.calls.at(-1)?.[1]?.cache).toBe('no-store')
+})
+
+it('keeps the public publisher from the cloud model definition', async () => {
+  const {account,setHandler}=setup()
+  setHandler(path=>{
+    if(path.endsWith('password-login')) return response({accessToken:'fixture-access',refreshToken:'fixture-refresh'})
+    if(path.endsWith('/me')) return response({email:'member@example.test'})
+    if(path.endsWith('/balance')) return response({balance:0})
+    return response({data:[{...model,modelDefinition:{publisher:' OpenAI '}}]})
+  })
+  expect((await account.passwordLogin('member@example.test','fixture-password')).models[0]).toMatchObject({publisher:'OpenAI'})
+})

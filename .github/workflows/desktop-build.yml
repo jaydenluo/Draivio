@@ -41,6 +41,8 @@ jobs:
           targets: ${{ matrix.rust-targets }}
       - run: npm ci
       - name: Build desktop preview
+        env:
+          VITE_CLOUD_API_ORIGIN: ${{ vars.VITE_CLOUD_API_ORIGIN || 'https://www.moviviz.com' }}
         run: npm exec -- tauri build --ci --config src-tauri/tauri.preview.conf.json ${{ matrix.build-args }}
       - name: Archive macOS application
         if: runner.os == 'macOS'

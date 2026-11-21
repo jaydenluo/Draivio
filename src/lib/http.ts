@@ -3,7 +3,7 @@ export class RequestError extends Error {
   constructor(public kind: RequestErrorKind, message: string) { super(message); this.name = 'RequestError' }
 }
 export type JsonResponse = { status: number; body: unknown; retryAfter: number }
-export type JsonOptions = { method?: 'GET' | 'POST'; headers?: Record<string, string>; body?: unknown; timeoutMs?: number; signal?: AbortSignal; maxResponseBytes?: number }
+export type JsonOptions = { method?: 'GET' | 'POST'; headers?: Record<string, string>; body?: unknown; timeoutMs?: number; signal?: AbortSignal; maxResponseBytes?: number; cache?: 'no-store' }
 
 function retryDelay(header: string | null) {
   const value = header && /^\d+(\.\d+)?$/.test(header) ? Number(header) * 1000 : header ? Date.parse(header) - Date.now() : 1000
@@ -22,7 +22,7 @@ export async function requestJson(url: string, options: JsonOptions = {}): Promi
     const response = await fetch(url, {
       method: options.method ?? 'GET', headers: { ...(options.body !== undefined && !multipart ? { 'Content-Type': 'application/json' } : {}), ...options.headers },
       ...(options.body !== undefined ? { body: (multipart ? options.body : JSON.stringify(options.body)) as any } : {}),
-      redirect: 'error', signal: controller.signal,
+      redirect: 'error', signal: controller.signal, ...(options.cache ? { cache: options.cache } : {}),
     })
     const relayError = response.headers.get('x-draivio-relay-error')
     if (relayError) throw new RequestError(relayError === 'timeout' ? 'timeout' : 'network', relayError === 'timeout' ? '请求超时，请稍后重试' : '本机无法连接供应商，请检查网络、接口地址或代理设置')

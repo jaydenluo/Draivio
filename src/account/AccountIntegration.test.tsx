@@ -39,7 +39,7 @@ it('shows zero as a real queried balance, supports refresh, and exposes logout',
  fireEvent.click(screen.getByRole('button',{name:'退出登录'}))
  await waitFor(()=>expect(account.logout).toHaveBeenCalledOnce())
  view.unmount();render(<BillingDialog onClose={vi.fn()}/>)
- expect(screen.getByText('当前余额：0 积分')).toBeInTheDocument()
+ expect(screen.getByRole('dialog',{name:'云服务充值'})).toHaveTextContent('当前余额 0 积分')
  fireEvent.click(screen.getByRole('button',{name:'刷新余额'}))
  await waitFor(()=>expect(account.refreshAccount).toHaveBeenCalledOnce())
 })
@@ -49,7 +49,7 @@ it('keeps refresh failures visible without inventing a new balance',async()=>{
  render(<BillingDialog onClose={vi.fn()}/>)
  fireEvent.click(screen.getByRole('button',{name:'刷新余额'}))
  await screen.findByRole('alert')
- expect(screen.getByText('当前余额：12.5 积分')).toBeInTheDocument()
+ expect(screen.getByRole('dialog',{name:'云服务充值'})).toHaveTextContent('当前余额 12.5 积分')
 })
 
 

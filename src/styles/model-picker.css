@@ -1,21 +1,42 @@
 .model-source-picker { min-width:0; margin:4px 0 14px; }
-.model-source-picker.is-compact { margin:0; max-height:inherit; }
+.model-source-picker.is-compact { margin:0; height:100%; }
 .model-picker-trigger { display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; min-width:0; padding:8px 10px; border:1px solid var(--ink-700); border-radius:6px; background:var(--ink-850); text-align:left; }
 .model-picker-trigger>span:first-child { min-width:0; }
 .model-picker-trigger strong,.model-picker-trigger small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .model-picker-trigger strong { color:var(--text); font-size:12px; font-weight:500; }
 .model-picker-trigger small { margin-top:3px; color:var(--muted); font-size:10px; }
 .model-picker-trigger:hover,.model-picker-trigger[aria-expanded=true] { border-color:var(--sky); }
-.model-picker-panel { display:flex; flex-direction:column; gap:0; box-sizing:border-box; min-height:0; max-height:420px; margin-top:6px; padding:9px; border:1px solid var(--ink-700); border-radius:9px; background:var(--ink-800); color:var(--text); box-shadow:0 12px 32px #0005; }
-.is-compact>.model-picker-panel { margin:0; max-height:inherit; }
+.model-picker-panel { display:flex; flex-direction:column; gap:0; box-sizing:border-box; min-height:0; height:100%; padding:9px; border:1px solid var(--ink-700); border-radius:9px; background:var(--ink-800); color:var(--text); box-shadow:0 12px 32px #0005; }
+.model-picker-panel > .dialog-titlebar { flex-shrink:0; }
 .model-picker-heading { flex-shrink:0; margin-bottom:6px; }
 .model-picker-heading>strong { font-size:13px; font-weight:600; }
 .model-picker-panel .model-picker-search { flex-shrink:0; width:100%; height:32px; min-height:32px; padding:0 9px; border:1px solid var(--ink-700); border-radius:5px; background:var(--ink-850); font-size:12px; }
-.model-picker-results { min-height:0; flex:1; overflow-y:auto; overscroll-behavior:contain; margin:5px -4px 0; padding:0 4px; scrollbar-width:thin; }
+.model-picker-results {
+  --model-scroll-thumb: #a7afbc22;
+  min-height:0;
+  flex:1;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  margin:5px -4px 0;
+  padding:0 4px;
+}
+.model-picker-results:is(:hover, :focus-within) { --model-scroll-thumb: #a7afbc55; }
+.model-picker-results::-webkit-scrollbar { width:3px; }
+.model-picker-results::-webkit-scrollbar-track { background:transparent; }
+.model-picker-results::-webkit-scrollbar-thumb { background:var(--model-scroll-thumb); border-radius:999px; }
+@supports not selector(::-webkit-scrollbar) {
+  .model-picker-results { scrollbar-width:thin; scrollbar-color:var(--model-scroll-thumb) transparent; }
+}
 .model-picker-group+.model-picker-group { margin-top:5px; padding-top:3px; border-top:1px solid var(--ink-700); }
 .model-picker-group-heading { display:flex; align-items:baseline; justify-content:space-between; gap:8px; padding:4px 4px; color:var(--muted); font-size:11px; }
 .model-picker-group-heading>span { min-width:0; overflow-wrap:anywhere; }
 .model-picker-group-heading>small { flex-shrink:0; font-size:10px; }
+.model-picker-results button[data-model-group] { width:100%; min-height:26px; align-items:center; border:0; border-radius:5px; background:transparent; text-align:left; cursor:pointer; }
+.model-picker-results button[data-model-group]:hover { background:#77c7ff12; color:var(--text); }
+.model-picker-results button[data-model-group]:focus-visible { outline:1px solid var(--sky); outline-offset:-1px; }
+button[data-model-group]>span { display:flex; align-items:center; gap:7px; }
+.model-picker-chevron { flex:0 0 6px; width:6px; height:6px; border:solid currentColor; border-width:0 1px 1px 0; transform:rotate(-45deg); }
+button[data-model-group][aria-expanded=true] .model-picker-chevron { transform:rotate(45deg); }
 .model-picker-results .model-picker-option { display:flex; align-items:center; gap:8px; width:100%; min-height:28px; padding:4px 5px; border:1px solid transparent; border-radius:5px; background:transparent; color:var(--text); text-align:left; font-size:12px; line-height:1.3; }
 .model-picker-option>span:last-child { min-width:0; overflow-wrap:anywhere; }
 .model-picker-check { flex:0 0 15px; color:var(--sky); text-align:center; }

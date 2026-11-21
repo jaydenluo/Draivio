@@ -4,7 +4,7 @@ import {requestJson, type JsonOptions, type JsonResponse} from '../lib/http'
 
 export type CloudModel = {
   id:string; code:string; displayName:string; modality:string; capabilities:string[]; constraints:Record<string,unknown>
-  isDefault?:boolean; availability?:{available:boolean; reason?:string}; estimatedCredits?:number; pricing?:Record<string,unknown>
+  publisher?:string; isDefault?:boolean; availability?:{available:boolean; reason?:string}; estimatedCredits?:number; pricing?:Record<string,unknown>
 }
 export type CloudAccountSnapshot = {authenticated:boolean; user:{email:string}|null; balance:number|null; models:CloudModel[]}
 export type AuthPurpose = 'login'|'register'|'password_reset'
@@ -36,7 +36,9 @@ function modelsFrom(body:Record<string,unknown>):CloudModel[]{
     if(typeof data.code!=='string'&&typeof data.id==='string')data.code=data.id
     if(typeof data.id!=='string'||typeof data.code!=='string'||typeof data.displayName!=='string'||typeof data.modality!=='string'||!Array.isArray(data.capabilities)||!data.capabilities.every(x=>typeof x==='string'))throw new CloudAccountError('INVALID_MODEL_CATALOG')
     const available=object(data.availability)
-    return {id:data.id,code:data.code,displayName:data.displayName,modality:data.modality,capabilities:[...data.capabilities] as string[],constraints:object(data.constraints),...(typeof data.isDefault==='boolean'?{isDefault:data.isDefault}:{}),...(typeof available.available==='boolean'?{availability:{available:available.available,...(typeof available.reason==='string'?{reason:available.reason}:{})}}:{}),...(typeof data.estimatedCredits==='number'&&Number.isFinite(data.estimatedCredits)?{estimatedCredits:data.estimatedCredits}:{}),...(data.pricing?{pricing:object(data.pricing)}:{})}
+    const rawPublisher = object(data.modelDefinition).publisher
+    const publisher = typeof rawPublisher === 'string' ? rawPublisher.trim() : ''
+    return {id:data.id,code:data.code,displayName:data.displayName,modality:data.modality,capabilities:[...data.capabilities] as string[],constraints:object(data.constraints),...(publisher?{publisher}:{}),...(typeof data.isDefault==='boolean'?{isDefault:data.isDefault}:{}),...(typeof available.available==='boolean'?{availability:{available:available.available,...(typeof available.reason==='string'?{reason:available.reason}:{})}}:{}),...(typeof data.estimatedCredits==='number'&&Number.isFinite(data.estimatedCredits)?{estimatedCredits:data.estimatedCredits}:{}),...(data.pricing?{pricing:object(data.pricing)}:{})}
   })
 }
 const empty=():CloudAccountSnapshot=>({authenticated:false,user:null,balance:null,models:[]})
@@ -45,6 +47,9 @@ export function createCloudAccount(config:{origin:string}){
   let origin=originValue(config.origin)
   let snapshot=empty(), accessToken='', refreshToken='', epoch=0, authEpoch=0
   let refreshFlight:Promise<void>|null=null
+  let modelFlight: { session: number; promise: Promise<CloudModel[]> } | undefined
+  let catalogRequest = 0
+  let appliedCatalogRequest = 0
   const listeners=new Set<()=>void>()
   const publish=(next:CloudAccountSnapshot)=>{snapshot=next;for(const listener of listeners)listener()}
   const clear=()=>{accessToken='';refreshToken='';refreshFlight=null;publish(empty())}
@@ -56,7 +61,7 @@ export function createCloudAccount(config:{origin:string}){
     for(const [key,value] of Object.entries(options.headers??{}))if(!['authorization','cookie','x-moviviz-client'].includes(key.toLowerCase()))headers[key]=value
     headers['X-MOVIVIZ-Client']='desktop'
     if(token)headers.Authorization=`Bearer ${token}`
-    const requestOptions={...options,headers}
+    const requestOptions:JsonOptions={...options,headers,...(path==='/api/model-gateway/v1/models'?{cache:'no-store' as const}:{})}
     const response=isTauri()?await invokeCommand<JsonResponse>('cloud_account_request',{origin,path,options:{method:options.method??'GET',headers,body:options.body??null,timeoutMs:options.timeoutMs??10000,maxResponseBytes:options.maxResponseBytes??64*1024*1024}}):await requestJson(`${origin}${path}`,requestOptions)
     if(options.signal?.aborted)throw new CloudAccountError('REQUEST_CANCELLED')
     return response.status>=200&&response.status<300?response:{...response,body:{code:codeFor(response.body,response.status)}}
@@ -100,6 +105,24 @@ export function createCloudAccount(config:{origin:string}){
     if(!Number.isFinite(balance)||balance<0)throw new CloudAccountError('INVALID_ACCOUNT_RESPONSE')
     return {authenticated:true,user:{email:me.email},balance,models:modelsFrom(catalog)}
   }
+  function refreshModels(): Promise<CloudModel[]> {
+    const session = epoch
+    if (modelFlight?.session === session) return modelFlight.promise
+
+    const revision = ++catalogRequest
+    const promise = request('/api/model-gateway/v1/models').then(response => {
+      assertCurrent(session)
+      const models = modelsFrom(checked(response))
+      if (revision < appliedCatalogRequest) return snapshot.models
+      appliedCatalogRequest = revision
+      publish({ ...snapshot, models })
+      return models
+    }).finally(() => {
+      if (modelFlight?.promise === promise) modelFlight = undefined
+    })
+    modelFlight = { session, promise }
+    return promise
+  }
   async function authenticate(path:string,body:Record<string,unknown>){
     const attempt=++authEpoch,session=epoch
     const current=()=>{assertCurrent(session);if(attempt!==authEpoch)throw new CloudAccountError('SESSION_CHANGED')}
@@ -123,7 +146,17 @@ export function createCloudAccount(config:{origin:string}){
     registerWithoutCode:(email:string,password:string)=>authenticate('/api/auth/register',{email,password}),
     resetPassword:async(email:string,code:string,password:string)=>{checked(await transport('/api/auth/password-reset',{method:'POST',body:{email:email.trim().toLowerCase(),code,password}}))},
     logout:async()=>{const token=refreshToken;epoch++;authEpoch++;clear();if(token)checked(await transport('/api/auth/logout',{method:'POST',body:{refreshToken:token}}))},
-    refreshAccount:async()=>{const session=epoch;const next=await readAccount(p=>request(p));assertCurrent(session);publish(next);return snapshot},
+    refreshAccount: async () => {
+      const session = epoch
+      const revision = ++catalogRequest
+      const next = await readAccount(p => request(p))
+      assertCurrent(session)
+      const models = revision < appliedCatalogRequest ? snapshot.models : next.models
+      appliedCatalogRequest = Math.max(revision, appliedCatalogRequest)
+      publish({ ...next, models })
+      return snapshot
+    },
+    refreshModels,
     request,
   }
 }
