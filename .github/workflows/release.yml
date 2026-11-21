@@ -91,4 +91,4 @@ jobs:
           releaseDraft: true
           updaterJsonPreferNsis: true
           prerelease: false
-          args: --config src-tauri/tauri.release.conf.json
+          args: --bundles nsis --config src-tauri/tauri.release.conf.json
