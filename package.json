@@ -13,7 +13,8 @@
     "tauri:build": "npm run image-worker:build && tauri build",
     "test": "vitest",
     "image-worker:build": "sh src-tauri/image-worker/build.sh",
-    "image-worker:test": "node --test src-tauri/image-worker/tests/worker.test.mjs"
+    "image-worker:test": "node --test src-tauri/image-worker/tests/worker.test.mjs",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.12.4",
