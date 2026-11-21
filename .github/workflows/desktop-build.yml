@@ -11,20 +11,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  image-worker:
+    uses: ./.github/workflows/image-worker.yml
+
   package:
+    needs: image-worker
     name: ${{ matrix.name }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: macOS universal
-            runner: macos-latest
+            runner: macos-15
+            worker-platform: macos
+            worker-artifacts: image-worker-macos-*
             rust-targets: aarch64-apple-darwin,x86_64-apple-darwin
             build-args: --target universal-apple-darwin --bundles app --no-sign
             artifact: draivio-macos-universal
             package-path: src-tauri/target/universal-apple-darwin/release/bundle/macos/*.zip
           - name: Windows x64
             runner: windows-latest
+            worker-platform: windows
+            worker-artifacts: image-worker-windows-x64
             rust-targets: x86_64-pc-windows-msvc
             build-args: --target x86_64-pc-windows-msvc --bundles nsis
             artifact: draivio-windows-x64
@@ -32,6 +40,9 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -39,11 +50,33 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.rust-targets }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ matrix.worker-artifacts }}
+          path: native-archives
+          merge-multiple: true
+      - name: Stage image runtime
+        shell: bash
+        run: bash scripts/stage-image-worker.sh ${{ matrix.worker-platform }} native-archives
       - run: npm ci
       - name: Build desktop preview
         env:
           VITE_CLOUD_API_ORIGIN: ${{ vars.VITE_CLOUD_API_ORIGIN || 'https://www.moviviz.com' }}
         run: npm exec -- tauri build --ci --config src-tauri/tauri.preview.conf.json ${{ matrix.build-args }}
+      - name: Verify packaged macOS runtime
+        if: runner.os == 'macOS'
+        shell: bash
+        run: python3 src-tauri/image-worker/verify-runtime.py src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app/Contents/Resources/image-worker
+      - name: Verify installed Windows runtime
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $installer = @(Get-ChildItem 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis' -Filter '*.exe')
+          if ($installer.Count -ne 1) { throw 'Expected one NSIS installer' }
+          $destination = Join-Path $env:RUNNER_TEMP 'DraivioPreview'
+          $install = Start-Process -FilePath $installer[0].FullName -ArgumentList "/S /D=$destination" -Wait -PassThru
+          if ($install.ExitCode -ne 0) { throw "Installer exited $($install.ExitCode)" }
+          python src-tauri/image-worker/verify-runtime.py (Join-Path $destination 'image-worker')
       - name: Archive macOS application
         if: runner.os == 'macOS'
         working-directory: src-tauri/target/universal-apple-darwin/release/bundle/macos

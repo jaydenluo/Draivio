@@ -2,13 +2,16 @@
  * Exit codes: 64 invalid request, 65 invalid image, 66 unsupported precision,
  * 67 metadata/input budget, 70 runtime. Host owns staging and publication. */
 #include <vips/vips.h>
+#include <glib/gstdio.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#ifndef _WIN32
 #include <sys/resource.h>
+#endif
 static volatile gint warned=0;
 static void warning_log(const gchar *domain,GLogLevelFlags level,const gchar *message,gpointer data) { (void)domain;(void)level;(void)message;(void)data;g_atomic_int_set(&warned,1); }
 static int number(const char *s,int lo,int hi,int *out) {
@@ -24,7 +27,7 @@ static int metadata_budget(VipsImage *in) {
   g_value_unset(&value);
  }g_strfreev(fields);return 0;
 }
-int main(int argc,char **argv) {
+static int run_worker(int argc,char **argv) {
  if(argc==2&&!strcmp(argv[1],"capabilities")) {
   if(VIPS_INIT(argv[0]))return 70;
   if(!vips_type_find("VipsOperation","jpegload_source")||!vips_type_find("VipsOperation","pngload_source")||!vips_type_find("VipsOperation","tiffload_source")){vips_shutdown();return 70;}
@@ -34,10 +37,12 @@ int main(int argc,char **argv) {
  const char *op=argv[1];int edge=0;
  if(strcmp(op,"probe")&&strcmp(op,"preview")&&strcmp(op,"cache"))return 64;
  if(!strcmp(op,"preview")){if(argc!=5||number(argv[4],1,4096,&edge))return 64;}else if(argc!=4)return 64;
- struct stat st;if(stat(argv[2],&st)||!S_ISREG(st.st_mode)||st.st_size<=0||st.st_size>16LL*1024*1024*1024)return 67;
+ GStatBuf st;if(g_stat(argv[2],&st)||!S_ISREG(st.st_mode)||st.st_size<=0||st.st_size>16LL*1024*1024*1024)return 67;
+#ifndef _WIN32
  /* Limits complement host deadlines/quotas; RLIMIT_AS is not reliable on macOS. */
  struct rlimit disk={8ULL*1024*1024*1024,8ULL*1024*1024*1024};setrlimit(RLIMIT_FSIZE,&disk);
  struct rlimit cpu={120,120};setrlimit(RLIMIT_CPU,&cpu);
+#endif
  if(VIPS_INIT(argv[0]))return 70;
  g_log_set_handler("VIPS",G_LOG_LEVEL_WARNING,warning_log,NULL);
  vips_concurrency_set(2);vips_cache_set_max_mem(64*1024*1024);vips_cache_set_max(0);
@@ -78,3 +83,23 @@ int main(int argc,char **argv) {
  if(rc)fprintf(stderr,"image worker rejected operation (%d)\n",rc);
  if(display)g_object_unref(display);if(out)g_object_unref(out);if(in)g_object_unref(in);if(source)g_object_unref(source);vips_shutdown();return rc;
 }
+
+#ifdef _WIN32
+int wmain(int argc, wchar_t **argv) {
+ char **utf8 = g_new0(char *, argc + 1);
+ for (int index = 0; index < argc; index++) {
+  utf8[index] = g_utf16_to_utf8((const gunichar2 *)argv[index], -1, NULL, NULL, NULL);
+  if (!utf8[index]) {
+   g_strfreev(utf8);
+   return 64;
+  }
+ }
+ int result = run_worker(argc, utf8);
+ g_strfreev(utf8);
+ return result;
+}
+#else
+int main(int argc, char **argv) {
+ return run_worker(argc, argv);
+}
+#endif

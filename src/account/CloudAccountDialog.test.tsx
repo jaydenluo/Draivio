@@ -3,6 +3,9 @@ import {afterEach, beforeEach, expect, it, vi} from 'vitest'
 import {CloudAccountDialog} from './CloudAccountDialog'
 import {MessageHost} from '../components/MessageHost'
 import {RequestError} from '../lib/http'
+import {removeLegacyPasswords} from './rememberedLogin'
+
+vi.mock('./cloudSessionStorage',()=>({supportsRememberedSession:()=>true}))
 
 vi.mock('./CloudServiceConfig',()=>({CloudServiceConfig:()=>null}))
 const api=vi.hoisted(()=>({getOrigin:vi.fn(),codeLogin:vi.fn(),requestCode:vi.fn(),passwordLogin:vi.fn(),register:vi.fn(),registerWithoutCode:vi.fn(),resetPassword:vi.fn(),cancelPendingAuthentication:vi.fn()}))
@@ -10,136 +13,66 @@ vi.mock('./cloudAccount',()=>({cloudAccount:api}))
 beforeEach(()=>{localStorage.clear();Object.values(api).forEach(fn=>fn.mockReset());api.getOrigin.mockReturnValue('https://cloud.test')})
 afterEach(()=>vi.useRealTimers())
 
-it('remembers a successful password login by default and closes only on success',async()=>{
- const close=vi.fn();render(<><CloudAccountDialog onClose={close}/><MessageHost/></>)
- expect(screen.queryByText(/使用与幕影相同的云端账号/)).not.toBeInTheDocument()
- expect(screen.queryByText('云服务地址')).not.toBeInTheDocument()
- expect(screen.getByRole('checkbox',{name:'记住账号与密码'})).toBeChecked()
- fireEvent.change(screen.getByLabelText('邮箱'),{target:{value:'person@example.com'}})
- fireEvent.change(screen.getByLabelText('密码'),{target:{value:'not-a-real-secret'}})
- api.passwordLogin.mockRejectedValueOnce(new Error('邮箱或密码不正确'))
- fireEvent.click(screen.getByRole('button',{name:'登录'}))
- await screen.findByRole('alert');expect(close).not.toHaveBeenCalled()
- expect(JSON.stringify(localStorage)).not.toContain('not-a-real-secret')
- api.passwordLogin.mockResolvedValueOnce(undefined)
- fireEvent.click(screen.getByRole('button',{name:'登录'}))
- await waitFor(()=>expect(close).toHaveBeenCalledOnce())
- expect(api.passwordLogin).toHaveBeenLastCalledWith('person@example.com','not-a-real-secret')
- expect(JSON.stringify(localStorage)).toContain('not-a-real-secret')
-})
-
 function fillLogin(){
  fireEvent.change(screen.getByLabelText('邮箱'),{target:{value:'person@example.com'}})
  fireEvent.change(screen.getByLabelText('密码'),{target:{value:'not-a-real-secret'}})
 }
-async function rememberLogin(){
- const close=vi.fn(),view=render(<CloudAccountDialog onClose={close}/> )
- fillLogin();fireEvent.click(screen.getByRole('button',{name:'登录'}))
- await waitFor(()=>expect(close).toHaveBeenCalledOnce())
- view.unmount()
-}
 
-it('prefills remembered credentials when reopened and uses the shared checkbox',async()=>{
- await rememberLogin()
- render(<CloudAccountDialog onClose={vi.fn()}/> )
- expect(screen.getByRole('checkbox',{name:'记住账号与密码'})).toBeChecked()
+it('requests session persistence by default and only remembers the email in local storage',async()=>{
+ const close=vi.fn()
+ render(<CloudAccountDialog onClose={close}/>)
+ expect(screen.getByRole('checkbox',{name:'保持登录'})).toBeChecked()
  expect(screen.getByRole('checkbox')).toHaveClass('app-checkbox')
- expect(screen.getByLabelText('邮箱')).toHaveValue('person@example.com')
- expect(screen.getByLabelText('密码')).toHaveValue('not-a-real-secret')
- expect(screen.getByLabelText('密码')).toHaveAttribute('type','password')
- expect(api.passwordLogin).toHaveBeenCalledOnce()
-})
-
-it('clears saved credentials immediately on opting out and remembers the choice',async()=>{
- await rememberLogin()
- const view=render(<CloudAccountDialog onClose={vi.fn()}/> )
- fireEvent.click(screen.getByRole('checkbox',{name:'记住账号与密码'}))
- expect(JSON.stringify(localStorage)).not.toContain('not-a-real-secret')
- view.unmount();render(<CloudAccountDialog onClose={vi.fn()}/> )
- expect(screen.getByRole('checkbox',{name:'记住账号与密码'})).not.toBeChecked()
- expect(screen.getByLabelText('密码')).toHaveValue('')
- fillLogin();fireEvent.click(screen.getByRole('button',{name:'登录'}))
- await waitFor(()=>expect(api.passwordLogin).toHaveBeenCalledTimes(2))
- expect(JSON.stringify(localStorage)).not.toContain('not-a-real-secret')
-})
-
-it('does not overwrite remembered credentials on failed login or unsubmitted changes',async()=>{
- await rememberLogin()
- const view=render(<><CloudAccountDialog onClose={vi.fn()}/><MessageHost/></>)
- fireEvent.change(screen.getByLabelText('密码'),{target:{value:'wrong-password'}})
- api.passwordLogin.mockRejectedValueOnce(new Error('INVALID_CREDENTIALS'))
+ fillLogin()
  fireEvent.click(screen.getByRole('button',{name:'登录'}))
- await screen.findByRole('alert')
- view.unmount();render(<CloudAccountDialog onClose={vi.fn()}/> )
- expect(screen.getByLabelText('密码')).toHaveValue('not-a-real-secret')
- expect(JSON.stringify(localStorage)).not.toContain('wrong-password')
+ await waitFor(()=>expect(close).toHaveBeenCalledOnce())
+ expect(api.passwordLogin).toHaveBeenCalledWith('person@example.com','not-a-real-secret',true)
+ expect(JSON.stringify(localStorage)).toContain('person@example.com')
+ expect(JSON.stringify(localStorage)).not.toContain('not-a-real-secret')
 })
 
-it('isolates remembered credentials by cloud service address',async()=>{
- await rememberLogin()
- api.getOrigin.mockReturnValue('https://another-cloud.test')
- render(<CloudAccountDialog onClose={vi.fn()}/> )
- expect(screen.getByRole('checkbox',{name:'记住账号与密码'})).toBeChecked()
- expect(screen.getByLabelText('邮箱')).toHaveValue('')
+it('preserves the opt-out and requests an in-memory login',async()=>{
+ const view=render(<CloudAccountDialog onClose={vi.fn()}/>)
+ fireEvent.click(screen.getByRole('checkbox',{name:'保持登录'}))
+ view.unmount()
+ render(<CloudAccountDialog onClose={vi.fn()}/>)
+ expect(screen.getByRole('checkbox',{name:'保持登录'})).not.toBeChecked()
+ fillLogin()
+ fireEvent.click(screen.getByRole('button',{name:'登录'}))
+ await waitFor(()=>expect(api.passwordLogin).toHaveBeenCalledWith('person@example.com','not-a-real-secret',false))
+})
+
+it('migrates legacy credentials without autofilling their password or using another service’s email',()=>{
+ const key='draivio-remembered-login-v1:'+encodeURIComponent('https://cloud.test')
+ localStorage.setItem(key,JSON.stringify({remember:true,email:'person@example.com',password:'legacy-password'}))
+ removeLegacyPasswords()
+ expect(localStorage.getItem(key)).not.toContain('legacy-password')
+ const view=render(<CloudAccountDialog onClose={vi.fn()}/>)
+ expect(screen.getByLabelText('邮箱')).toHaveValue('person@example.com')
  expect(screen.getByLabelText('密码')).toHaveValue('')
+ view.unmount()
+ api.getOrigin.mockReturnValue('https://another-cloud.test')
+ render(<CloudAccountDialog onClose={vi.fn()}/>)
+ expect(screen.getByLabelText('邮箱')).toHaveValue('')
 })
 
-it('blocks submitting remembered credentials if the service changes while the dialog is open',async()=>{
- await rememberLogin()
+it('blocks submitting credentials if the service changes while the dialog is open',async()=>{
  render(<><CloudAccountDialog onClose={vi.fn()}/><MessageHost/></>)
+ fillLogin()
  api.getOrigin.mockReturnValue('https://another-cloud.test')
  fireEvent.click(screen.getByRole('button',{name:'登录'}))
  expect(await screen.findByRole('alert')).toHaveTextContent('云服务地址已变更，请关闭窗口后重新登录')
- expect(api.passwordLogin).toHaveBeenCalledOnce()
+ expect(api.passwordLogin).not.toHaveBeenCalled()
 })
 
-it('does not fill saved passwords in registration or recovery, and restores them only for the same login email',async()=>{
- await rememberLogin()
- render(<CloudAccountDialog onClose={vi.fn()}/> )
- fireEvent.click(screen.getByRole('button',{name:'注册账户'}))
- expect(screen.getByLabelText('密码')).toHaveValue('')
- expect(screen.queryByRole('checkbox',{name:'记住账号与密码'})).not.toBeInTheDocument()
- fireEvent.click(screen.getByRole('button',{name:'找回密码'}))
- expect(screen.getByLabelText('新密码')).toHaveValue('')
- fireEvent.click(screen.getByRole('button',{name:'登录账户'}))
- expect(screen.getByLabelText('密码')).toHaveValue('not-a-real-secret')
- fireEvent.change(screen.getByLabelText('邮箱'),{target:{value:'someone-else@example.com'}})
- expect(screen.getByLabelText('密码')).toHaveValue('')
-})
-
-it('still closes after login if storage is unavailable and reports the save failure',async()=>{
- const close=vi.fn();render(<><CloudAccountDialog onClose={close}/><MessageHost/></>)
- const storage=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('test storage unavailable')})
- try{
-  fillLogin();fireEvent.click(screen.getByRole('button',{name:'登录'}))
-  await waitFor(()=>expect(close).toHaveBeenCalledOnce())
-  expect(screen.getByText('已登录，但未能记住账号与密码')).toBeInTheDocument()
- }finally{storage.mockRestore()}
-})
-
-it('removes an old remembered password after resetting the same account',async()=>{
- await rememberLogin()
- const view=render(<CloudAccountDialog onClose={vi.fn()}/> )
- fireEvent.click(screen.getByRole('button',{name:'找回密码'}))
- fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'a-replacement-password'}})
- fireEvent.change(screen.getByLabelText('验证码'),{target:{value:'123456'}})
- fireEvent.click(screen.getByRole('button',{name:'重置密码'}))
- await screen.findByText('密码已重置，请使用新密码登录')
- expect(JSON.stringify(localStorage)).not.toContain('not-a-real-secret')
- view.unmount();render(<CloudAccountDialog onClose={vi.fn()}/> )
- expect(screen.getByLabelText('邮箱')).toHaveValue('person@example.com')
- expect(screen.getByLabelText('密码')).toHaveValue('')
-})
-
-it('does not claim stored credentials were cleared when the storage update fails',async()=>{
- await rememberLogin()
- render(<><CloudAccountDialog onClose={vi.fn()}/><MessageHost/></>)
- const storage=vi.spyOn(Storage.prototype,'setItem').mockImplementation(()=>{throw new Error('test storage unavailable')})
- try{
-  fireEvent.click(screen.getByRole('checkbox',{name:'记住账号与密码'}))
-  expect(screen.getByRole('checkbox')).toBeChecked()
-  expect(screen.getByText('未能更新记住密码设置，请重试')).toBeInTheDocument()
- }finally{storage.mockRestore()}
+it('continues a successful login and reports a system credential store failure',async()=>{
+ const close=vi.fn()
+ api.passwordLogin.mockResolvedValueOnce({sessionStorageFailed:true})
+ render(<><CloudAccountDialog onClose={close}/><MessageHost/></>)
+ fillLogin()
+ fireEvent.click(screen.getByRole('button',{name:'登录'}))
+ await waitFor(()=>expect(close).toHaveBeenCalledOnce())
+ expect(screen.getByText('已登录，但系统凭据库未能保存登录状态')).toBeInTheDocument()
 })
 
 it('shows a credential error when the cloud returns INVALID_PASSWORD',async()=>{
@@ -206,7 +139,7 @@ it('uses the same register and password-reset purposes as the shared cloud',asyn
  await waitFor(()=>expect(api.requestCode).toHaveBeenCalledWith('new@example.com','register'))
  fireEvent.change(screen.getByLabelText('验证码'),{target:{value:'123456'}})
  fireEvent.click(screen.getByRole('button',{name:'注册'}))
- await waitFor(()=>expect(api.register).toHaveBeenCalledWith('new@example.com','123456','a-long-password'))
+ await waitFor(()=>expect(api.register).toHaveBeenCalledWith('new@example.com','123456','a-long-password',true))
  fireEvent.click(screen.getByRole('button',{name:'找回密码'}))
  fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'replacement-password'}})
  fireEvent.change(screen.getByLabelText('验证码'),{target:{value:'654321'}})
@@ -229,7 +162,7 @@ it('registers without a code only after opting in and warns about email recovery
  fireEvent.change(screen.getByLabelText('密码'),{target:{value:'a-long-password'}})
  fireEvent.click(screen.getByRole('button',{name:'注册'}))
  await waitFor(()=>expect(close).toHaveBeenCalledOnce())
- expect(api.registerWithoutCode).toHaveBeenCalledWith('new@example.com','a-long-password')
+ expect(api.registerWithoutCode).toHaveBeenCalledWith('new@example.com','a-long-password',true)
  expect(api.requestCode).not.toHaveBeenCalled();expect(api.register).not.toHaveBeenCalled()
 })
 
@@ -267,6 +200,6 @@ it('supports code login without asking for a password',async()=>{
  await waitFor(()=>expect(api.requestCode).toHaveBeenCalledWith('member@example.com','login'))
  fireEvent.change(screen.getByLabelText('验证码'),{target:{value:'123456'}})
  fireEvent.click(screen.getByRole('button',{name:'登录'}))
- await waitFor(()=>expect(api.codeLogin).toHaveBeenCalledWith('member@example.com','123456'))
+ await waitFor(()=>expect(api.codeLogin).toHaveBeenCalledWith('member@example.com','123456',true))
  expect(close).toHaveBeenCalledOnce();expect(api.passwordLogin).not.toHaveBeenCalled()
 })

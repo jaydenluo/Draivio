@@ -70,11 +70,21 @@ pub fn worker_path(app: &tauri::AppHandle) -> Option<std::path::PathBuf> {
     } else {
         "draivio-image-worker"
     };
-    app.path()
-        .resource_dir()
-        .ok()
-        .map(|p| p.join("image-worker").join(name))
-        .filter(|p| p.is_file())
+    let root = app.path().resource_dir().ok()?.join("image-worker");
+    #[cfg(target_os = "macos")]
+    {
+        let architecture = if cfg!(target_arch = "aarch64") {
+            "macos-arm64"
+        } else {
+            "macos-x86_64"
+        };
+        let packaged = root.join(architecture).join(name);
+        if packaged.is_file() {
+            return Some(packaged);
+        }
+    }
+    let worker = root.join(name);
+    worker.is_file().then_some(worker)
 }
 #[tauri::command]
 pub async fn image_asset_pick(

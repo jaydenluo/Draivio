@@ -286,7 +286,7 @@ export function TopBar({ compact = false }: { compact?: boolean } = {}) {
                             .logout()
                             .catch(() =>
                               message.error(
-                                "本机已退出，云端会话撤销失败，请稍后重试",
+                                "退出登录未能清理全部会话凭据，请重新打开账户设置确认登录状态",
                               ),
                             );
                         }}

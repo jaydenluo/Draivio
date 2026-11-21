@@ -1,0 +1,48 @@
+name: Build native image runtime
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    name: Image worker (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            target: macos-arm64
+          - runner: macos-15-intel
+            target: macos-x86_64
+          - runner: windows-latest
+            target: windows-x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build macOS runtime
+        if: runner.os == 'macOS'
+        run: |
+          brew install meson ninja pkgconf glib expat libpng jpeg-turbo libtiff little-cms2 libexif zlib
+          python3 src-tauri/image-worker/package-macos.py native-runtime
+          python3 src-tauri/image-worker/verify-runtime.py native-runtime
+          tar -czf "${{ matrix.target }}.tar.gz" -C native-runtime .
+      - name: Build Windows runtime
+        if: runner.os == 'Windows'
+        run: |
+          python src-tauri/image-worker/bundle-windows.py native-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python src-tauri/image-worker/verify-runtime.py native-runtime
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          tar -czf "${{ matrix.target }}.tar.gz" -C native-runtime .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: image-worker-${{ matrix.target }}
+          path: ${{ matrix.target }}.tar.gz
+          if-no-files-found: error
+          retention-days: 3

@@ -1,7 +1,7 @@
 {
   "name": "draivio-desktop",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "predev": "node scripts/clear-dev-port.mjs 5173",

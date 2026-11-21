@@ -10,9 +10,13 @@ permissions:
   contents: write
 
 jobs:
+  image-worker:
+    uses: ./.github/workflows/image-worker.yml
+
   macos:
+    needs: image-worker
     name: macOS universal
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,12 +26,21 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: image-worker-macos-*
+          path: native-archives
+          merge-multiple: true
+      - name: Stage image runtime
+        shell: bash
+        run: bash scripts/stage-image-worker.sh macos native-archives
       - run: npm ci
       - run: node scripts/prepare-tauri-release.mjs
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
       - uses: tauri-apps/tauri-action@v0
         env:
+          VITE_CLOUD_API_ORIGIN: ${{ vars.VITE_CLOUD_API_ORIGIN || 'https://www.moviviz.com' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -36,11 +49,13 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: Draivio ${{ github.ref_name }}
           releaseBody: See the assets below for the macOS and Windows installers.
-          releaseDraft: false
+          releaseDraft: true
+          updaterJsonPreferNsis: true
           prerelease: false
           args: --target universal-apple-darwin --config src-tauri/tauri.release.conf.json
 
   windows:
+    needs: image-worker
     name: Windows x64
     runs-on: windows-latest
     steps:
@@ -50,12 +65,21 @@ jobs:
           node-version: 22
           cache: npm
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: image-worker-windows-x64
+          path: native-archives
+          merge-multiple: true
+      - name: Stage image runtime
+        shell: bash
+        run: bash scripts/stage-image-worker.sh windows native-archives
       - run: npm ci
       - run: node scripts/prepare-tauri-release.mjs
         env:
           GITHUB_REPOSITORY: ${{ github.repository }}
       - uses: tauri-apps/tauri-action@v0
         env:
+          VITE_CLOUD_API_ORIGIN: ${{ vars.VITE_CLOUD_API_ORIGIN || 'https://www.moviviz.com' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -64,6 +88,7 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: Draivio ${{ github.ref_name }}
           releaseBody: See the assets below for the macOS and Windows installers.
-          releaseDraft: false
+          releaseDraft: true
+          updaterJsonPreferNsis: true
           prerelease: false
           args: --config src-tauri/tauri.release.conf.json

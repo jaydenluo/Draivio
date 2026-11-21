@@ -9,15 +9,23 @@ The main Tauri cargo test also runs these tests and requires that same helper
 and fixture corpus; missing prerequisites are failures, not silent skips.
 
 Debug desktop runs may set **absolute** `DRAIVIO_IMAGE_WORKER` to this built
-helper. Only `cfg(debug_assertions)` reads this variable. Release resolves
-`resource_dir/image-worker/draivio-image-worker[.exe]`; tauri.conf bundles
-`image-worker/bin/` into that resource folder. Build the helper before Tauri
-packaging; there is no PATH search and no automatic browser fallback.
-The local build links Homebrew libraries. It is **not** a self-contained
-redistributable runtime. A release pipeline must supply a minimal relocated,
-signed libvips runtime and licenses (LI19); clean-machine macOS, Windows,
-Linux and WebView resource display remain unverified. This configuration
-provides the resource mapping, not proof that distribution requirements pass.
+helper. Only debug builds read this variable. The developer helper links to
+locally installed libvips.
+
+The GitHub desktop preview and release workflows build and stage a separate
+runtime for each target. The macOS universal app includes
+`image-worker/macos-arm64/` and `image-worker/macos-x86_64/`. The app selects
+the directory that matches the running process. Windows x64 installs the worker
+and its DLLs from `image-worker/`. Each runtime includes dependency notices.
+The workflow checks JPEG, PNG and TIFF metadata and previews after relocating
+the runtime. The preview workflow also checks the bundled macOS runtime and
+the runtime installed by the Windows installer.
+
+These checks exercise the worker. Full desktop validation also requires
+opening, editing, saving, reopening and exporting a project on clean machines.
+The worker supports JPEG, PNG and single-page TIFF preview. The current
+desktop import UI still limits compatibility editing to 16 MiB and does not
+support editing TIFF or high precision originals through this import path.
 
 ## Service contract
 

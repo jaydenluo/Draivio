@@ -206,3 +206,35 @@ it('keeps the public publisher from the cloud model definition', async () => {
   })
   expect((await account.passwordLogin('member@example.test','fixture-password')).models[0]).toMatchObject({publisher:'OpenAI'})
 })
+
+it('restores a remembered session after restart, saves the rotated token, and removes it on logout', async () => {
+ const {setHandler,calls}=setup()
+ let saved: string | null = null
+ const storage = {read: async () => saved, write: async (_origin:string, token:string|null) => {saved=token}}
+ const first=createCloudAccount({origin:'https://cloud.test',sessionStorage:storage})
+ await first.passwordLogin('member@example.test','password-value',true)
+ expect(saved).toBe('secret-refresh')
+ setHandler(path=>path.endsWith('/refresh')?response({accessToken:'rotated-access',refreshToken:'rotated-refresh'}):path.endsWith('/me')?response({email:'member@example.test'}):path.endsWith('/balance')?response({balance:42}):path.endsWith('/models')?response({data:[model]}):response({},204))
+ const restarted=createCloudAccount({origin:'https://cloud.test',sessionStorage:storage})
+ await Promise.all([restarted.restoreSession(),restarted.restoreSession()])
+ expect(restarted.getSnapshot().authenticated).toBe(true)
+ expect(saved).toBe('rotated-refresh')
+ expect(calls.filter(call=>call.path.endsWith('/refresh'))).toHaveLength(1)
+ expect(JSON.stringify(localStorage)).not.toContain('rotated-refresh')
+ await restarted.logout()
+ expect(saved).toBeNull()
+ expect(calls.at(-1)?.body).toEqual({refreshToken:'rotated-refresh'})
+})
+
+it('keeps a remembered session through a temporary refresh failure and removes revoked sessions', async () => {
+ const {setHandler}=setup()
+ let saved: string | null = 'saved-refresh'
+ const account=createCloudAccount({origin:'https://cloud.test',sessionStorage:{read:async()=>saved,write:async(_origin,token)=>{saved=token}}})
+ setHandler(()=>response({},503))
+ await expect(account.restoreSession()).rejects.toMatchObject({status:503})
+ expect(saved).toBe('saved-refresh')
+ setHandler(()=>response({code:'INVALID_REFRESH_TOKEN'},401))
+ await expect(account.restoreSession()).rejects.toMatchObject({status:401})
+ expect(saved).toBeNull()
+ expect(account.getSnapshot().authenticated).toBe(false)
+})

@@ -6,6 +6,7 @@ import {message} from '../ui/message'
 import {RequestError} from '../lib/http'
 import {cloudAccount} from './cloudAccount'
 import {readRememberedLogin,writeRememberedLogin} from './rememberedLogin'
+import {supportsRememberedSession} from './cloudSessionStorage'
 import './cloudAccount.css'
 
 type Mode='login'|'code'|'register'|'reset'
@@ -36,26 +37,20 @@ function accountErrorText(reason:unknown,mode:Mode){
 }
 export function CloudAccountDialog({onClose}:{onClose:()=>void}){
  const [origin]=useState(()=>cloudAccount.getOrigin())
+ const canRemember=supportsRememberedSession()
  const [remembered,setRemembered]=useState(()=>readRememberedLogin(origin))
- const [mode,setMode]=useState<Mode>('login'),[email,setEmail]=useState(remembered.email),[password,setPassword]=useState(remembered.password),[code,setCode]=useState('')
+ const [mode,setMode]=useState<Mode>('login'),[email,setEmail]=useState(remembered.email),[password,setPassword]=useState(''),[code,setCode]=useState('')
  const [skipRegistrationCode,setSkipRegistrationCode]=useState(false)
  const needsCode=mode==='code'||mode==='reset'||(mode==='register'&&!skipRegistrationCode)
  const [busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState(''),[remaining,setRemaining]=useState(0)
  const mounted=useRef(true),epoch=useRef(0)
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;epoch.current++;cloudAccount.cancelPendingAuthentication()}},[])
  useEffect(()=>{if(remaining<=0)return;const timer=setTimeout(()=>setRemaining(n=>n-1),1000);return()=>clearTimeout(timer)},[remaining])
- const switchMode=(next:Mode)=>{epoch.current++;cloudAccount.cancelPendingAuthentication();setMode(next);setSkipRegistrationCode(false);setPassword(next==='login'&&remembered.remember&&email.trim().toLowerCase()===remembered.email?remembered.password:'');setCode('');setError('');setNotice('');setBusy(false)}
+ const switchMode=(next:Mode)=>{epoch.current++;cloudAccount.cancelPendingAuthentication();setMode(next);setSkipRegistrationCode(false);setPassword('');setCode('');setError('');setNotice('');setBusy(false)}
  const changeRemember=(remember:boolean)=>{
-  const next={remember,email:'',password:''}
+  const next={remember,email:remembered.email}
   if(writeRememberedLogin(origin,next))setRemembered(next)
-  else message.warning('未能更新记住密码设置，请重试',{key:'cloud-account'})
- }
- const changeEmail=(value:string)=>{
-  if(mode==='login'&&remembered.password){
-   if(value.trim().toLowerCase()!==remembered.email&&password===remembered.password)setPassword('')
-   else if(value.trim().toLowerCase()===remembered.email&&!password)setPassword(remembered.password)
-  }
-  setEmail(value)
+  else message.warning('未能更新保持登录设置，请重试',{key:'cloud-account'})
  }
  const fail=(reason:unknown)=>message.error(accountErrorText(reason,mode),{key:'cloud-account'})
  const sameOrigin=()=>{
@@ -80,28 +75,24 @@ export function CloudAccountDialog({onClose}:{onClose:()=>void}){
   if(needsCode&&!/^\d{6}$/.test(code)){setError('请输入 6 位验证码');return}
   const attempt=epoch.current;setBusy(true);setError('');setNotice('')
   try{
-   if(mode==='login')await cloudAccount.passwordLogin(email.trim(),password)
-   else if(mode==='code')await cloudAccount.codeLogin(email.trim(),code)
+   const remember=canRemember&&remembered.remember
+   let result: {sessionStorageFailed?: boolean} | undefined
+   if(mode==='login')result=await cloudAccount.passwordLogin(email.trim(),password,remember)
+   else if(mode==='code')result=await cloudAccount.codeLogin(email.trim(),code,remember)
    else if(mode==='register'){
-    if(skipRegistrationCode)await cloudAccount.registerWithoutCode(email.trim(),password)
-    else await cloudAccount.register(email.trim(),code,password)
+    result=skipRegistrationCode
+      ? await cloudAccount.registerWithoutCode(email.trim(),password,remember)
+      : await cloudAccount.register(email.trim(),code,password,remember)
    }
    else await cloudAccount.resetPassword(email.trim(),code,password)
    if(!mounted.current||attempt!==epoch.current)return
    setPassword('');setCode('')
    if(mode==='reset'){
-    if(remembered.email===email.trim().toLowerCase()){
-     const next={...remembered,password:''};setRemembered(next)
-     if(!writeRememberedLogin(origin,next))message.warning('密码已重置，但未能清除本地记忆的旧密码',{key:'cloud-account'})
-    }
     setMode('login');setNotice('密码已重置，请使用新密码登录')
    }
    else {
-    if(mode==='login'&&remembered.remember){
-     const next={remember:true,email:email.trim().toLowerCase(),password}
-     if(writeRememberedLogin(origin,next))setRemembered(next)
-     else message.warning('已登录，但未能记住账号与密码',{key:'cloud-account'})
-    }
+    writeRememberedLogin(origin,{remember:remembered.remember,email:email.trim().toLowerCase()})
+    if(result?.sessionStorageFailed)message.warning('已登录，但系统凭据库未能保存登录状态',{key:'cloud-account-session'})
     if(mode==='register')message.success('注册成功，已自动登录',{key:'cloud-account'})
     onClose()
    }
@@ -112,9 +103,9 @@ export function CloudAccountDialog({onClose}:{onClose:()=>void}){
   <DialogTitlebar title="Draivio 云端账号" onClose={onClose}/>
   <div className="cloud-account-tabs" aria-label="账户操作">{([['login','登录账户'],['code','验证码登录'],['register','注册账户'],['reset','找回密码']] as const).map(([value,label])=><button key={value} type="button" aria-pressed={mode===value} disabled={busy} onClick={()=>switchMode(value)}>{label}</button>)}</div>
   <form onSubmit={submit}>
-   <label>邮箱<input type="email" name="email" autoComplete="username" required value={email} disabled={busy} onChange={e=>changeEmail(e.target.value)}/></label>
+   <label>邮箱<input type="email" name="email" autoComplete="username" required value={email} disabled={busy} onChange={e=>setEmail(e.target.value)}/></label>
    {mode!=='code'?<label>{mode==='reset'?'新密码':'密码'}<input type="password" name="password" autoComplete={mode==='login'?'current-password':'new-password'} required maxLength={128} minLength={mode==='login'?1:8} value={password} disabled={busy} onChange={e=>setPassword(e.target.value)}/></label>:null}
-   {mode==='login'?<label className="cloud-remember-toggle"><Checkbox checked={remembered.remember} disabled={busy} onChange={e=>changeRemember(e.target.checked)}/>记住账号与密码</label>:null}
+   {canRemember&&mode!=='reset'?<label className="cloud-remember-toggle"><Checkbox checked={remembered.remember} disabled={busy} onChange={e=>changeRemember(e.target.checked)}/>保持登录</label>:null}
    {mode==='register'?<div className="cloud-registration-option">
     <label className="cloud-register-toggle"><Checkbox checked={skipRegistrationCode} disabled={busy} aria-describedby={skipRegistrationCode?'registration-email-warning':undefined} onChange={e=>{setSkipRegistrationCode(e.target.checked);setCode('');setError('');setNotice('')}}/>免验证码注册</label>
     {skipRegistrationCode?<p id="registration-email-warning">请确保邮箱地址正确，否则无法找回密码。</p>:null}

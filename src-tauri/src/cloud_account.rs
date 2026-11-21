@@ -308,3 +308,66 @@ mod tests {
         assert_eq!(result.body, json!({"code":"INSUFFICIENT_CREDITS"}));
     }
 }
+
+#[cfg(any(target_os = "macos", target_os = "windows"))]
+fn session_entry(origin: &str) -> Result<keyring::Entry, String> {
+    validate(origin, "/api/auth/refresh", "POST")?;
+    let origin = reqwest::Url::parse(origin).map_err(|_| "INVALID_CLOUD_ORIGIN")?;
+    keyring::Entry::new(
+        "com.draivio.app.cloud-session",
+        &origin.origin().ascii_serialization(),
+    )
+    .map_err(|_| "CLOUD_SESSION_STORAGE_UNAVAILABLE".into())
+}
+
+#[tauri::command]
+pub async fn cloud_session_read(origin: String) -> Result<Option<String>, String> {
+    #[cfg(any(target_os = "macos", target_os = "windows"))]
+    return tauri::async_runtime::spawn_blocking(move || {
+        match session_entry(&origin)?.get_secret() {
+            Ok(secret) => String::from_utf8(secret)
+                .map(Some)
+                .map_err(|_| "INVALID_SAVED_SESSION".into()),
+            Err(keyring::Error::NoEntry) => Ok(None),
+            Err(_) => Err("CLOUD_SESSION_STORAGE_UNAVAILABLE".into()),
+        }
+    })
+    .await
+    .map_err(|_| "CLOUD_SESSION_STORAGE_UNAVAILABLE")?;
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        let _ = origin;
+        Ok(None)
+    }
+}
+
+#[tauri::command]
+pub async fn cloud_session_write(origin: String, token: Option<String>) -> Result<(), String> {
+    #[cfg(any(target_os = "macos", target_os = "windows"))]
+    return tauri::async_runtime::spawn_blocking(move || {
+        let entry = session_entry(&origin)?;
+        if token
+            .as_ref()
+            .is_some_and(|value| value.is_empty() || value.len() > 2048)
+        {
+            return Err("INVALID_SAVED_SESSION".into());
+        }
+        let result = match token {
+            Some(value) => entry.set_secret(value.as_bytes()),
+            None => match entry.delete_credential() {
+                Err(keyring::Error::NoEntry) => Ok(()),
+                result => result,
+            },
+        };
+        result.map_err(|_| "CLOUD_SESSION_STORAGE_UNAVAILABLE".into())
+    })
+    .await
+    .map_err(|_| "CLOUD_SESSION_STORAGE_UNAVAILABLE")?;
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        let _ = (origin, token);
+        Err("CLOUD_SESSION_STORAGE_UNAVAILABLE".into())
+    }
+}

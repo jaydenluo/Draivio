@@ -1137,8 +1137,14 @@ fn execute(
         .prefix("draivio-worker-scratch-")
         .tempdir()
         .map_err(|_| err("storage_unavailable"))?;
-    let mut child = Command::new(worker)
-        .args(args)
+    let mut command = Command::new(worker);
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        command.creation_flags(CREATE_NO_WINDOW);
+    }
+    let mut child = command.args(args)
         .env("TMPDIR", scratch.path())
         .env("TMP", scratch.path())
         .env("TEMP", scratch.path())

@@ -65,6 +65,8 @@ pub fn run() {
             image_commands::image_asset_cancel,
             image_commands::image_asset_dispose,
             cloud_account::cloud_account_request,
+            cloud_account::cloud_session_read,
+            cloud_account::cloud_session_write,
             result_library_settings::result_library_settings,
             result_library_settings::result_library_choose_directory,
             result_library_settings::result_library_reset_directory,
